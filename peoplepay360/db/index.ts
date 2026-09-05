@@ -4,21 +4,28 @@ import * as schema from './schema';
 
 const { Pool } = pg;
 
-let pool: pg.Pool | null = null;
+const globalForPostgres = globalThis as typeof globalThis & {
+  peoplePayPostgresPool?: pg.Pool;
+};
 
 export function getPgPool(): pg.Pool {
-  if (!pool) {
+  if (!globalForPostgres.peoplePayPostgresPool) {
     const connectionString = process.env.DATABASE_URL;
     if (!connectionString) {
       throw new Error(
         'DATABASE_URL environment variable is not set. Please set DATABASE_URL in .env.local (e.g. postgresql://postgres:password@localhost:5432/peoplepay360).'
       );
     }
-    pool = new Pool({
+    globalForPostgres.peoplePayPostgresPool = new Pool({
       connectionString,
+      // Keep one pool across Vinext hot reloads. Creating a new 25-connection
+      // pool for every module reload quickly exhausts a local PostgreSQL server.
+      max: 5,
+      connectionTimeoutMillis: 5000,
+      idleTimeoutMillis: 30000,
     });
   }
-  return pool;
+  return globalForPostgres.peoplePayPostgresPool;
 }
 
 export function getDb() {
