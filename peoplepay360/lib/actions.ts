@@ -66,7 +66,12 @@ export function mutate(source:Workspace,action:string,p:Record<string,any>,actor
  else if(['compute','validate','markPaid'].includes(action)){
   const r=s.payruns.find(x=>x.id===p.id);requireThat(r,'Payrun not found.');
   if(action==='compute'){requireThat(['Draft','Computed'].includes(r!.status),'Finalized payroll cannot be recomputed.');r!.slips=r!.employeeIds.map((id:string)=>computeSlip(s,id,r!.period,r!.structureId));r!.status='Computed';}
-  if(action==='validate'){requireThat(r!.status==='Computed'&&r!.slips.length===r!.employeeIds.length,'Compute all payslips before validation.');requireThat(!warnings(s,r!).length,warnings(s,r!).join('; '));r!.status='Validated';}
+  if(action==='validate'){
+   requireThat(r!.status==='Computed'&&r!.slips.length===r!.employeeIds.length,'Compute all payslips before validation.');
+   const blocking=warnings(s,r!).filter(w=>!w.includes('missing bank details'));
+   requireThat(!blocking.length,blocking.join('; '));
+   r!.status='Validated';
+  }
   if(action==='markPaid'){requireThat(r!.status==='Validated','Validate payroll before marking it paid.');r!.status='Paid';r!.paidAt=new Date().toISOString();}
  }
  else if(action==='clock'){
