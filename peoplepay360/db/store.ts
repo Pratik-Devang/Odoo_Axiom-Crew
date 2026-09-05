@@ -1,62 +1,47 @@
 import { seed, type Workspace } from '@/lib/domain';
 import { getPgPool } from './index';
-import type { PoolClient } from 'pg';
+import type { PoolClient, Pool } from 'pg';
 
 /**
  * Read the entire workspace from normalized PostgreSQL relational tables.
  */
 async function readRelational(client: PoolClient): Promise<Workspace> {
-  const [
-    employeesRes,
-    contractsRes,
-    attendanceRes,
-    requestsRes,
-    allocationsRes,
-    leaveTypesRes,
-    rulesRes,
-    structuresRes,
-    schedulesRes,
-    payrunsRes,
-    payslipsRes,
-    auditRes,
-  ] = await Promise.all([
-    client.query(
-      'SELECT id, name, email, COALESCE(phone, \'\') AS phone, department, position, type, status, COALESCE(manager, \'\') AS manager, COALESCE(location, \'Mumbai\') AS location, COALESCE(schedule_id, \'sch1\') AS "scheduleId", COALESCE(bank, \'\') AS bank FROM employees ORDER BY id'
-    ),
-    client.query(
-      `SELECT id, employee_id AS "employeeId", to_char(start_date, 'YYYY-MM-DD') AS "start", COALESCE(to_char(end_date, 'YYYY-MM-DD'), '') AS "end", wage::float AS wage, COALESCE(structure_id, '') AS "structureId", COALESCE(schedule_id, '') AS "scheduleId", status FROM contracts ORDER BY id`
-    ),
-    client.query(
-      `SELECT id, employee_id AS "employeeId", to_char(date, 'YYYY-MM-DD') AS "date", COALESCE(check_in, '') AS "checkIn", COALESCE(check_out, '') AS "checkOut", edited FROM attendance ORDER BY date, employee_id`
-    ),
-    client.query(
-      `SELECT id, employee_id AS "employeeId", type_id AS "typeId", to_char(start_date, 'YYYY-MM-DD') AS "start", to_char(end_date, 'YYYY-MM-DD') AS "end", duration::float AS duration, COALESCE(reason, '') AS reason, status, COALESCE(approver, '') AS approver FROM leave_requests ORDER BY id`
-    ),
-    client.query(
-      `SELECT id, employee_id AS "employeeId", type_id AS "typeId", amount::float AS amount, to_char(start_date, 'YYYY-MM-DD') AS "start", to_char(end_date, 'YYYY-MM-DD') AS "end", status FROM leave_allocations ORDER BY id`
-    ),
-    client.query(
-      'SELECT id, name, unit, requires_allocation AS "requiresAllocation" FROM leave_types ORDER BY id'
-    ),
-    client.query(
-      "SELECT id, name, code, category, sequence, method, COALESCE(base, '') AS base, COALESCE(value::float, 0) AS value, COALESCE(expression, '') AS expression FROM salary_rules ORDER BY sequence"
-    ),
-    client.query(
-      `SELECT s.id, s.name, s.active, COALESCE(array_remove(array_agg(sr.rule_id ORDER BY r.sequence), NULL), ARRAY[]::varchar[]) AS "ruleIds" FROM salary_structures s LEFT JOIN salary_structure_rules sr ON s.id = sr.structure_id LEFT JOIN salary_rules r ON sr.rule_id = r.id GROUP BY s.id, s.name, s.active ORDER BY s.id`
-    ),
-    client.query(
-      'SELECT id, name, days, start_time AS "start", end_time AS "end", break_hours::float AS "breakHours" FROM schedules ORDER BY id'
-    ),
-    client.query(
-      `SELECT p.id, p.name, p.period, COALESCE(p.structure_id, '') AS "structureId", p.status, COALESCE((SELECT array_agg(employee_id) FROM payrun_employees WHERE payrun_id = p.id), ARRAY[]::varchar[]) AS "employeeIds" FROM payruns p ORDER BY p.period`
-    ),
-    client.query(
-      'SELECT id, payrun_id AS "payrunId", employee_id AS "employeeId", period, COALESCE(structure_id, \'\') AS "structureId", COALESCE(contract_id, \'\') AS "contractId", basic::float AS basic, gross::float AS gross, deductions::float AS deductions, net::float AS net, worked_days AS "workedDays", lines FROM payslips ORDER BY id'
-    ),
-    client.query(
-      'SELECT id, action, to_char(at, \'YYYY-MM-DD"T"HH24:MI:SS"Z"\') AS at, actor FROM audit_logs ORDER BY at DESC LIMIT 100'
-    ),
-  ]);
+  const employeesRes = await client.query(
+    'SELECT id, name, email, COALESCE(phone, \'\') AS phone, department, position, type, status, COALESCE(manager, \'\') AS manager, COALESCE(location, \'Mumbai\') AS location, COALESCE(schedule_id, \'sch1\') AS "scheduleId", COALESCE(bank, \'\') AS bank FROM employees ORDER BY id'
+  );
+  const contractsRes = await client.query(
+    `SELECT id, employee_id AS "employeeId", to_char(start_date, 'YYYY-MM-DD') AS "start", COALESCE(to_char(end_date, 'YYYY-MM-DD'), '') AS "end", wage::float AS wage, COALESCE(structure_id, '') AS "structureId", COALESCE(schedule_id, '') AS "scheduleId", status FROM contracts ORDER BY id`
+  );
+  const attendanceRes = await client.query(
+    `SELECT id, employee_id AS "employeeId", to_char(date, 'YYYY-MM-DD') AS "date", COALESCE(check_in, '') AS "checkIn", COALESCE(check_out, '') AS "checkOut", edited FROM attendance ORDER BY date, employee_id`
+  );
+  const requestsRes = await client.query(
+    `SELECT id, employee_id AS "employeeId", type_id AS "typeId", to_char(start_date, 'YYYY-MM-DD') AS "start", to_char(end_date, 'YYYY-MM-DD') AS "end", duration::float AS duration, COALESCE(reason, '') AS reason, status, COALESCE(approver, '') AS approver FROM leave_requests ORDER BY id`
+  );
+  const allocationsRes = await client.query(
+    `SELECT id, employee_id AS "employeeId", type_id AS "typeId", amount::float AS amount, to_char(start_date, 'YYYY-MM-DD') AS "start", to_char(end_date, 'YYYY-MM-DD') AS "end", status FROM leave_allocations ORDER BY id`
+  );
+  const leaveTypesRes = await client.query(
+    'SELECT id, name, unit, requires_allocation AS "requiresAllocation" FROM leave_types ORDER BY id'
+  );
+  const rulesRes = await client.query(
+    "SELECT id, name, code, category, sequence, method, COALESCE(base, '') AS base, COALESCE(value::float, 0) AS value, COALESCE(expression, '') AS expression FROM salary_rules ORDER BY sequence"
+  );
+  const structuresRes = await client.query(
+    `SELECT s.id, s.name, s.active, COALESCE(array_remove(array_agg(sr.rule_id ORDER BY r.sequence), NULL), ARRAY[]::varchar[]) AS "ruleIds" FROM salary_structures s LEFT JOIN salary_structure_rules sr ON s.id = sr.structure_id LEFT JOIN salary_rules r ON sr.rule_id = r.id GROUP BY s.id, s.name, s.active ORDER BY s.id`
+  );
+  const schedulesRes = await client.query(
+    'SELECT id, name, days, start_time AS "start", end_time AS "end", break_hours::float AS "breakHours" FROM schedules ORDER BY id'
+  );
+  const payrunsRes = await client.query(
+    `SELECT p.id, p.name, p.period, COALESCE(p.structure_id, '') AS "structureId", p.status, COALESCE((SELECT array_agg(employee_id) FROM payrun_employees WHERE payrun_id = p.id), ARRAY[]::varchar[]) AS "employeeIds" FROM payruns p ORDER BY p.period`
+  );
+  const payslipsRes = await client.query(
+    'SELECT id, payrun_id AS "payrunId", employee_id AS "employeeId", period, COALESCE(structure_id, \'\') AS "structureId", COALESCE(contract_id, \'\') AS "contractId", basic::float AS basic, gross::float AS gross, deductions::float AS deductions, net::float AS net, worked_days AS "workedDays", lines FROM payslips ORDER BY id'
+  );
+  const auditRes = await client.query(
+    'SELECT id, action, to_char(at, \'YYYY-MM-DD"T"HH24:MI:SS"Z"\') AS at, actor FROM audit_logs ORDER BY at DESC LIMIT 100'
+  );
 
   const slipsByPayrun: Record<string, any[]> = {};
   for (const s of payslipsRes.rows) {
@@ -463,36 +448,29 @@ async function syncRelational(client: PoolClient, data: Workspace) {
 export async function readWorkspace(): Promise<{ data: Workspace; revision: number }> {
   if (process.env.DATABASE_URL) {
     const pool = getPgPool();
-    const client = await pool.connect();
-    try {
-      // 1. Check workspace revision
-      const revRes = await client.query('SELECT revision FROM workspace WHERE id = $1', ['demo']);
-      let revision = 0;
-      if (revRes.rows.length === 0) {
-        await client.query(
-          'INSERT INTO workspace (id, data, revision) VALUES ($1, $2, 0) ON CONFLICT (id) DO NOTHING',
-          ['demo', '{}']
-        );
-      } else {
-        revision = Number(revRes.rows[0].revision);
-      }
+    const res = await pool.query<{ data: string | object; revision: number }>(
+      'SELECT data, revision FROM workspace WHERE id = $1',
+      ['demo']
+    );
 
-      // 2. Check if relational tables have records
-      const empCount = await client.query('SELECT count(*) FROM employees');
-      if (Number(empCount.rows[0].count) === 0) {
-        // Seed relational data if empty
-        const initial = seed();
-        await client.query('BEGIN');
+    let row = res.rows[0];
+    if (!row || !row.data || row.data === '{}') {
+      const initial = seed();
+      await pool.query(
+        'INSERT INTO workspace (id, data, revision) VALUES ($1, $2, 0) ON CONFLICT (id) DO UPDATE SET data = $2, revision = 0',
+        ['demo', JSON.stringify(initial)]
+      );
+      const client = await pool.connect();
+      try {
         await syncRelational(client, initial);
-        await client.query('COMMIT');
-        return { data: initial, revision };
+      } finally {
+        client.release();
       }
-
-      const data = await readRelational(client);
-      return { data, revision };
-    } finally {
-      client.release();
+      return { data: initial, revision: 0 };
     }
+
+    const parsedData = typeof row.data === 'string' ? JSON.parse(row.data) : row.data;
+    return { data: parsedData as Workspace, revision: Number(row.revision) };
   }
 
   // Fallback to Cloudflare D1

@@ -16,6 +16,9 @@ export function getPgPool(): pg.Pool {
     }
     pool = new Pool({
       connectionString,
+      max: 25,
+      connectionTimeoutMillis: 5000,
+      idleTimeoutMillis: 30000,
     });
   }
   return pool;
