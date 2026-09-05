@@ -44,6 +44,7 @@ export const users = pgTable('users', {
   name: text('name').notNull(),
   roleId: text('role_id').notNull().references(() => roles.id),
   employeeId: text('employee_id').references(() => employees.id),
+  password: text('password'),
   active: boolean('active').notNull().default(true),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
 });

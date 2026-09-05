@@ -49,9 +49,13 @@ CREATE TABLE IF NOT EXISTS users (
     name VARCHAR(150) NOT NULL,
     role_id VARCHAR(50) NOT NULL REFERENCES roles(id) ON DELETE RESTRICT,
     employee_id VARCHAR(50) REFERENCES employees(id) ON DELETE SET NULL,
+    password VARCHAR(255),
     active BOOLEAN NOT NULL DEFAULT true,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Upgrade databases created before login support was introduced.
+ALTER TABLE users ADD COLUMN IF NOT EXISTS password VARCHAR(255);
 
 -- 5. SALARY STRUCTURES
 CREATE TABLE IF NOT EXISTS salary_structures (
@@ -188,6 +192,8 @@ VALUES
      '["employees:read","employees:write","contracts:read","contracts:write","attendance:read","attendance:write","leaves:approve"]'::jsonb),
     ('finance_manager', 'Finance & Payroll Manager', 'Compute payruns, validate salary disbursement, export banking files', 
      '["payroll:read","payroll:compute","payroll:validate","payroll:pay","employees:read","contracts:read"]'::jsonb),
+    ('payroll_user', 'HR Payroll User', 'Review payruns and compute payslip calculations',
+     '["payroll:read","payroll:compute","employees:read","contracts:read"]'::jsonb),
     ('employee', 'Standard Employee', 'Personal profile, self attendance clocking, and leave requests', 
      '["self:read","attendance:clock","leaves:request"]'::jsonb)
 ON CONFLICT (id) DO NOTHING;
@@ -415,6 +421,25 @@ BEGIN
             deductions = EXCLUDED.deductions;
     END IF;
 END $$;
+
+-- Demo credentials used by the local login screen. The employee link is
+-- populated when the matching sample employee exists and otherwise stays null.
+INSERT INTO users (id, email, name, role_id, employee_id, password, active)
+VALUES
+    ('demo_admin', 'admin@oxp.example', 'Demo Administrator', 'admin', NULL, 'admin123', true),
+    ('demo_payroll_manager', 'nisha@oxp.example', 'Nisha Rao', 'finance_manager',
+     (SELECT id FROM employees WHERE id = 'e6'), 'payrollmgr123', true),
+    ('demo_payroll_user', 'payroll.user@oxp.example', 'Payroll User', 'payroll_user', NULL, 'payroll123', true),
+    ('demo_hr_manager', 'sara@oxp.example', 'Sara Khan', 'hr_manager',
+     (SELECT id FROM employees WHERE id = 'e1'), 'hrmanager123', true),
+    ('demo_employee', 'john@oxp.example', 'John Dsouza', 'employee',
+     (SELECT id FROM employees WHERE id = 'e2'), 'employee123', true)
+ON CONFLICT (email) DO UPDATE SET
+    name = EXCLUDED.name,
+    role_id = EXCLUDED.role_id,
+    employee_id = COALESCE(EXCLUDED.employee_id, users.employee_id),
+    password = EXCLUDED.password,
+    active = true;
 
 -- ====================================================================
 -- CONVENIENCE VIEWS FOR PGADMIN 4
