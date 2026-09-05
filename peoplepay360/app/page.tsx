@@ -110,6 +110,60 @@ const DEMO_ACCOUNTS = [
   { role: 'Employee', email: 'john@oxp.example', password: 'employee123', desc: 'Self-service attendance, requests & payslips' },
 ];
 
+const EMPLOYEE_QUICK_LOGINS = [
+  { name: 'Aarav Mehta', position: 'Senior Payroll Manager', department: 'Finance', email: 'aarav.mehta@oxp.example' },
+  { name: 'Abhishek Roy', position: 'Business Development Representative', department: 'Sales', email: 'abhishek.roy@oxp.example' },
+  { name: 'Aditya Sen', position: 'Senior Backend Engineer', department: 'Engineering', email: 'aditya.sen@oxp.example' },
+  { name: 'Ananya Deshmukh', position: 'HR Business Partner', department: 'HR', email: 'ananya.deshmukh@oxp.example' },
+  { name: 'Ananya Iyer', position: 'Head of Product Design', department: 'Product', email: 'ananya.iyer@oxp.example' },
+  { name: 'Anik Dutta', position: 'Cloud Infrastructure Intern', department: 'Engineering', email: 'anik.dutta@oxp.example' },
+  { name: 'Arun Bhatia', position: 'Staff Backend Architect', department: 'Engineering', email: 'arun.bhatia@oxp.example' },
+  { name: 'Bhavna Parekh', position: 'Client Solutions Consultant', department: 'Sales', email: 'bhavna.parekh@oxp.example' },
+  { name: 'Chetan Bhagat', position: 'Technical Support Specialist', department: 'Support', email: 'chetan.bhagat@oxp.example' },
+  { name: 'Deepak Chopra', position: 'Senior DevOps / SRE', department: 'Engineering', email: 'deepak.chopra@oxp.example' },
+  { name: 'Dev Shah', position: 'Head of Enterprise Sales', department: 'Sales', email: 'dev.shah@oxp.example' },
+  { name: 'Divya Sundaram', position: 'Frontend Engineer', department: 'Engineering', email: 'divya.sundaram@oxp.example' },
+  { name: 'Gautam Singhania', position: 'HR Operations Specialist', department: 'HR', email: 'gautam.singhania@oxp.example' },
+  { name: 'Ishaan Kapoor', position: 'Support Operations Manager', department: 'Support', email: 'ishaan.kapoor@oxp.example' },
+  { name: 'John Dsouza', position: 'Frontend Lead Developer', department: 'Engineering', email: 'john.dsouza@oxp.example' },
+  { name: 'Kabir Sethi', position: 'Software Engineering Intern', department: 'Engineering', email: 'kabir.sethi@oxp.example' },
+  { name: 'Karthik Raja', position: 'Full Stack Engineer', department: 'Engineering', email: 'karthik.raja@oxp.example' },
+  { name: 'Kavita Joshi', position: 'Recruiting Coordinator', department: 'HR', email: 'kavita.joshi@oxp.example' },
+  { name: 'Kunal Kapoor', position: 'Regional Sales Manager (North)', department: 'Sales', email: 'kunal.kapoor@oxp.example' },
+  { name: 'Manish Tiwari', position: 'Payroll Specialist', department: 'Finance', email: 'manish.tiwari@oxp.example' },
+  { name: 'Maya Shah', position: 'Senior Account Executive', department: 'Sales', email: 'maya.shah@oxp.example' },
+  { name: 'Meera Nambiar', position: 'Compensation & Benefits Analyst', department: 'Finance', email: 'meera.nambiar@oxp.example' },
+  { name: 'Monika Sehgal', position: 'Client Care Associate', department: 'Support', email: 'monika.sehgal@oxp.example' },
+  { name: 'Natasha Thomas', position: 'Visual Designer', department: 'Product', email: 'natasha.thomas@oxp.example' },
+  { name: 'Naveen Kumar', position: 'QA Automation Engineer', department: 'Engineering', email: 'naveen.kumar@oxp.example' },
+  { name: 'Neha Patel', position: 'Talent Acquisition Lead', department: 'HR', email: 'neha.patel@oxp.example' },
+  { name: 'Nikhil Mathur', position: 'Helpdesk Analyst', department: 'Support', email: 'nikhil.mathur@oxp.example' },
+  { name: 'Nisha Rao', position: 'Director of Finance & Accounts', department: 'Finance', email: 'nisha.rao@oxp.example' },
+  { name: 'Pallavi Rao', position: 'Junior Frontend Developer', department: 'Engineering', email: 'pallavi.rao@oxp.example' },
+  { name: 'Pooja Bhatt', position: 'Customer Success Associate', department: 'Support', email: 'pooja.bhatt@oxp.example' },
+  { name: 'Pooja Hegde', position: 'Principal QA Engineer', department: 'Engineering', email: 'pooja.hegde@oxp.example' },
+  { name: 'Prashant Verma', position: 'Principal Product Manager', department: 'Product', email: 'prashant.verma@oxp.example' },
+  { name: 'Priya Nair', position: 'Customer Success Team Lead', department: 'Support', email: 'priya.nair@oxp.example' },
+  { name: 'Rahul Bose', position: 'Junior Backend Developer', department: 'Engineering', email: 'rahul.bose@oxp.example' },
+  { name: 'Rajesh Varma', position: 'Chief Executive Officer', department: 'Management', email: 'rajesh.varma@oxp.example' },
+  { name: 'Ritu Kulkarni', position: 'Senior Staff Accountant', department: 'Finance', email: 'ritu.kulkarni@oxp.example' },
+  { name: 'Rohan Patel', position: 'Engineering Director', department: 'Engineering', email: 'rohan.patel@oxp.example' },
+  { name: 'Sameer Qureshi', position: 'Sales Operations Coordinator', department: 'Sales', email: 'sameer.qureshi@oxp.example' },
+  { name: 'Sanya Mirza', position: 'Senior UX Researcher', department: 'Product', email: 'sanya.mirza@oxp.example' },
+  { name: 'Sara Khan', position: 'Head of People & Culture', department: 'HR', email: 'sara.khan@oxp.example' },
+  { name: 'Shreya Ghosh', position: 'Database Reliability Engineer', department: 'Engineering', email: 'shreya.ghosh@oxp.example' },
+  { name: 'Shruti Bhatt', position: 'UI/UX Mobile Developer', department: 'Engineering', email: 'shruti.bhatt@oxp.example' },
+  { name: 'Siddharth Roy', position: 'Accounts Payable Associate', department: 'Finance', email: 'siddharth.roy@oxp.example' },
+  { name: 'Sneha Chawla', position: 'Cloud Security Specialist', department: 'Engineering', email: 'sneha.chawla@oxp.example' },
+  { name: 'Sunita Menon', position: 'Chief Operating Officer', department: 'Management', email: 'sunita.menon@oxp.example' },
+  { name: 'Tanvi Agarwal', position: 'People Operations Intern', department: 'HR', email: 'tanvi.agarwal@oxp.example' },
+  { name: 'Tarun Saxena', position: 'Product Analyst', department: 'Product', email: 'tarun.saxena@oxp.example' },
+  { name: 'Varun Reddy', position: 'Data Platform Engineer', department: 'Engineering', email: 'varun.reddy@oxp.example' },
+  { name: 'Vikramaditya Rao', position: 'VP of Technology & Operations', department: 'Management', email: 'vikram.rao@oxp.example' },
+  { name: 'Zoya Khan', position: 'Inbound Sales Associate', department: 'Sales', email: 'zoya.khan@oxp.example' }
+].map(e => ({ ...e, password: 'welcome123' }));
+
+
 const DEFAULT_LOGIN = DEMO_ACCOUNTS[0];
 
 const ROLE_STYLES: Record<string, string> = {
@@ -153,6 +207,8 @@ export default function Home() {
   const [loginPassword, setLoginPassword] = useState(DEFAULT_LOGIN.password);
   const [loginError, setLoginError] = useState('');
   const [loginBusy, setLoginBusy] = useState(false);
+  const [loginDropdownOpen, setLoginDropdownOpen] = useState(false);
+  const [loginSearch, setLoginSearch] = useState('');
 
   // Admin users state
   const [systemUsers, setSystemUsers] = useState<any[]>([]);
@@ -581,6 +637,108 @@ export default function Home() {
               <span>{loginError}</span>
             </div>
           )}
+
+          {/* ── Employee Quick-Login Picker ─────────────────────── */}
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => { setLoginDropdownOpen(o => !o); setLoginSearch(''); }}
+              className="w-full flex items-center justify-between px-3 py-2 rounded-xl border border-[#e5ded4] bg-[#faf8f5] hover:border-slate-400 hover:bg-white transition-all text-left cursor-pointer"
+            >
+              <span className="flex items-center gap-2 text-xs text-slate-600 font-medium">
+                <Users size={13} className="text-[#c99a2e]" />
+                Quick Employee Login
+              </span>
+              <ChevronDown size={13} className={`text-slate-400 transition-transform duration-200 ${loginDropdownOpen ? 'rotate-180' : ''}`} />
+            </button>
+
+            {loginDropdownOpen && (() => {
+              const q = loginSearch.toLowerCase();
+              const filtered = EMPLOYEE_QUICK_LOGINS.filter(e =>
+                !q || e.name.toLowerCase().includes(q) || e.position.toLowerCase().includes(q) || e.department.toLowerCase().includes(q)
+              );
+              const grouped = Array.from(new Set(filtered.map(e => e.department))).sort().map(dept => ({
+                dept,
+                employees: filtered.filter(e => e.department === dept),
+              }));
+              const DEPT_COLORS: Record<string, string> = {
+                Executive: 'bg-purple-50 text-purple-700',
+                Management: 'bg-purple-50 text-purple-700',
+                Engineering: 'bg-blue-50 text-blue-700',
+                Finance: 'bg-emerald-50 text-emerald-700',
+                HR: 'bg-rose-50 text-rose-700',
+                Marketing: 'bg-orange-50 text-orange-700',
+                Product: 'bg-indigo-50 text-indigo-700',
+                Sales: 'bg-amber-50 text-amber-800',
+                Support: 'bg-teal-50 text-teal-700',
+              };
+              return (
+                <div className="absolute z-50 top-full mt-1.5 left-0 right-0 bg-white border border-[#e5ded4] rounded-2xl shadow-lg overflow-hidden">
+                  {/* Search bar */}
+                  <div className="flex items-center gap-2 px-3 py-2 border-b border-[#f0ece5] bg-[#faf8f5]">
+                    <Search size={12} className="text-slate-400 shrink-0" />
+                    <input
+                      autoFocus
+                      type="text"
+                      value={loginSearch}
+                      onChange={e => setLoginSearch(e.target.value)}
+                      placeholder="Search name, position or department…"
+                      className="w-full text-xs outline-none bg-transparent text-slate-700 placeholder:text-slate-400"
+                    />
+                    {loginSearch && (
+                      <button type="button" onClick={() => setLoginSearch('')} className="text-slate-400 hover:text-slate-600">
+                        <XCircle size={12} />
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Results */}
+                  <div className="max-h-64 overflow-y-auto">
+                    {grouped.length === 0 ? (
+                      <div className="text-center text-xs text-slate-400 py-6">No matching employees</div>
+                    ) : (
+                      grouped.map(({ dept, employees: emps }) => (
+                        <div key={dept}>
+                          <div className={`px-3 py-1 text-[9px] font-bold uppercase tracking-widest ${DEPT_COLORS[dept] || 'bg-slate-50 text-slate-600'}`}>
+                            {dept}
+                          </div>
+                          {emps.map(emp => (
+                            <button
+                              key={emp.email}
+                              type="button"
+                              onClick={() => {
+                                setLoginEmail(emp.email);
+                                setLoginPassword(emp.password);
+                                setLoginDropdownOpen(false);
+                                setLoginSearch('');
+                              }}
+                              className="w-full flex items-center justify-between px-3 py-2 hover:bg-[#faf8f5] transition-colors text-left group"
+                            >
+                              <div className="flex items-center gap-2.5 min-w-0">
+                                <div className="w-6 h-6 rounded-lg bg-slate-100 flex items-center justify-center text-[9px] font-bold text-slate-600 group-hover:bg-slate-800 group-hover:text-white transition-colors shrink-0">
+                                  {emp.name.split(' ').map((n: string) => n[0]).slice(0, 2).join('')}
+                                </div>
+                                <div className="min-w-0">
+                                  <div className="text-xs font-semibold text-slate-800 leading-tight truncate">{emp.name}</div>
+                                  <div className="text-[10px] text-slate-400 truncate">{emp.position}</div>
+                                </div>
+                              </div>
+                              <span className="text-[10px] text-[#c99a2e] font-semibold shrink-0 ml-2 opacity-0 group-hover:opacity-100 transition-opacity">Fill →</span>
+                            </button>
+                          ))}
+                        </div>
+                      ))
+                    )}
+                  </div>
+
+                  {/* Footer hint */}
+                  <div className="px-3 py-1.5 border-t border-[#f0ece5] bg-[#faf8f5] text-[9px] text-slate-400 text-center">
+                    All employees · password: <span className="font-mono font-semibold text-slate-500">welcome123</span>
+                  </div>
+                </div>
+              );
+            })()}
+          </div>
 
           <form
             onSubmit={(e) => {
