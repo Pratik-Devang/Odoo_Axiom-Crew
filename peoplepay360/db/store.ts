@@ -409,13 +409,14 @@ async function syncRelational(client: PoolClient, data: Workspace) {
 
     await client.query(
       `
-      INSERT INTO payrun_employees (payrun_id, employee_id)
+      INSERT INTO payrun_employees (payrun_id, employee_id, period)
       SELECT
         p->>'id',
-        e.employee_id
+        e.employee_id,
+        p->>'period'
       FROM jsonb_array_elements($1::jsonb) AS p,
       LATERAL jsonb_array_elements_text(p->'employeeIds') AS e(employee_id)
-      ON CONFLICT (payrun_id, employee_id) DO NOTHING
+      ON CONFLICT (payrun_id, employee_id) DO UPDATE SET period = EXCLUDED.period
     `,
       [JSON.stringify(data.payruns)]
     );

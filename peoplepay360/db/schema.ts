@@ -1,4 +1,4 @@
-import { pgTable, text, integer, numeric, date, boolean, jsonb, timestamp, primaryKey } from 'drizzle-orm/pg-core';
+import { pgTable, text, integer, numeric, date, boolean, jsonb, timestamp, primaryKey, uniqueIndex } from 'drizzle-orm/pg-core';
 
 // 1. Roles (RBAC)
 export const roles = pgTable('roles', {
@@ -170,9 +170,11 @@ export const payrunEmployees = pgTable(
   {
     payrunId: text('payrun_id').notNull().references(() => payruns.id),
     employeeId: text('employee_id').notNull().references(() => employees.id),
+    period: text('period').notNull(),
   },
   (table) => [
     primaryKey({ columns: [table.payrunId, table.employeeId] }),
+    uniqueIndex('uq_payrun_employee_period').on(table.employeeId, table.period),
   ]
 );
 
@@ -194,7 +196,10 @@ export const payslips = pgTable('payslips', {
   payableDays: numeric('payable_days').notNull().default('0'),
   lines: jsonb('lines').notNull().default([]),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
-});
+}, (table) => [
+  uniqueIndex('uq_payslip_payrun_employee').on(table.payrunId, table.employeeId),
+  uniqueIndex('uq_payslip_employee_period').on(table.employeeId, table.period),
+]);
 
 // 16. Audit Logs
 export const auditLogs = pgTable('audit_logs', {
