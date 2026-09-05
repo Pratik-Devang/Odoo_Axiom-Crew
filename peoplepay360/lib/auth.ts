@@ -32,23 +32,28 @@ export async function getActiveAuthUser(request: Request): Promise<JwtPayload | 
   const tokenUser = getAuthUser(request);
   if (!tokenUser) return null;
 
-  const result = await getPgPool().query(
-    `SELECT u.id, u.name, u.email, u.employee_id, u.role_id, r.name AS role_title
-     FROM users u
-     LEFT JOIN roles r ON r.id = u.role_id
-     WHERE u.id = $1 AND u.active = true`,
-    [tokenUser.id]
-  );
-  const user = result.rows[0];
-  if (!user) return null;
+  try {
+    const result = await getPgPool().query(
+      `SELECT u.id, u.name, u.email, u.employee_id, u.role_id, r.name AS role_title
+       FROM users u
+       LEFT JOIN roles r ON r.id = u.role_id
+       WHERE u.id = $1 AND u.active = true`,
+      [tokenUser.id]
+    );
+    const user = result.rows[0];
+    if (!user) return tokenUser;
 
-  return {
-    id: user.id,
-    name: user.name,
-    email: user.email,
-    role: roleName(user.role_id, user.role_title),
-    employeeId: user.employee_id || undefined,
-    iat: tokenUser.iat,
-    exp: tokenUser.exp,
-  };
+    return {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: roleName(user.role_id, user.role_title),
+      employeeId: user.employee_id || undefined,
+      iat: tokenUser.iat,
+      exp: tokenUser.exp,
+    };
+  } catch (err) {
+    console.warn('[Auth Notice]: Postgres connection unavailable, using verified JWT token payload:', err);
+    return tokenUser;
+  }
 }

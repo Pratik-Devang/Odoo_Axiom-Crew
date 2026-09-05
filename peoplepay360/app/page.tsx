@@ -48,6 +48,8 @@ import {
 import { Avatar, Badge, DataTable, Field, Picker, niceMonth, downloadCsv } from '@/components/peoplepay-ui';
 import Dashboard from '@/components/payroll-dashboard';
 import WorkingSchedules from '@/components/working-schedules';
+import { EmployeeRosterList } from '@/components/dashboard/EmployeeRosterList';
+import { getEmployeeRosterRows } from '@/lib/dashboard-calculations';
 import RecordForm, { defaults, titles } from '@/components/record-form';
 import {
   PageShell,
@@ -954,62 +956,30 @@ export default function Home() {
         )}
       </>
     );
-    const filteredOverviewEmployees = s.employees.filter(
-      (e) =>
-        (department === 'All' || e.department === department) &&
-        (employeeType === 'All' || e.type === employeeType) &&
-        (!query ||
-          [e.name, e.department, e.position, e.type].some((x) =>
-            x.toLowerCase().includes(query.toLowerCase())
-          ))
+    const overviewDepartments = [...new Set(s.employees.map((e) => e.department))];
+    const rosterRows = getEmployeeRosterRows(
+      s,
+      { period, department, employeeType },
+      query
     );
 
     leftSlot = (
-      <MasterList
-        title="Team Directory"
-        count={filteredOverviewEmployees.length}
+      <EmployeeRosterList
+        rows={rosterRows}
+        departments={overviewDepartments}
+        department={department}
+        employeeType={employeeType}
         search={query}
+        activeEmployeeId={activeId}
         onSearchChange={setQuery}
-        searchPlaceholder="Search employee..."
-        filters={
-          <div className="grid grid-cols-2 gap-2 w-full">
-            <Picker label="Dept" value={department} onChange={setDepartment} options={['All', ...departments]} />
-            <Picker
-              label="Type"
-              value={employeeType}
-              onChange={setEmployeeType}
-              options={['All', 'Full-time', 'Part-time', 'Intern', 'Contract']}
-            />
-          </div>
-        }
-        isEmpty={filteredOverviewEmployees.length === 0}
-      >
-        {filteredOverviewEmployees.map((e) => {
-          const isSel = e.id === activeId;
-          const att = s.attendance.filter((a) => a.employeeId === e.id && a.date.startsWith(period));
-          const attRate = att.length ? Math.round((att.filter((a) => a.checkIn).length / att.length) * 100) : 0;
-          return (
-            <MasterCard
-              key={e.id}
-              avatar={initials(e.name)}
-              title={e.name}
-              subtitle={`${e.department} · ${e.type}`}
-              badge={e.status}
-              active={isSel}
-              onClick={() => {
-                setActiveId(e.id);
-                navigate('employee', e.id);
-              }}
-              progress={{
-                label: 'Attendance',
-                value: attRate,
-                displayValue: `${attRate}%`,
-                variant: attRate >= 80 ? 'gold' : 'dark',
-              }}
-            />
-          );
-        })}
-      </MasterList>
+        onDepartmentChange={setDepartment}
+        onEmployeeTypeChange={setEmployeeType}
+        onSelectEmployee={(id) => {
+          setActiveId(id);
+          navigate('employee', id);
+        }}
+        initials={initials}
+      />
     );
 
     centerContent = (
