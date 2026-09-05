@@ -116,7 +116,7 @@ export function PageShell({
           }}
         >
           <img
-            src="/logo.jpg"
+            src="/favicon.png"
             alt="PeoplePay360 Logo"
             className="w-8 h-8 rounded-lg object-contain border border-amber-200/60 shadow-2xs shrink-0"
           />

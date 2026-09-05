@@ -567,7 +567,7 @@ export default function Home() {
         <div className="w-full max-w-md bg-white rounded-3xl border border-[#e5ded4] shadow-sm p-8 space-y-6">
           <div className="text-center space-y-2">
             <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-amber-50 border border-amber-200/60 shadow-2xs mb-1">
-              <img src="/logo.jpg" alt="PeoplePay360" className="w-10 h-10 rounded-xl object-contain" />
+              <img src="/favicon.png" alt="PeoplePay360" className="w-10 h-10 rounded-xl object-contain" />
             </div>
             <h1 className="text-xl font-extrabold tracking-tight text-slate-900">
               peoplepay<span className="text-[#e6a817]">360</span>
@@ -2794,7 +2794,7 @@ export default function Home() {
             <div className="space-y-4 text-xs text-slate-600">
               <div className="flex flex-col items-center justify-center p-4 bg-amber-50/50 rounded-2xl border border-amber-100/80 text-center">
                 <img
-                  src="/logo.jpg"
+                  src="/favicon.png"
                   alt="PeoplePay360"
                   className="w-24 h-24 rounded-2xl object-contain shadow-xs border border-amber-200/60 bg-white mb-2"
                 />
