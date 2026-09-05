@@ -9,6 +9,7 @@ Use Node.js 22.13 or later. From this folder:
 ```powershell
 npm.cmd install
 npm.cmd run db:setup
+npm.cmd run db:seed
 npm.cmd run dev
 ```bash
 npm install
@@ -23,6 +24,8 @@ The application runs directly against your local PostgreSQL database configured 
 For bulk payslip email, configure `SMTP_HOST`, `SMTP_PORT`, `SMTP_FROM`, and optional `SMTP_USER`, `SMTP_PASS`, and `SMTP_SECURE`. A local MailHog server normally uses port `1025` without authentication.
 
 Create a local PostgreSQL database named `peoplepay360` and set `DATABASE_URL` in `.env.local` before running `db:setup`. The setup command creates the relational schema. The first API read inserts the fictional OXP sample company only when the employee tables are empty. Reopening the app does not reset existing records.
+
+`db:seed` transactionally replaces the local demo business records with a deterministic 300-person company snapshot dated September 5, 2026. It includes reporting lines, salary-banded contracts, three working schedules, varied attendance, leave allocations and requests, six payroll periods, payslips, and employee login accounts. Use it only with a local demo database because existing employee, attendance, leave, payroll, and user rows are replaced.
 
 ## Your build and checks
 

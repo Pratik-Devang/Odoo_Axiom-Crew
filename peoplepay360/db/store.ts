@@ -82,7 +82,11 @@ async function ensureSchema(client: PoolClient) {
 /**
  * Read the entire workspace from normalized PostgreSQL relational tables.
  */
-async function readRelational(client: PoolClient): Promise<Workspace> {
+type WorkspaceReadOptions = {
+  attendancePeriod?: string;
+};
+
+async function readRelational(client: PoolClient, options: WorkspaceReadOptions = {}): Promise<Workspace> {
   await ensureSchema(client);
   const employeesRes = await client.query(
     `SELECT id, name, email, COALESCE(phone, '') AS phone, department, position, type, status,
@@ -96,9 +100,22 @@ async function readRelational(client: PoolClient): Promise<Workspace> {
   const contractsRes = await client.query(
     `SELECT id, employee_id AS "employeeId", to_char(start_date, 'YYYY-MM-DD') AS "start", COALESCE(to_char(end_date, 'YYYY-MM-DD'), '') AS "end", wage::float AS wage, COALESCE(structure_id, '') AS "structureId", COALESCE(schedule_id, '') AS "scheduleId", status FROM contracts ORDER BY id`
   );
-  const attendanceRes = await client.query(
-    `SELECT id, employee_id AS "employeeId", to_char(date, 'YYYY-MM-DD') AS "date", COALESCE(check_in, '') AS "checkIn", COALESCE(check_out, '') AS "checkOut", edited FROM attendance ORDER BY date, employee_id`
-  );
+  const attendanceRes = options.attendancePeriod
+    ? await client.query(
+        `SELECT id, employee_id AS "employeeId", to_char(date, 'YYYY-MM-DD') AS "date",
+                COALESCE(check_in, '') AS "checkIn", COALESCE(check_out, '') AS "checkOut",
+                COALESCE(overtime::float, 0) AS overtime, edited
+         FROM attendance
+         WHERE date >= $1::date AND date < ($1::date + INTERVAL '1 month')
+         ORDER BY date, employee_id`,
+        [`${options.attendancePeriod}-01`]
+      )
+    : await client.query(
+        `SELECT id, employee_id AS "employeeId", to_char(date, 'YYYY-MM-DD') AS "date",
+                COALESCE(check_in, '') AS "checkIn", COALESCE(check_out, '') AS "checkOut",
+                COALESCE(overtime::float, 0) AS overtime, edited
+         FROM attendance ORDER BY date, employee_id`
+      );
   const requestsRes = await client.query(
     `SELECT id, employee_id AS "employeeId", type_id AS "typeId", to_char(start_date, 'YYYY-MM-DD') AS "start", to_char(end_date, 'YYYY-MM-DD') AS "end", duration::float AS duration, COALESCE(reason, '') AS reason, status, COALESCE(approver, '') AS approver, COALESCE(allocation_id, '') AS "allocationId" FROM leave_requests ORDER BY id`
   );
@@ -126,9 +143,11 @@ async function readRelational(client: PoolClient): Promise<Workspace> {
        COALESCE(structure_id, '') AS "structureId", COALESCE(contract_id, '') AS "contractId",
        basic::float AS basic, gross::float AS gross, deductions::float AS deductions,
        net::float AS net, worked_days AS "workedDays", scheduled_days::float AS "scheduledDays",
-       unpaid_leave_days::float AS "unpaidLeaveDays", payable_days::float AS "payableDays", lines
+       unpaid_leave_days::float AS "unpaidLeaveDays", payable_days::float AS "payableDays",
+       CASE WHEN $1::text IS NULL OR period = $1 THEN lines ELSE '[]'::jsonb END AS lines
      FROM payslips
-     ORDER BY payrun_id, employee_id, created_at DESC, id DESC`
+     ORDER BY payrun_id, employee_id, created_at DESC, id DESC`,
+    [options.attendancePeriod || null]
   );
   const auditRes = await client.query(
     'SELECT id, action, to_char(at, \'YYYY-MM-DD"T"HH24:MI:SS"Z"\') AS at, actor FROM audit_logs ORDER BY at DESC LIMIT 100'
@@ -381,18 +400,20 @@ async function syncRelational(client: PoolClient, data: Workspace) {
   if (data.attendance?.length) {
     await client.query(
       `
-      INSERT INTO attendance (id, employee_id, date, check_in, check_out, edited)
+      INSERT INTO attendance (id, employee_id, date, check_in, check_out, overtime, edited)
       SELECT
         x->>'id',
         x->>'employeeId',
         (x->>'date')::date,
         NULLIF(x->>'checkIn', ''),
         NULLIF(x->>'checkOut', ''),
+        COALESCE((x->>'overtime')::numeric, 0),
         COALESCE((x->>'edited')::boolean, false)
       FROM jsonb_array_elements($1::jsonb) AS x
       ON CONFLICT (id) DO UPDATE SET
         check_in = EXCLUDED.check_in,
         check_out = EXCLUDED.check_out,
+        overtime = EXCLUDED.overtime,
         edited = EXCLUDED.edited;
     `,
       [JSON.stringify(data.attendance)]
@@ -617,7 +638,7 @@ function getMemoryWorkspace(): Workspace {
   return memoryWorkspace;
 }
 
-export async function readWorkspace(): Promise<{ data: Workspace; revision: number }> {
+export async function readWorkspace(options: WorkspaceReadOptions = {}): Promise<{ data: Workspace; revision: number }> {
   try {
     const pool = getPgPool();
     const client = await pool.connect();
@@ -645,8 +666,8 @@ export async function readWorkspace(): Promise<{ data: Workspace; revision: numb
         );
       }
 
-      const data = await readRelational(client);
-      memoryWorkspace = data;
+      const data = await readRelational(client, options);
+      if (!options.attendancePeriod) memoryWorkspace = data;
       memoryRevision = Number(workspaceRow.rows[0]?.revision || 0);
       return { data, revision: memoryRevision };
     } finally {
@@ -654,7 +675,13 @@ export async function readWorkspace(): Promise<{ data: Workspace; revision: numb
     }
   } catch (err) {
     console.warn('[DB Notice]: Postgres unavailable, using demo seed fallback:', err);
-    return { data: getMemoryWorkspace(), revision: memoryRevision };
+    const data = getMemoryWorkspace();
+    return {
+      data: options.attendancePeriod
+        ? { ...data, attendance: data.attendance.filter((item) => item.date.startsWith(options.attendancePeriod!)) }
+        : data,
+      revision: memoryRevision,
+    };
   }
 }
 
