@@ -272,19 +272,13 @@ export default function Dashboard({
         <div className="dash-left-header">
           <div className="flex items-center justify-between">
             <p className="dash-left-title">Team · {employees.length}</p>
+          </div>
+          <div className="grid grid-cols-2 gap-2 w-full">
             <Picker
               label="Dept"
               value={department}
               onChange={setDepartment}
               options={['All', ...departments]}
-            />
-          </div>
-          <div className="flex items-center gap-2">
-            <Picker
-              label="Period"
-              value={period}
-              onChange={setPeriod}
-              options={months.map((m) => ({ value: m, label: niceMonth(m) }))}
             />
             <Picker
               label="Type"
