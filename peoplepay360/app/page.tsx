@@ -417,6 +417,9 @@ export default function Home() {
 
   function navigate(v: string, id?: string) {
     let resolvedView = v;
+    if ((resolvedView === 'employees' || resolvedView === 'employee' || resolvedView === 'admin/employees') && currentUser?.role === 'Admin') {
+      resolvedView = 'users';
+    }
     let resolvedId = id || '';
     let newQuery = '';
 
@@ -1015,53 +1018,6 @@ export default function Home() {
           ))
     );
 
-    // LEFT COLUMN: Master Employee Roster
-    leftSlot = (
-      <MasterList
-        title="Employees"
-        count={filteredEmployees.length}
-        search={query}
-        onSearchChange={setQuery}
-        searchPlaceholder="Search employee..."
-        filters={
-          <div className="grid grid-cols-2 gap-2 w-full">
-            <Picker label="Dept" value={department} onChange={setDepartment} options={['All', ...departments]} />
-            <Picker
-              label="Type"
-              value={employeeType}
-              onChange={setEmployeeType}
-              options={['All', 'Full-time', 'Part-time', 'Intern', 'Contract']}
-            />
-          </div>
-        }
-        isEmpty={filteredEmployees.length === 0}
-      >
-        {filteredEmployees.map((e) => {
-          const isSel = e.id === activeEmp?.id;
-          const att = s.attendance.filter((a) => a.employeeId === e.id && a.date.startsWith(period));
-          const attRate = att.length ? Math.round((att.filter((a) => a.checkIn).length / att.length) * 100) : 0;
-          return (
-            <MasterCard
-              key={e.id}
-              avatar={initials(e.name)}
-              title={e.name}
-              subtitle={`${e.department} - ${e.type}`}
-              badge={e.status}
-              active={isSel}
-              onClick={() => setActiveId(e.id)}
-              progress={{
-                label: 'Attendance Rate',
-                value: attRate,
-                displayValue: `${attRate}%`,
-                variant: attRate >= 80 ? 'gold' : 'dark',
-              }}
-            />
-          );
-        })}
-      </MasterList>
-    );
-
-
     // CENTER COLUMN: Directory Grid or Data Table
     centerContent = (
       <div className="workora-table-container">
@@ -1270,44 +1226,6 @@ export default function Home() {
     const filteredContracts = filtered(s.contracts);
     const activeContractRecord = s.contracts.find((c) => c.id === activeId) || filteredContracts[0];
 
-    leftSlot = (
-      <MasterList
-        title="Contracts"
-        count={filteredContracts.length}
-        search={query}
-        onSearchChange={setQuery}
-        searchPlaceholder="Search contracts…"
-        isEmpty={filteredContracts.length === 0}
-      >
-        {filteredContracts.map((c) => {
-          const emp = employee(c.employeeId);
-          const isSel = c.id === activeContractRecord?.id;
-          const isRunning = !c.end || c.end >= todayIso;
-          return (
-            <MasterCard
-              key={c.id}
-              avatar={initials(emp?.name || 'CT')}
-              title={emp?.name || 'Contract'}
-              subtitle={
-                c.id.startsWith('c') && c.id.length < 5
-                  ? `CON/2026/${String(+c.id.slice(1) + 1).padStart(4, '0')}`
-                  : c.id.slice(0, 8).toUpperCase()
-              }
-              badge={isRunning ? 'Running' : 'Expired'}
-              active={isSel}
-              onClick={() => setActiveId(c.id)}
-              progress={{
-                label: 'Monthly Wage',
-                value: 100,
-                displayValue: money(c.wage),
-                variant: 'gold',
-              }}
-            />
-          );
-        })}
-      </MasterList>
-    );
-
     centerContent = (
       <div className="workora-table-container">
         <div className="table-tab-strip">
@@ -1481,40 +1399,6 @@ export default function Home() {
       })
       .sort((a, b) => b.date.localeCompare(a.date));
 
-    leftSlot = (
-      <MasterList
-        title={currentUser.role === 'Employee' ? 'My Profile' : 'Staff Attendance'}
-        count={employeePool.length}
-        search={query}
-        onSearchChange={setQuery}
-        searchPlaceholder="Filter team…"
-      >
-        {employeePool.map((e) => {
-          const att = s.attendance.filter((a) => a.employeeId === e.id && a.date.startsWith(period));
-          const presentCount = att.filter((a) => a.checkIn).length;
-          const rate = att.length ? Math.round((presentCount / att.length) * 100) : 0;
-          const isSel = e.id === activeEmp?.id;
-          return (
-            <MasterCard
-              key={e.id}
-              avatar={initials(e.name)}
-              title={e.name}
-              subtitle={e.department}
-              badge={rate >= 80 ? 'Present' : rate > 0 ? 'Late' : 'Absent'}
-              active={isSel}
-              onClick={() => setActiveId(e.id)}
-              progress={{
-                label: 'Attendance Rate',
-                value: rate,
-                displayValue: `${rate}%`,
-                variant: rate >= 80 ? 'gold' : 'dark',
-              }}
-            />
-          );
-        })}
-      </MasterList>
-    );
-
     centerContent = (
       <div className="workora-table-container">
         <div className="table-tab-strip flex items-center justify-between">
@@ -1655,39 +1539,6 @@ export default function Home() {
 
     const filteredRequests = filtered(baseRequests);
     const activeReq = baseRequests.find((r) => r.id === activeId) || filteredRequests[0];
-
-    leftSlot = (
-      <MasterList
-        title={currentUser.role === 'Employee' ? 'My Requests' : 'Leave Requests'}
-        count={filteredRequests.length}
-        search={query}
-        onSearchChange={setQuery}
-        searchPlaceholder="Filter requests…"
-        isEmpty={filteredRequests.length === 0}
-      >
-        {filteredRequests.map((r) => {
-          const emp = employee(r.employeeId);
-          const isSel = r.id === activeReq?.id;
-          return (
-            <MasterCard
-              key={r.id}
-              avatar={initials(emp?.name || 'TO')}
-              title={emp?.name || 'Employee'}
-              subtitle={`${leaveType(r.typeId)?.name} · ${r.duration} ${leaveType(r.typeId)?.unit?.toLowerCase() || 'days'}`}
-              badge={r.status}
-              active={isSel}
-              onClick={() => setActiveId(r.id)}
-              progress={{
-                label: 'Duration',
-                value: Math.min(r.duration * 10, 100),
-                displayValue: `${r.duration} ${leaveType(r.typeId)?.unit?.toLowerCase() || 'days'}`,
-                variant: r.status === 'Approved' ? 'green' : 'gold',
-              }}
-            />
-          );
-        })}
-      </MasterList>
-    );
 
     centerContent = (
       <div className="workora-table-container">
