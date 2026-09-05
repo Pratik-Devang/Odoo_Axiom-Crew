@@ -22,6 +22,31 @@ async function ensureSchema(client: PoolClient) {
       ALTER TABLE payruns ADD COLUMN IF NOT EXISTS paid_at TIMESTAMPTZ;
 
       ALTER TABLE attendance ADD COLUMN IF NOT EXISTS overtime NUMERIC(5,2) DEFAULT 0;
+
+      ALTER TABLE employees ADD COLUMN IF NOT EXISTS manager_employee_id VARCHAR(50);
+      ALTER TABLE employees ADD COLUMN IF NOT EXISTS personal_email VARCHAR(255);
+      ALTER TABLE employees ADD COLUMN IF NOT EXISTS personal_phone VARCHAR(50);
+      ALTER TABLE employees ADD COLUMN IF NOT EXISTS address TEXT;
+      ALTER TABLE employees ADD COLUMN IF NOT EXISTS emergency_contact_name VARCHAR(150);
+      ALTER TABLE employees ADD COLUMN IF NOT EXISTS emergency_contact_phone VARCHAR(50);
+      ALTER TABLE employees ADD COLUMN IF NOT EXISTS government_id_type VARCHAR(50);
+      ALTER TABLE employees ADD COLUMN IF NOT EXISTS government_id_number VARCHAR(150);
+
+      CREATE TABLE IF NOT EXISTS user_roles (
+        user_id VARCHAR(50) NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        role_id VARCHAR(50) NOT NULL REFERENCES roles(id) ON DELETE RESTRICT,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (user_id, role_id)
+      );
+
+      CREATE TABLE IF NOT EXISTS password_reset_tokens (
+        id VARCHAR(80) PRIMARY KEY,
+        user_id VARCHAR(50) NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        token_hash VARCHAR(128) NOT NULL UNIQUE,
+        expires_at TIMESTAMPTZ NOT NULL,
+        used_at TIMESTAMPTZ,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+      );
     `);
     schemaEnsured = true;
   } catch (err) {
@@ -35,7 +60,13 @@ async function ensureSchema(client: PoolClient) {
 async function readRelational(client: PoolClient): Promise<Workspace> {
   await ensureSchema(client);
   const employeesRes = await client.query(
-    'SELECT id, name, email, COALESCE(phone, \'\') AS phone, department, position, type, status, COALESCE(manager, \'\') AS manager, COALESCE(location, \'Mumbai\') AS location, COALESCE(schedule_id, \'sch1\') AS "scheduleId", COALESCE(bank, \'\') AS bank FROM employees ORDER BY id'
+    `SELECT id, name, email, COALESCE(phone, '') AS phone, department, position, type, status,
+            COALESCE(manager, '') AS manager, manager_employee_id AS "managerEmployeeId",
+            COALESCE(location, 'Mumbai') AS location, COALESCE(schedule_id, 'sch1') AS "scheduleId",
+            COALESCE(bank, '') AS bank, personal_email AS "personalEmail", personal_phone AS "personalPhone",
+            address, emergency_contact_name AS "emergencyContactName", emergency_contact_phone AS "emergencyContactPhone",
+            government_id_type AS "governmentIdType", government_id_number AS "governmentIdNumber"
+     FROM employees ORDER BY id`
   );
   const contractsRes = await client.query(
     `SELECT id, employee_id AS "employeeId", to_char(start_date, 'YYYY-MM-DD') AS "start", COALESCE(to_char(end_date, 'YYYY-MM-DD'), '') AS "end", wage::float AS wage, COALESCE(structure_id, '') AS "structureId", COALESCE(schedule_id, '') AS "scheduleId", status FROM contracts ORDER BY id`
@@ -143,7 +174,7 @@ async function syncRelational(client: PoolClient, data: Workspace) {
   if (data.employees?.length) {
     await client.query(
       `
-      INSERT INTO employees (id, name, email, phone, department, position, type, status, manager, location, schedule_id, bank)
+      INSERT INTO employees (id, name, email, phone, department, position, type, status, manager, manager_employee_id, location, schedule_id, bank, personal_email, personal_phone, address, emergency_contact_name, emergency_contact_phone, government_id_type, government_id_number)
       SELECT
         x->>'id',
         x->>'name',
@@ -154,9 +185,17 @@ async function syncRelational(client: PoolClient, data: Workspace) {
         COALESCE(x->>'type', 'Full-time'),
         COALESCE(x->>'status', 'Active'),
         x->>'manager',
+        NULLIF(x->>'managerEmployeeId', ''),
         COALESCE(x->>'location', 'Mumbai'),
         x->>'scheduleId',
-        x->>'bank'
+        x->>'bank',
+        x->>'personalEmail',
+        x->>'personalPhone',
+        x->>'address',
+        x->>'emergencyContactName',
+        x->>'emergencyContactPhone',
+        x->>'governmentIdType',
+        x->>'governmentIdNumber'
       FROM jsonb_array_elements($1::jsonb) AS x
       ON CONFLICT (id) DO UPDATE SET
         name = EXCLUDED.name,
@@ -167,9 +206,17 @@ async function syncRelational(client: PoolClient, data: Workspace) {
         type = EXCLUDED.type,
         status = EXCLUDED.status,
         manager = EXCLUDED.manager,
+        manager_employee_id = EXCLUDED.manager_employee_id,
         location = EXCLUDED.location,
         schedule_id = EXCLUDED.schedule_id,
-        bank = EXCLUDED.bank;
+        bank = EXCLUDED.bank,
+        personal_email = EXCLUDED.personal_email,
+        personal_phone = EXCLUDED.personal_phone,
+        address = EXCLUDED.address,
+        emergency_contact_name = EXCLUDED.emergency_contact_name,
+        emergency_contact_phone = EXCLUDED.emergency_contact_phone,
+        government_id_type = EXCLUDED.government_id_type,
+        government_id_number = EXCLUDED.government_id_number;
     `,
       [JSON.stringify(data.employees)]
     );
@@ -193,6 +240,11 @@ async function syncRelational(client: PoolClient, data: Workspace) {
       ON CONFLICT (email) DO UPDATE SET
         name = EXCLUDED.name,
         employee_id = EXCLUDED.employee_id;
+
+      INSERT INTO user_roles (user_id, role_id)
+      SELECT u.id, u.role_id
+      FROM users u
+      ON CONFLICT (user_id, role_id) DO NOTHING;
     `);
   }
 
