@@ -944,7 +944,64 @@ export default function Home() {
         )}
       </>
     );
-    // Dashboard itself implements the full 3-column Crextio layout
+    const filteredOverviewEmployees = s.employees.filter(
+      (e) =>
+        (department === 'All' || e.department === department) &&
+        (employeeType === 'All' || e.type === employeeType) &&
+        (!query ||
+          [e.name, e.department, e.position, e.type].some((x) =>
+            x.toLowerCase().includes(query.toLowerCase())
+          ))
+    );
+
+    leftSlot = (
+      <MasterList
+        title="Team Directory"
+        count={filteredOverviewEmployees.length}
+        search={query}
+        onSearchChange={setQuery}
+        searchPlaceholder="Search employee..."
+        filters={
+          <div className="grid grid-cols-2 gap-2 w-full">
+            <Picker label="Dept" value={department} onChange={setDepartment} options={['All', ...departments]} />
+            <Picker
+              label="Type"
+              value={employeeType}
+              onChange={setEmployeeType}
+              options={['All', 'Full-time', 'Part-time', 'Intern', 'Contract']}
+            />
+          </div>
+        }
+        isEmpty={filteredOverviewEmployees.length === 0}
+      >
+        {filteredOverviewEmployees.map((e) => {
+          const isSel = e.id === activeId;
+          const att = s.attendance.filter((a) => a.employeeId === e.id && a.date.startsWith(period));
+          const attRate = att.length ? Math.round((att.filter((a) => a.checkIn).length / att.length) * 100) : 0;
+          return (
+            <MasterCard
+              key={e.id}
+              avatar={initials(e.name)}
+              title={e.name}
+              subtitle={`${e.department} · ${e.type}`}
+              badge={e.status}
+              active={isSel}
+              onClick={() => {
+                setActiveId(e.id);
+                navigate('employee', e.id);
+              }}
+              progress={{
+                label: 'Attendance',
+                value: attRate,
+                displayValue: `${attRate}%`,
+                variant: attRate >= 80 ? 'gold' : 'dark',
+              }}
+            />
+          );
+        })}
+      </MasterList>
+    );
+
     centerContent = (
       <Dashboard
         s={s}
