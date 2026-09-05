@@ -20,6 +20,9 @@ export const schedules = pgTable('schedules', {
   endTime: text('end_time').notNull().default('18:00'),
   breakHours: numeric('break_hours').notNull().default('1.0'),
   weeklyHours: numeric('weekly_hours').notNull().default('0'),
+  company: text('company').notNull().default('My Company'),
+  timezone: text('timezone').notNull().default('Company timezone'),
+  status: text('status').notNull().default('Active'),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
 });
 
