@@ -43,16 +43,16 @@ export function StatusBadge({
   const negative = ['Refused', 'Absent', 'Archived', 'Expired'];
 
   if (positive.includes(value)) {
-    styleClasses = 'bg-emerald-50 text-emerald-700 border-emerald-200/80';
+    styleClasses = 'bg-slate-50 text-slate-800 border-slate-200';
     dotColor = 'bg-emerald-500';
   } else if (value === 'Validated') {
-    styleClasses = 'bg-blue-50 text-blue-700 border-blue-200/80';
-    dotColor = 'bg-blue-500';
+    styleClasses = 'bg-slate-900 text-white border-slate-900';
+    dotColor = 'bg-white';
   } else if (pending.includes(value)) {
-    styleClasses = 'bg-amber-50 text-amber-800 border-amber-200/80';
+    styleClasses = 'bg-slate-50 text-slate-700 border-slate-200';
     dotColor = 'bg-amber-500';
   } else if (negative.includes(value)) {
-    styleClasses = 'bg-rose-50 text-rose-700 border-rose-200/80';
+    styleClasses = 'bg-slate-50 text-slate-700 border-slate-200';
     dotColor = 'bg-rose-500';
   }
 
