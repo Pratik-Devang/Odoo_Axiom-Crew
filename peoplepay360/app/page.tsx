@@ -53,8 +53,10 @@ import {
   employeeSchedule,
 } from '@/lib/domain';
 import { Avatar, Badge, DataTable, Field, Picker, niceMonth, downloadCsv } from '@/components/peoplepay-ui';
-import Dashboard from '@/components/overview-dashboard';
+import Dashboard from '@/components/payroll-dashboard';
 import WorkingSchedules from '@/components/working-schedules';
+import { EmployeeRosterList } from '@/components/dashboard/EmployeeRosterList';
+import { getEmployeeRosterRows } from '@/lib/dashboard-calculations';
 import RecordForm, { defaults, titles } from '@/components/record-form';
 import {
   PageShell,
@@ -1355,6 +1357,43 @@ export default function Home() {
         <div className="table-tab-strip">
           <button className="table-tab-item active">Contracts ({s.contracts.length})</button>
         </div>
+        <DataTable
+          rows={filteredContracts}
+          columns={[
+            {
+              title: 'Contract',
+              render: (c) => (
+                <button
+                  className="font-semibold text-slate-900 hover:underline cursor-pointer"
+                  onClick={() => setActiveId(c.id)}
+                >
+                  {c.id.startsWith('c') && c.id.length < 5
+                    ? 'CON/2026/' + String(+c.id.slice(1) + 1).padStart(4, '0')
+                    : c.id.slice(0, 8).toUpperCase()}
+                </button>
+              ),
+            },
+            { title: 'Employee', render: cellEmployee },
+            { title: 'Start date', render: (c) => c.start },
+            { title: 'End date', render: (c) => c.end || 'Open-ended' },
+            { title: 'Monthly wage', render: (c) => money(c.wage) },
+            { title: 'Structure', render: (c) => structure(c.structureId) },
+            {
+              title: 'Status',
+              render: (c) => (
+                <Badge
+                  value={
+                    c.end && c.end < todayIso
+                      ? 'Expired'
+                      : c.start > todayIso
+                      ? 'Upcoming'
+                      : 'Running'
+                  }
+                />
+              ),
+            },
+          ]}
+        />
         {view === 'contracts' ? (
           <DataTable
             rows={filteredContracts}
@@ -2672,6 +2711,246 @@ export default function Home() {
       >
         {centerContent}
       </PageShell>
+
+      {/* ─── Slide-Over Right Drawer Overlay for Users ─── */}
+      {selectedUserDrawer && (
+        <div className="fixed inset-0 z-50 overflow-hidden">
+          <div
+            className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs transition-opacity"
+            onClick={() => setSelectedUserDrawer(null)}
+          />
+          <div className="fixed inset-y-0 right-0 max-w-full flex pl-6 py-4">
+            <div className="w-screen max-w-md bg-white border border-[#e5ded4] rounded-l-3xl shadow-2xl flex flex-col h-full overflow-hidden animate-in slide-in-from-right duration-250">
+              
+              {/* Profile Header (Centered Avatar & Details matching uploaded design) */}
+              <div className="p-6 pb-4 bg-white relative border-b border-[#f0ece5] text-center shrink-0">
+                <button
+                  onClick={() => setSelectedUserDrawer(null)}
+                  className="absolute top-4 right-4 p-1.5 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
+                  title="Close Drawer"
+                >
+                  <XCircle size={20} />
+                </button>
+
+                <div className="w-20 h-20 rounded-full bg-[#1a1a1a] text-white text-2xl font-bold flex items-center justify-center border-4 border-[#f7f4ee] shadow-sm mx-auto mb-2.5">
+                  {initials(selectedUserDrawer.name)}
+                </div>
+
+                <h2 className="text-lg font-bold text-slate-900 tracking-tight">
+                  {selectedUserDrawer.name}
+                </h2>
+
+                <p className="text-xs text-slate-500 font-medium mt-0.5">
+                  {selectedUserDrawer.email.split('@')[0]} · {selectedUserDrawer.department || 'Engineering'}
+                </p>
+
+                <div className="flex justify-center mt-2.5">
+                  <span className={`inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-semibold border ${
+                    selectedUserDrawer.active 
+                      ? 'bg-[#f0fdf4] text-emerald-700 border-emerald-200' 
+                      : 'bg-slate-100 text-slate-600 border-slate-200'
+                  }`}>
+                    <span className={`w-1.5 h-1.5 rounded-full ${selectedUserDrawer.active ? 'bg-emerald-500' : 'bg-slate-400'}`} />
+                    {selectedUserDrawer.active ? 'Active' : 'Deactivated'}
+                  </span>
+                </div>
+              </div>
+
+              {/* Body with Collapsible Accordion Dropdowns */}
+              <div className="flex-1 overflow-y-auto p-5 space-y-4 bg-white">
+                
+                {/* 1. BASIC INFORMATION (Collapsible) */}
+                <details className="group border border-[#e5ded4] rounded-2xl bg-[#faf8f5]/60 overflow-hidden text-xs" open>
+                  <summary className="flex items-center justify-between px-4 py-3 bg-[#f5efe6] hover:bg-[#ebdcc8]/60 cursor-pointer font-bold text-xs text-slate-800 transition-colors select-none">
+                    <span className="flex items-center gap-1.5">
+                      <ChevronDown className="size-4 text-[#c99a2e] transition-transform duration-200 group-open:rotate-180" />
+                      BASIC INFORMATION
+                    </span>
+                    <span className="text-[10px] text-slate-500 font-semibold uppercase tracking-wide group-open:hidden">Expand</span>
+                    <span className="text-[10px] text-slate-500 font-semibold uppercase tracking-wide hidden group-open:inline">Collapse</span>
+                  </summary>
+
+                  <div className="p-4 space-y-2.5 border-t border-[#e5ded4] bg-white">
+                    <div className="flex items-center justify-between py-1 border-b border-slate-50">
+                      <span className="text-xs text-slate-400 font-medium">Department</span>
+                      <span className="text-xs text-slate-900 font-bold">{selectedUserDrawer.department || 'Engineering'}</span>
+                    </div>
+                    <div className="flex items-center justify-between py-1 border-b border-slate-50">
+                      <span className="text-xs text-slate-400 font-medium">Manager</span>
+                      <span className="text-xs text-slate-900 font-bold">{selectedUserDrawer.manager || 'Sara Khan'}</span>
+                    </div>
+                    <div className="flex items-center justify-between py-1 border-b border-slate-50">
+                      <span className="text-xs text-slate-400 font-medium">Work Schedule</span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const schedId = selectedUserDrawer.scheduleId || 'sch1';
+                          setSelectedUserDrawer(null);
+                          navigate('schedules', schedId);
+                        }}
+                        className="text-xs text-amber-700 font-bold hover:underline cursor-pointer"
+                        title="Click to view working schedule"
+                      >
+                        {selectedUserDrawer.scheduleName || '40 Hours / Week'}
+                      </button>
+                    </div>
+                    <div className="flex items-center justify-between py-1 border-b border-slate-50">
+                      <span className="text-xs text-slate-400 font-medium">Location</span>
+                      <span className="text-xs text-slate-900 font-bold">{selectedUserDrawer.location || 'Mumbai'}</span>
+                    </div>
+                    <div className="flex items-center justify-between py-1 border-b border-slate-50">
+                      <span className="text-xs text-slate-400 font-medium">Employee Type</span>
+                      <span className="text-xs text-slate-900 font-bold">{selectedUserDrawer.type || 'Full-time'}</span>
+                    </div>
+                    <div className="flex items-center justify-between py-1">
+                      <span className="text-xs text-slate-400 font-medium">Bank Reference</span>
+                      <span className="text-xs text-slate-900 font-bold font-mono">{selectedUserDrawer.bank || 'egshhdasf'}</span>
+                    </div>
+                  </div>
+                </details>
+
+                {/* 2. DOCUMENTS & CONTRACTS (Collapsible) */}
+                <details className="group border border-[#e5ded4] rounded-2xl bg-[#faf8f5]/60 overflow-hidden text-xs">
+                  <summary className="flex items-center justify-between px-4 py-3 bg-[#f5efe6] hover:bg-[#ebdcc8]/60 cursor-pointer font-bold text-xs text-slate-800 transition-colors select-none">
+                    <span className="flex items-center gap-1.5">
+                      <ChevronDown className="size-4 text-[#c99a2e] transition-transform duration-200 group-open:rotate-180" />
+                      DOCUMENTS & CONTRACTS
+                    </span>
+                    <span className="text-[10px] text-slate-500 font-semibold uppercase tracking-wide group-open:hidden">Expand</span>
+                    <span className="text-[10px] text-slate-500 font-semibold uppercase tracking-wide hidden group-open:inline">Collapse</span>
+                  </summary>
+
+                  <div className="p-4 space-y-2.5 border-t border-[#e5ded4] bg-white">
+                    <div 
+                      className="rounded-2xl border border-[#e8e2d8] bg-[#fcfbfa] p-3 flex items-center justify-between hover:bg-[#f7f4ee] cursor-pointer transition-colors shadow-2xs"
+                      onClick={() => { setSelectedUserDrawer(null); navigate('contracts'); }}
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <FileText className="size-4 text-[#8a7a6d]" />
+                        <span className="text-xs font-bold text-slate-900">Create employment contract</span>
+                      </div>
+                      <span className="text-xs text-slate-400 font-medium flex items-center gap-1">Draft <ChevronRight size={13} /></span>
+                    </div>
+
+                    <div 
+                      className="rounded-2xl border border-[#e8e2d8] bg-[#fcfbfa] p-3 flex items-center justify-between hover:bg-[#f7f4ee] cursor-pointer transition-colors shadow-2xs"
+                      onClick={() => { setSelectedUserDrawer(null); navigate('schedules'); }}
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <FileText className="size-4 text-[#8a7a6d]" />
+                        <span className="text-xs font-bold text-slate-900">Standard workweek...</span>
+                      </div>
+                      <span className="text-xs text-slate-400 font-medium flex items-center gap-1">09:00 – 18:00 <ChevronRight size={13} /></span>
+                    </div>
+                  </div>
+                </details>
+
+                {/* 3. STATISTICS & ATTENDANCE (Collapsible) */}
+                <details className="group border border-[#e5ded4] rounded-2xl bg-[#faf8f5]/60 overflow-hidden text-xs">
+                  <summary className="flex items-center justify-between px-4 py-3 bg-[#f5efe6] hover:bg-[#ebdcc8]/60 cursor-pointer font-bold text-xs text-slate-800 transition-colors select-none">
+                    <span className="flex items-center gap-1.5">
+                      <ChevronDown className="size-4 text-[#c99a2e] transition-transform duration-200 group-open:rotate-180" />
+                      STATISTICS & ATTENDANCE
+                    </span>
+                    <span className="text-[10px] text-slate-500 font-semibold uppercase tracking-wide group-open:hidden">Expand</span>
+                    <span className="text-[10px] text-slate-500 font-semibold uppercase tracking-wide hidden group-open:inline">Collapse</span>
+                  </summary>
+
+                  <div className="p-4 space-y-3 border-t border-[#e5ded4] bg-white">
+                    <StatBar
+                      label="Shift Attendance Rate"
+                      value={92}
+                      displayValue="92%"
+                      variant="gold"
+                    />
+                    <StatBar
+                      label="Approved Leave Pool"
+                      value={80}
+                      displayValue="16 days"
+                      variant="green"
+                    />
+                  </div>
+                </details>
+
+                {/* 4. ACCOUNT PERMISSIONS & RESPONSIBILITIES (Collapsible) */}
+                <details className="group border border-[#e5ded4] rounded-2xl bg-[#faf8f5]/60 overflow-hidden text-xs">
+                  <summary className="flex items-center justify-between px-4 py-3 bg-[#f5efe6] hover:bg-[#ebdcc8]/60 cursor-pointer font-bold text-xs text-slate-800 transition-colors select-none">
+                    <span className="flex items-center gap-1.5">
+                      <ChevronDown className="size-4 text-[#c99a2e] transition-transform duration-200 group-open:rotate-180" />
+                      ACCOUNT PERMISSIONS
+                    </span>
+                    <span className="text-[10px] text-slate-500 font-semibold uppercase tracking-wide group-open:hidden">Expand</span>
+                    <span className="text-[10px] text-slate-500 font-semibold uppercase tracking-wide hidden group-open:inline">Collapse</span>
+                  </summary>
+
+                  <div className="p-4 space-y-3 border-t border-[#e5ded4] bg-white">
+                    <DetailRow label="Role Level" value={selectedUserDrawer.roleName || selectedUserDrawer.roleId} />
+                    <DetailRow
+                      label="Access Scope"
+                      value={
+                        selectedUserDrawer.roleId === 'admin'
+                          ? 'Universal Control'
+                          : selectedUserDrawer.roleId === 'employee'
+                          ? 'Self-service Portal'
+                          : 'Department Operations'
+                      }
+                    />
+                    <p className="text-xs text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-100 leading-relaxed mt-2">
+                      {selectedUserDrawer.roleId === 'admin'
+                        ? 'Full system governance, security settings, user provisioning, role assignments, and all HR/Payroll modules.'
+                        : selectedUserDrawer.roleId === 'payroll_manager'
+                        ? 'Authorized for payroll run creation, salary structures, rule authoring, validation, and final disbursement.'
+                        : selectedUserDrawer.roleId === 'payroll_user'
+                        ? 'Authorized for contract review, calculating payslips, and computing draft payruns.'
+                        : selectedUserDrawer.roleId === 'hr_manager'
+                        ? 'Authorized for employee profile creation, contract administration, attendance oversight, and approving time-off.'
+                        : 'Self-service access to check-in attendance, view personal time off requests, and view generated monthly payslips.'}
+                    </p>
+                  </div>
+                </details>
+              </div>
+
+              {/* Drawer Footer Actions */}
+              <div className="p-4 border-t border-[#e5ded4] bg-[#faf8f5] flex items-center justify-between shrink-0">
+                <button
+                  className="pill-btn pill-btn-black !py-2 justify-center text-xs font-semibold cursor-pointer"
+                  onClick={() => {
+                    const targetUser = selectedUserDrawer;
+                    setSelectedUserDrawer(null);
+                    setUserFormData({
+                      id: targetUser.id,
+                      name: targetUser.name,
+                      email: targetUser.email,
+                      roleId: targetUser.roleId,
+                      employeeId: targetUser.employeeId || '',
+                      password: '',
+                      active: targetUser.active ?? true,
+                      department: targetUser.department || 'Engineering',
+                      position: targetUser.position || 'Team Member',
+                      phone: targetUser.phone || '+91 90000 10000',
+                      type: targetUser.type || 'Full-time',
+                      manager: targetUser.manager || 'Sara Khan',
+                      location: targetUser.location || 'Mumbai',
+                      scheduleId: targetUser.scheduleId || 'sch1',
+                      bank: targetUser.bank || '',
+                    });
+                    setModal({ kind: 'userForm' });
+                  }}
+                >
+                  Edit Account Details
+                </button>
+                <button
+                  className="pill-btn !py-2 cursor-pointer"
+                  onClick={() => setSelectedUserDrawer(null)}
+                >
+                  Close
+                </button>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ─── Modals and Dialogs ─── */}
       {modal && (
