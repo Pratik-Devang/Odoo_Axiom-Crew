@@ -7,14 +7,40 @@ import {StatusBadge} from '@/components/ui/status-badge';
 import {Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription} from '@/components/ui/empty';
 import {Inbox} from 'lucide-react';
 
-export function Picker({label,value,onChange,options}:{label:string;value:string;onChange:(value:string)=>void;options:({value:string;label:string}|string)[]}){
+export function Picker({
+  label,
+  value,
+  onChange,
+  options,
+  className,
+}: {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  options: ({ value: string; label: string } | string)[];
+  className?: string;
+}) {
   return (
-    <Select value={value} onValueChange={v=>onChange(String(v??''))}>
-      <SelectTrigger aria-label={label} className="h-9 px-3 rounded-full bg-white border border-slate-200 text-xs font-medium text-slate-700 shadow-2xs hover:bg-slate-50 min-w-[140px]">
-        <SelectValue>{options.map(o=>typeof o==='string'?{value:o,label:o}:o).find(o=>o.value===value)?.label||label}</SelectValue>
+    <Select value={value} onValueChange={(v) => onChange(String(v ?? ''))}>
+      <SelectTrigger
+        aria-label={label}
+        className={
+          'h-9 px-3 rounded-full bg-white border border-[#e5ded4] text-xs font-medium text-slate-700 shadow-2xs hover:bg-[#faf7f3] transition-colors w-full min-w-0 ' +
+          (className || '')
+        }
+      >
+        <SelectValue className="truncate">
+          {options.map((o) => (typeof o === 'string' ? { value: o, label: o } : o)).find((o) => o.value === value)?.label || label}
+        </SelectValue>
       </SelectTrigger>
-      <SelectContent className="rounded-xl border border-slate-200 bg-white shadow-lg">
-        {options.map(o=>typeof o==='string'?{value:o,label:o}:o).map(o=><SelectItem key={o.value} value={o.value} className="text-xs rounded-lg">{o.label}</SelectItem>)}
+      <SelectContent className="rounded-xl border border-[#e5ded4] bg-white shadow-lg z-50">
+        {options
+          .map((o) => (typeof o === 'string' ? { value: o, label: o } : o))
+          .map((o) => (
+            <SelectItem key={o.value} value={o.value} className="text-xs rounded-lg">
+              {o.label}
+            </SelectItem>
+          ))}
       </SelectContent>
     </Select>
   );
