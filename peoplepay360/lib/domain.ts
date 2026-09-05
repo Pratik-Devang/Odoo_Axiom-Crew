@@ -70,12 +70,23 @@ export function canView(role: string | undefined | null, section: string): boole
   if (r === 'HR Payroll User') {
     return [
       'employees',
+      'contracts',
+      'attendance',
+      'time-off',
       'payroll/dashboard',
       'payroll/payruns',
       'payroll/payslips',
+      'payroll/structures',
+      'payroll/rules',
       'overview',
       'payruns',
       'payslips',
+      'structures',
+      'rules',
+      'requests',
+      'allocations',
+      'leaveTypes',
+      'schedules',
     ].includes(s);
   }
 
@@ -98,8 +109,8 @@ export function canView(role: string | undefined | null, section: string): boole
       'time-off',
       'payroll/payslips',
       'requests',
-      'allocations',
       'payslips',
+      'employee',
       'profile',
     ].includes(s);
   }

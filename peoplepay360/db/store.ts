@@ -28,13 +28,13 @@ async function readRelational(client: PoolClient): Promise<Workspace> {
     "SELECT id, name, code, category, sequence, method, COALESCE(base, '') AS base, COALESCE(value::float, 0) AS value, COALESCE(expression, '') AS expression FROM salary_rules ORDER BY sequence"
   );
   const structuresRes = await client.query(
-    `SELECT s.id, s.name, s.active, COALESCE(array_remove(array_agg(sr.rule_id ORDER BY r.sequence), NULL), ARRAY[]::varchar[]) AS "ruleIds" FROM salary_structures s LEFT JOIN salary_structure_rules sr ON s.id = sr.structure_id LEFT JOIN salary_rules r ON sr.rule_id = r.id GROUP BY s.id, s.name, s.active ORDER BY s.id`
+    `SELECT s.id, s.name, s.active, COALESCE(array_remove(array_agg(sr.rule_id ORDER BY r.sequence), NULL), ARRAY[]::text[]) AS "ruleIds" FROM salary_structures s LEFT JOIN salary_structure_rules sr ON s.id = sr.structure_id LEFT JOIN salary_rules r ON sr.rule_id = r.id GROUP BY s.id, s.name, s.active ORDER BY s.id`
   );
   const schedulesRes = await client.query(
     'SELECT id, name, days, start_time AS "start", end_time AS "end", break_hours::float AS "breakHours" FROM schedules ORDER BY id'
   );
   const payrunsRes = await client.query(
-    `SELECT p.id, p.name, p.period, COALESCE(p.structure_id, '') AS "structureId", p.status, COALESCE((SELECT array_agg(employee_id) FROM payrun_employees WHERE payrun_id = p.id), ARRAY[]::varchar[]) AS "employeeIds" FROM payruns p ORDER BY p.period`
+    `SELECT p.id, p.name, p.period, COALESCE(p.structure_id, '') AS "structureId", p.status, COALESCE((SELECT array_agg(employee_id) FROM payrun_employees WHERE payrun_id = p.id), ARRAY[]::text[]) AS "employeeIds" FROM payruns p ORDER BY p.period`
   );
   const payslipsRes = await client.query(
     'SELECT id, payrun_id AS "payrunId", employee_id AS "employeeId", period, COALESCE(structure_id, \'\') AS "structureId", COALESCE(contract_id, \'\') AS "contractId", basic::float AS basic, gross::float AS gross, deductions::float AS deductions, net::float AS net, worked_days AS "workedDays", lines FROM payslips ORDER BY id'
@@ -443,6 +443,20 @@ async function syncRelational(client: PoolClient, data: Workspace) {
       [JSON.stringify(data.audit)]
     );
   }
+
+  const slipIds = data.payruns.flatMap((run) => run.slips.map((slip: any) => slip.id));
+  await client.query('DELETE FROM payslips WHERE NOT (id = ANY($1::text[]))', [slipIds]);
+  await client.query('DELETE FROM payrun_employees WHERE NOT (payrun_id = ANY($1::text[]))', [data.payruns.map((run) => run.id)]);
+  await client.query('DELETE FROM payruns WHERE NOT (id = ANY($1::text[]))', [data.payruns.map((run) => run.id)]);
+  await client.query('DELETE FROM leave_requests WHERE NOT (id = ANY($1::text[]))', [data.requests.map((item) => item.id)]);
+  await client.query('DELETE FROM leave_allocations WHERE NOT (id = ANY($1::text[]))', [data.allocations.map((item) => item.id)]);
+  await client.query('DELETE FROM attendance WHERE NOT (id = ANY($1::text[]))', [data.attendance.map((item) => item.id)]);
+  await client.query('DELETE FROM contracts WHERE NOT (id = ANY($1::text[]))', [data.contracts.map((item) => item.id)]);
+  await client.query('DELETE FROM salary_structures WHERE NOT (id = ANY($1::text[]))', [data.structures.map((item) => item.id)]);
+  await client.query('DELETE FROM salary_rules WHERE NOT (id = ANY($1::text[]))', [data.rules.map((item) => item.id)]);
+  await client.query('DELETE FROM employees WHERE NOT (id = ANY($1::text[]))', [data.employees.map((item) => item.id)]);
+  await client.query('DELETE FROM leave_types WHERE NOT (id = ANY($1::text[]))', [data.leaveTypes.map((item) => item.id)]);
+  await client.query('DELETE FROM schedules WHERE NOT (id = ANY($1::text[]))', [data.schedules.map((item) => item.id)]);
 }
 
 export async function readWorkspace(): Promise<{ data: Workspace; revision: number }> {

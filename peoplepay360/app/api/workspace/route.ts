@@ -1,41 +1,18 @@
 import { readWorkspace, writeWorkspace } from '@/db/store';
 import { mutate } from '@/lib/actions';
+import { getActiveAuthUser } from '@/lib/auth';
+import { canMutateWorkspace, visibleWorkspace } from '@/lib/workspace-access';
+import { isAllowedOrigin } from '@/lib/request-origin';
 
 export const runtime = 'nodejs';
 
-function isAllowedOrigin(request: Request) {
-  const origin = request.headers.get('origin');
-  if (!origin) return true;
-
-  // A browser loading the app through a port-forwarding URL still makes a
-  // same-origin request, even when the proxy forwards it to localhost.
-  if (request.headers.get('sec-fetch-site') === 'same-origin') return true;
-
-  const requestUrl = new URL(request.url);
-  const allowedOrigins = new Set([requestUrl.origin]);
-  const forwardedHost = request.headers.get('x-forwarded-host')?.split(',')[0]?.trim();
-  const host = forwardedHost || request.headers.get('host');
-  const protocol =
-    request.headers.get('x-forwarded-proto')?.split(',')[0]?.trim() ||
-    requestUrl.protocol.replace(':', '');
-
-  if (host) allowedOrigins.add(`${protocol}://${host}`);
-
-  for (const configuredOrigin of (process.env.ALLOWED_ORIGINS || '').split(',')) {
-    const value = configuredOrigin.trim();
-    if (value) allowedOrigins.add(value.replace(/\/$/, ''));
-  }
-
+export async function GET(request: Request) {
   try {
-    return allowedOrigins.has(new URL(origin).origin);
-  } catch {
-    return false;
-  }
-}
+    const user = await getActiveAuthUser(request);
+    if (!user) return Response.json({ error: 'Authentication required.' }, { status: 401 });
 
-export async function GET() {
-  try {
-    return Response.json(await readWorkspace(), {
+    const current = await readWorkspace();
+    return Response.json({ ...current, data: visibleWorkspace(current.data, user) }, {
       headers: { 'Cache-Control': 'no-store' },
     });
   } catch (error) {
@@ -58,6 +35,9 @@ export async function POST(request: Request) {
   }
 
   try {
+    const user = await getActiveAuthUser(request);
+    if (!user) return Response.json({ error: 'Authentication required.' }, { status: 401 });
+
     if (Number(request.headers.get('content-length') || 0) > 100000) {
       return Response.json({ error: 'Request too large.' }, { status: 413 });
     }
@@ -69,6 +49,10 @@ export async function POST(request: Request) {
     };
     const current = await readWorkspace();
 
+    if (!canMutateWorkspace(user, current.data, body.action, body.payload || {})) {
+      return Response.json({ error: 'You do not have permission to perform this action.' }, { status: 403 });
+    }
+
     if (body.revision !== current.revision) {
       return Response.json(
         { error: 'The workspace changed in another session. Reload and try again.' },
@@ -76,7 +60,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const next = mutate(current.data, body.action, body.payload || {});
+    const next = mutate(current.data, body.action, body.payload || {}, user.name || user.email);
     const result = await writeWorkspace(next, current.revision);
 
     if (!result.meta.changes) {
@@ -86,7 +70,7 @@ export async function POST(request: Request) {
       );
     }
 
-    return Response.json({ data: next, revision: current.revision + 1 });
+    return Response.json({ data: visibleWorkspace(next, user), revision: current.revision + 1 });
   } catch (error) {
     return Response.json(
       { error: error instanceof Error ? error.message : 'Unable to save changes.' },

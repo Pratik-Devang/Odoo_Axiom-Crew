@@ -18,7 +18,9 @@ npm run dev
 Open the local URL printed by the development server (normally http://localhost:3000).
 
 `npm.cmd` avoids PowerShell's script-execution restriction on `npm.ps1`. On macOS/Linux, use `npm` instead. Dependencies are already installed in this checkout; installation is needed for another machine or a fresh clone.
-The application runs directly against your local PostgreSQL database configured via `DATABASE_URL` in `.env.local` without any Cloudflare or Wrangler dependencies.
+The application runs directly against your local PostgreSQL database configured via `DATABASE_URL` in `.env.local` without any Cloudflare or Wrangler dependencies. Set a random `JWT_SECRET` containing at least 32 characters.
+
+For bulk payslip email, configure `SMTP_HOST`, `SMTP_PORT`, `SMTP_FROM`, and optional `SMTP_USER`, `SMTP_PASS`, and `SMTP_SECURE`. A local MailHog server normally uses port `1025` without authentication.
 
 Create a local PostgreSQL database named `peoplepay360` and set `DATABASE_URL` in `.env.local` before running `db:setup`. The setup command creates the relational schema. The first API read inserts the fictional OXP sample company only when the employee tables are empty. Reopening the app does not reset existing records.
 
@@ -42,7 +44,7 @@ The completed implementation has **not been built or tested**, per your request.
 4. Open **Payroll → Payruns**, then **September 2026**.
 5. Review the generated payslips; use **Compute** to recompute if desired.
 6. **Validate**, then **Mark paid**. The dashboard's paid totals now reflect that transition.
-7. Open a payslip and use **Print / Save PDF**. Choose your browser's Save as PDF destination.
+7. Open a payslip and use **Download PDF**, or use **Send Payslips** on a validated/paid payrun to email all generated PDFs.
 
 “Mark paid” records a status. It never initiates a bank transfer.
 
@@ -95,7 +97,7 @@ If two sessions edit concurrently, the later stale request returns a conflict. R
 ## Current boundaries
 
 - Opens as a clearly labeled **demo administrator**. User creation, passwords and server-enforced roles are not implemented. Use fictional data; do not expose this version as a real multi-user HR service.
-- Payslips use browser printing/Save as PDF. No email is sent. Bulk payroll exports are CSV, not email delivery.
+- Payslips are generated as PDF files. Bulk delivery requires an SMTP server configured through the environment variables above.
 - Sample salary components are demonstration rules, not statutory tax or contribution logic.
 - Full-month contracts only; no partial-period wage proration.
 - Leave uses inclusive calendar days. Hourly requests must be on one day. Weekend/holiday exclusion, approval chains and payroll-linked unpaid leave remain to implement.

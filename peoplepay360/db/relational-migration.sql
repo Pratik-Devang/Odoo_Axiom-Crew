@@ -49,9 +49,12 @@ CREATE TABLE IF NOT EXISTS users (
     name VARCHAR(150) NOT NULL,
     role_id VARCHAR(50) NOT NULL REFERENCES roles(id) ON DELETE RESTRICT,
     employee_id VARCHAR(50) REFERENCES employees(id) ON DELETE SET NULL,
+    password VARCHAR(255),
     active BOOLEAN NOT NULL DEFAULT true,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
+
+ALTER TABLE users ADD COLUMN IF NOT EXISTS password VARCHAR(255);
 
 -- 5. SALARY STRUCTURES
 CREATE TABLE IF NOT EXISTS salary_structures (
@@ -188,6 +191,10 @@ VALUES
      '["employees:read","employees:write","contracts:read","contracts:write","attendance:read","attendance:write","leaves:approve"]'::jsonb),
     ('finance_manager', 'Finance & Payroll Manager', 'Compute payruns, validate salary disbursement, export banking files', 
      '["payroll:read","payroll:compute","payroll:validate","payroll:pay","employees:read","contracts:read"]'::jsonb),
+    ('payroll_manager', 'HR Payroll Manager', 'Full HR and payroll access, including salary configuration',
+     '["hr:*","payroll:*"]'::jsonb),
+    ('payroll_user', 'HR Payroll User', 'HR access plus payrun and payslip processing with read-only salary configuration',
+     '["hr:*","payroll:read","payroll:compute","config:read"]'::jsonb),
     ('employee', 'Standard Employee', 'Personal profile, self attendance clocking, and leave requests', 
      '["self:read","attendance:clock","leaves:request"]'::jsonb)
 ON CONFLICT (id) DO NOTHING;
@@ -415,6 +422,22 @@ BEGIN
             deductions = EXCLUDED.deductions;
     END IF;
 END $$;
+
+-- Demo credentials are stored as scrypt hashes. Existing password hashes are
+-- never overwritten when the migration is re-run.
+INSERT INTO users (id, email, name, role_id, employee_id, password, active)
+VALUES
+    ('u_admin', 'admin@oxp.example', 'Demo Administrator', 'admin', NULL, 'scrypt$f23d82845a806df241886dbe51c90c6e$46f07cdf1afff856653d76e793923d72b8170640e14bd713edd491c23d89d9daca59d3bd7a17716b08413817367b39a431dba90ccc047d95783663a672509dae', true),
+    ('u_payroll_manager', 'nisha@oxp.example', 'Nisha Rao', 'payroll_manager', (SELECT id FROM employees WHERE id = 'e6'), 'scrypt$92c64f1c93cc465ca090501c6e205685$0901b45dc2faf475fc7f23afb7a80a20274085d06746d3c73fc058afa2bbdee134880d06b7eb1aade7f061026b73f4ecc3c66393c951a86c448cc3d17fc32815', true),
+    ('u_payroll_user', 'payroll.user@oxp.example', 'Payroll User', 'payroll_user', NULL, 'scrypt$a601935fe6b6129606a9c711c9958601$132d1db4f50c6399a231c10e5d8bed512109bff193837bcbacf3a745d8b55b40607ada6903b17a95f522c04fef48fb102424c1a897bb9e5f649ea6e3b9d8ce27', true),
+    ('u_hr_manager', 'sara@oxp.example', 'Sara Khan', 'hr_manager', (SELECT id FROM employees WHERE id = 'e1'), 'scrypt$e9ebb8c09b3381be908d36314b6d931b$8c042b4a61b0e3afc1917261811dad8317915876e7534f5899737c6725e548f2010739a8467f8513212ecab6fe91ebda246726a67613e48cca0468263fef4856', true),
+    ('u_employee', 'john@oxp.example', 'John Dsouza', 'employee', (SELECT id FROM employees WHERE id = 'e2'), 'scrypt$3eaa57da8c5119c658b757e748fb5019$8ff65eb3e21c7c51e88020b262fc7e1d7675b0f7b9a1216d188045c077cafc5dccce995a4fccf5ad1a7709c19d57c5a1d2510b40544f7314754d0c3592c7e5dc', true)
+ON CONFLICT (email) DO UPDATE SET
+    name = EXCLUDED.name,
+    role_id = EXCLUDED.role_id,
+    employee_id = COALESCE(EXCLUDED.employee_id, users.employee_id),
+    password = COALESCE(users.password, EXCLUDED.password),
+    active = true;
 
 -- ====================================================================
 -- CONVENIENCE VIEWS FOR PGADMIN 4

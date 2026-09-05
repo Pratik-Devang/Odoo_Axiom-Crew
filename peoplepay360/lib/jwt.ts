@@ -1,6 +1,10 @@
 import crypto from 'node:crypto';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'peoplepay360-jwt-secret-key-production-change-in-env';
+function jwtSecret() {
+  const secret = process.env.JWT_SECRET;
+  if (!secret || secret.length < 32) throw new Error('JWT_SECRET must be set to at least 32 characters.');
+  return secret;
+}
 
 export interface JwtPayload {
   id: string;
@@ -26,7 +30,7 @@ export function signJwt(payload: Omit<JwtPayload, 'iat' | 'exp'>, expiresInSecon
   const message = `${encodedHeader}.${encodedPayload}`;
 
   const signature = crypto
-    .createHmac('sha256', JWT_SECRET)
+    .createHmac('sha256', jwtSecret())
     .update(message)
     .digest('base64url');
 
@@ -41,11 +45,13 @@ export function verifyJwt(token: string): JwtPayload | null {
 
     const message = `${encodedHeader}.${encodedPayload}`;
     const expectedSignature = crypto
-      .createHmac('sha256', JWT_SECRET)
+      .createHmac('sha256', jwtSecret())
       .update(message)
       .digest('base64url');
 
-    if (signature !== expectedSignature) return null;
+    const supplied = Buffer.from(signature);
+    const expected = Buffer.from(expectedSignature);
+    if (supplied.length !== expected.length || !crypto.timingSafeEqual(supplied, expected)) return null;
 
     const payload: JwtPayload = JSON.parse(
       Buffer.from(encodedPayload, 'base64url').toString('utf-8')

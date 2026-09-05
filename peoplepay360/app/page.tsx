@@ -29,6 +29,7 @@ import {
   Wallet,
   Eye,
   Key,
+  Mail,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -233,6 +234,8 @@ export default function Home() {
       await fetch('/api/auth/logout', { method: 'POST' });
     } catch {}
     setCurrentUser(null);
+    setS(null);
+    setRevision(0);
     setView('overview');
     window.location.hash = '';
   }
@@ -264,6 +267,10 @@ export default function Home() {
       setError('');
       const r = await fetch('/api/workspace', { cache: 'no-store' });
       const body = await readApiResponse(r);
+      if (r.status === 401) {
+        setCurrentUser(null);
+        setS(null);
+      }
       if (!r.ok) throw new Error(body.error || 'Unable to load the workspace.');
       setS(body.data);
       setRevision(body.revision);
@@ -344,6 +351,10 @@ export default function Home() {
         body: JSON.stringify({ action, payload, revision }),
       });
       const b = await readApiResponse(r);
+      if (r.status === 401) {
+        setCurrentUser(null);
+        setS(null);
+      }
       if (!r.ok) throw new Error(b.error || 'Unable to save.');
       setS(b.data);
       setRevision(b.revision);
@@ -377,6 +388,34 @@ export default function Home() {
     if (result) setModal(null);
   };
 
+  const deleteRecord = async () => {
+    if (!modal?.collection || !modal.record?.id) return;
+    const archived = modal.collection === 'employees';
+    const result = await act(
+      'delete',
+      { collection: modal.collection, id: modal.record.id },
+      archived ? 'Employee archived.' : 'Record deleted.'
+    );
+    if (result) setModal(null);
+  };
+
+  const sendPayslips = async (runId: string) => {
+    if (busy) return;
+    setBusy(true);
+    setError('');
+    setMessage('');
+    try {
+      const response = await fetch(`/api/payruns/${encodeURIComponent(runId)}/send`, { method: 'POST' });
+      const body = await readApiResponse(response);
+      if (!response.ok && response.status !== 207) throw new Error(body.error || 'Unable to send payslips.');
+      setMessage(`${body.sent} payslip${body.sent === 1 ? '' : 's'} sent${body.failed ? `; ${body.failed} failed` : ''}.`);
+    } catch (error) {
+      setError((error as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  };
+
   const filtered = (list: Row[]) =>
     list.filter(
       (r) =>
@@ -398,7 +437,7 @@ export default function Home() {
   const currentClock =
     mounted && clockNow && s
       ? s.attendance.find(
-          (a) => a.employeeId === 'e6' && a.date === clockNow.toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' })
+          (a) => a.employeeId === currentUser?.employeeId && a.date === clockNow.toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' })
         )
       : null;
   const signedIn = !!currentClock?.checkIn && !currentClock?.checkOut;
@@ -657,7 +696,7 @@ export default function Home() {
           <Download size={14} />
           Export
         </button>
-        {['Admin', 'HR Payroll Manager'].includes(currentUser.role) && (
+        {['Admin', 'HR Payroll Manager', 'HR Payroll User'].includes(currentUser.role) && (
           <button
             className="pill-btn pill-btn-black"
             onClick={() => {
@@ -1522,7 +1561,7 @@ export default function Home() {
 
           <DetailSection title="APPROVAL STATUS">
             {activeReq.status === 'Pending' ? (
-              ['Admin', 'HR Manager'].includes(currentUser.role) ? (
+              ['Admin', 'HR Manager', 'HR Payroll User', 'HR Payroll Manager'].includes(currentUser.role) ? (
                 <div className="flex flex-col gap-2">
                   <button
                     className="pill-btn pill-btn-black w-full justify-center !py-2 cursor-pointer"
@@ -1610,16 +1649,18 @@ export default function Home() {
           <Download size={14} />
           Export
         </button>
-        <button
-          className="pill-btn pill-btn-black"
-          onClick={() => {
-            setError('');
-            setModal({ kind: 'wizard' });
-          }}
-        >
-          <Plus size={14} />
-          New Payrun
-        </button>
+        {['Admin', 'HR Payroll Manager', 'HR Payroll User'].includes(currentUser.role) && (
+          <button
+            className="pill-btn pill-btn-black"
+            onClick={() => {
+              setError('');
+              setModal({ kind: 'wizard' });
+            }}
+          >
+            <Plus size={14} />
+            New Payrun
+          </button>
+        )}
       </>
     );
 
@@ -1738,6 +1779,29 @@ export default function Home() {
               >
                 <Download size={13} /> Export Payslips
               </button>
+              {['Admin', 'HR Payroll Manager'].includes(currentUser.role) && (
+                <button
+                  className="pill-btn !py-1.5 cursor-pointer"
+                  disabled={busy || !run.slips.length || !['Validated', 'Paid'].includes(run.status)}
+                  onClick={() => void sendPayslips(run.id)}
+                >
+                  <Mail size={13} /> {busy ? 'Sending…' : 'Send Payslips'}
+                </button>
+              )}
+              {['Admin', 'HR Payroll Manager', 'HR Payroll User'].includes(currentUser.role) &&
+                ['Draft', 'Computed'].includes(run.status) && (
+                  <button
+                    className="pill-btn !py-1.5 cursor-pointer text-rose-600"
+                    disabled={busy}
+                    onClick={async () => {
+                      if (!window.confirm('Delete this unfinished payrun?')) return;
+                      const result = await act('delete', { collection: 'payruns', id: run.id }, 'Payrun deleted.');
+                      if (result) navigate('payruns');
+                    }}
+                  >
+                    Delete Payrun
+                  </button>
+                )}
             </div>
           </div>
 
@@ -1803,14 +1867,17 @@ export default function Home() {
               columns={[
                 {
                   title: 'Structure name',
-                  render: (r) => (
-                    <button
-                      className="font-semibold text-slate-900 hover:underline cursor-pointer"
-                      onClick={() => openForm('structures', r)}
-                    >
-                      {r.name}
-                    </button>
-                  ),
+                  render: (r) =>
+                    currentUser.role === 'HR Payroll User' ? (
+                      <span className="font-semibold text-slate-900">{r.name}</span>
+                    ) : (
+                      <button
+                        className="font-semibold text-slate-900 hover:underline cursor-pointer"
+                        onClick={() => openForm('structures', r)}
+                      >
+                        {r.name}
+                      </button>
+                    ),
                 },
                 { title: 'Rules', render: (r) => r.ruleIds.length + ' rules' },
                 {
@@ -1833,14 +1900,17 @@ export default function Home() {
               columns={[
                 {
                   title: 'Rule name',
-                  render: (r) => (
-                    <button
-                      className="font-semibold text-slate-900 hover:underline cursor-pointer"
-                      onClick={() => openForm('rules', r)}
-                    >
-                      {r.name}
-                    </button>
-                  ),
+                  render: (r) =>
+                    currentUser.role === 'HR Payroll User' ? (
+                      <span className="font-semibold text-slate-900">{r.name}</span>
+                    ) : (
+                      <button
+                        className="font-semibold text-slate-900 hover:underline cursor-pointer"
+                        onClick={() => openForm('rules', r)}
+                      >
+                        {r.name}
+                      </button>
+                    ),
                 },
                 {
                   title: 'Code',
@@ -2341,6 +2411,14 @@ export default function Home() {
               s={s}
               busy={busy}
               onSave={saveRecord}
+              onDelete={
+                currentUser.role === 'Admin' ||
+                currentUser.role === 'HR Payroll Manager' ||
+                (['HR Manager', 'HR Payroll User'].includes(currentUser.role) &&
+                  ['employees', 'contracts', 'attendance', 'requests', 'allocations', 'leaveTypes', 'schedules'].includes(modal.collection!))
+                  ? deleteRecord
+                  : undefined
+              }
               onCancel={() => setModal(null)}
             />
           )}
@@ -2479,12 +2557,12 @@ export default function Home() {
                 <button className="pill-btn !py-1.5 cursor-pointer" onClick={() => setModal(null)}>
                   Close
                 </button>
-                <button
+                <a
                   className="pill-btn pill-btn-black !py-1.5 cursor-pointer"
-                  onClick={() => window.print()}
+                  href={`/api/payslips/${encodeURIComponent(modal.record.id)}/pdf`}
                 >
-                  <Download size={13} /> Print / PDF
-                </button>
+                  <Download size={13} /> Download PDF
+                </a>
               </div>
             </div>
           )}
@@ -2535,8 +2613,15 @@ export default function Home() {
                 </button>
                 <button
                   className="pill-btn pill-btn-black cursor-pointer"
-                  disabled={busy || !!currentClock?.checkOut}
-                  onClick={() => void act('clock', { employeeId: 'e6' }, signedIn ? 'Checked out.' : 'Checked in.')}
+                  disabled={busy || !!currentClock?.checkOut || !currentUser.employeeId}
+                  onClick={() =>
+                    currentUser.employeeId &&
+                    void act(
+                      'clock',
+                      { employeeId: currentUser.employeeId },
+                      signedIn ? 'Checked out.' : 'Checked in.'
+                    )
+                  }
                 >
                   {signedIn ? 'Check out' : 'Check in'}
                 </button>
