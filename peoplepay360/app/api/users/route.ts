@@ -76,14 +76,14 @@ export async function POST(request: Request) {
       if (password && password.trim()) {
         await pool.query(
           `UPDATE users
-           SET name = $1, email = $2, role_id = $3, employee_id = $4, active = $5, password = $6, updated_at = CURRENT_TIMESTAMP
+           SET name = $1, email = $2, role_id = $3, employee_id = $4, active = $5, password = $6
            WHERE id = $7`,
           [name.trim(), email.trim().toLowerCase(), roleId, employeeId || null, active, password, id]
         );
       } else {
         await pool.query(
           `UPDATE users
-           SET name = $1, email = $2, role_id = $3, employee_id = $4, active = $5, updated_at = CURRENT_TIMESTAMP
+           SET name = $1, email = $2, role_id = $3, employee_id = $4, active = $5
            WHERE id = $6`,
           [name.trim(), email.trim().toLowerCase(), roleId, employeeId || null, active, id]
         );

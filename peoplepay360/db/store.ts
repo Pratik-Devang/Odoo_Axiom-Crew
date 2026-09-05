@@ -489,34 +489,6 @@ export async function readWorkspace(): Promise<{ data: Workspace; revision: numb
     }
   }
 
-  // Fallback to Cloudflare D1
-  try {
-    const { env } = await import('cloudflare:workers');
-    const db = env?.DB;
-    if (db) {
-      let row = await db
-        .prepare('SELECT data, revision FROM workspace WHERE id = ?')
-        .bind('demo')
-        .first<{ data: string; revision: number }>();
-
-      if (!row) {
-        await db
-          .prepare('INSERT OR IGNORE INTO workspace (id, data, revision) VALUES (?, ?, 0)')
-          .bind('demo', JSON.stringify(seed()))
-          .run();
-        row = await db
-          .prepare('SELECT data, revision FROM workspace WHERE id = ?')
-          .bind('demo')
-          .first<{ data: string; revision: number }>();
-      }
-
-      if (!row) throw new Error('Workspace could not be loaded.');
-      return { data: JSON.parse(row.data), revision: row.revision };
-    }
-  } catch {
-    // Cloudflare binding not available
-  }
-
   throw new Error(
     'No database configured. Please configure DATABASE_URL in .env.local to connect to PostgreSQL.'
   );
@@ -556,15 +528,7 @@ export async function writeWorkspace(data: unknown, revision: number) {
     }
   }
 
-  // Fallback to Cloudflare D1
-  const { env } = await import('cloudflare:workers');
-  if (!env?.DB) {
-    throw new Error('No database configured.');
-  }
-
-  return env.DB.prepare(
-    'UPDATE workspace SET data = ?, revision = revision + 1 WHERE id = ? AND revision = ?'
-  )
-    .bind(serialized, 'demo', revision)
-    .run();
+  throw new Error(
+    'No database configured. Please configure DATABASE_URL in .env.local to connect to PostgreSQL.'
+  );
 }
