@@ -291,7 +291,11 @@ export function buildDashboardSnapshot(s: Workspace, filters: DashboardFilters):
   const trend = getNetSalaryTrend(s, filteredEmployeeIds, filters.period);
   const prevMonthNet = trend[trend.length - 2]?.value || totalNet;
   const deltaPct = prevMonthNet > 0 ? ((totalNet - prevMonthNet) / prevMonthNet) * 100 : 0;
-  const deltaLabel = `${deltaPct >= 0 ? '+' : ''}${deltaPct.toFixed(1)}% vs prev month`;
+  const deltaLabel = hasActualPayroll
+    ? prevMonthNet > 0
+      ? `${deltaPct >= 0 ? '+' : ''}${deltaPct.toFixed(1)}% vs prev month`
+      : 'First payrun'
+    : 'Not yet run for this period';
 
   const { rows: departmentShare, totalAmount: totalDepartmentAmount } = getDepartmentShare(
     s,
