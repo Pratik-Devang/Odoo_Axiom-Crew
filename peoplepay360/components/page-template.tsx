@@ -136,7 +136,7 @@ export function PageShell({
               Overview
             </button>
           )}
-          {(!currentUser || (currentUser.role !== 'Admin' && canView(currentUser.role, 'employees'))) && (
+          {(!currentUser || canView(currentUser.role, 'employees')) && (
             <button
               className={`nav-pill ${isEmployees ? 'active' : ''}`}
               onClick={() => onNavigate('employees')}
@@ -181,7 +181,7 @@ export function PageShell({
               {currentUser?.role === 'Employee' ? 'My Payslips' : 'Payroll'}
             </button>
           )}
-          {currentUser && canView(currentUser.role, 'admin/users') && (
+          {currentUser && !isOverview && canView(currentUser.role, 'admin/users') && (
             <button
               className={`nav-pill ${isUsers ? 'active' : ''}`}
               onClick={() => onNavigate('users')}
@@ -194,7 +194,7 @@ export function PageShell({
 
         {/* Right Action Utility Buttons */}
         <div className="workora-top-actions items-center gap-2">
-          {(!currentUser || currentUser.employeeId) && (
+          {(!currentUser || currentUser.employeeId || isOverview) && (
             <button
               className={`circle-btn ${isCheckedIn ? 'clock-active' : ''}`}
               title={isCheckedIn ? 'Checked in · Live Shift' : 'Attendance check-in'}

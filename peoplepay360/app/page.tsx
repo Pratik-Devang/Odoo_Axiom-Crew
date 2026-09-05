@@ -53,7 +53,7 @@ import {
   employeeSchedule,
 } from '@/lib/domain';
 import { Avatar, Badge, DataTable, Field, Picker, niceMonth, downloadCsv } from '@/components/peoplepay-ui';
-import Dashboard from '@/components/payroll-dashboard';
+import Dashboard from '@/components/overview-dashboard';
 import WorkingSchedules from '@/components/working-schedules';
 import RecordForm, { defaults, titles } from '@/components/record-form';
 import {
@@ -888,13 +888,6 @@ export default function Home() {
     pageTitle = 'People & Operations Workflow';
     headerActions = (
       <>
-        <Input
-          type="month"
-          aria-label="Payroll period"
-          className="h-9 px-3 rounded-full bg-white border border-[#e5ded4] text-xs font-medium text-slate-700 w-36 shadow-2xs"
-          value={period}
-          onChange={(e) => setPeriod(e.target.value)}
-        />
         <button className="pill-btn" onClick={exportPayroll}>
           <Download size={14} />
           Export
