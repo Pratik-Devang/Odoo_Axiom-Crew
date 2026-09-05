@@ -210,9 +210,12 @@ export default function Home() {
   const [loginDropdownOpen, setLoginDropdownOpen] = useState(false);
   const [loginSearch, setLoginSearch] = useState('');
 
-  // Admin users state
+  // Admin users state & unified view options
   const [systemUsers, setSystemUsers] = useState<any[]>([]);
   const [systemRoles, setSystemRoles] = useState<any[]>([]);
+  const [userViewMode, setUserViewMode] = useState<'grid' | 'list'>('list');
+  const [userRoleFilter, setUserRoleFilter] = useState<string>('All');
+  const [selectedUserDrawer, setSelectedUserDrawer] = useState<any | null>(null);
   const [userFormData, setUserFormData] = useState({
     id: '',
     name: '',
@@ -221,6 +224,14 @@ export default function Home() {
     employeeId: '',
     password: '',
     active: true,
+    department: 'Engineering',
+    position: 'Team Member',
+    phone: '+91 90000 10000',
+    type: 'Full-time',
+    manager: 'Sara Khan',
+    location: 'Mumbai',
+    scheduleId: 'sch1',
+    bank: '',
   });
 
   const checkAuth = useCallback(async () => {
@@ -2260,232 +2271,183 @@ export default function Home() {
       );
     }
   } else if (view === 'users') {
-    pageTitle = 'System Users & RBAC Administration';
+    pageTitle = 'System Users & Administration';
     headerActions = (
-      <button
-        className="pill-btn pill-btn-black"
-        onClick={() => {
-          setUserFormData({
-            id: '',
-            name: '',
-            email: '',
-            roleId: 'employee',
-            employeeId: '',
-            password: '',
-            active: true,
-          });
-          setModal({ kind: 'userForm' });
-        }}
-      >
-        <Plus size={14} /> New User Account
-      </button>
+      <>
+        <div className="flex items-center bg-slate-100 p-0.5 rounded-full border border-slate-200">
+          <button
+            className={
+              'px-2.5 py-1 rounded-full text-xs font-medium cursor-pointer ' +
+              (userViewMode === 'grid' ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-500')
+            }
+            onClick={() => setUserViewMode('grid')}
+            title="Kanban / Card grid"
+          >
+            <LayoutGrid size={13} />
+          </button>
+          <button
+            className={
+              'px-2.5 py-1 rounded-full text-xs font-medium cursor-pointer ' +
+              (userViewMode === 'list' ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-500')
+            }
+            onClick={() => setUserViewMode('list')}
+            title="Tabular / List view"
+          >
+            <List size={13} />
+          </button>
+        </div>
+
+        <div className="pill-search !py-1.5 w-56 bg-white border border-[#e5ded4]">
+          <Search size={14} className="text-slate-400 shrink-0" />
+          <input
+            type="text"
+            placeholder="Filter accounts…"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            className="w-full text-xs outline-none bg-transparent"
+          />
+        </div>
+
+        <Picker
+          label="Role"
+          value={userRoleFilter}
+          onChange={setUserRoleFilter}
+          options={['All', 'Admin', 'HR Payroll Manager', 'HR Payroll User', 'HR Manager', 'Employee']}
+        />
+
+        <button
+          className="pill-btn pill-btn-black"
+          onClick={() => {
+            setUserFormData({
+              id: '',
+              name: '',
+              email: '',
+              roleId: 'employee',
+              employeeId: '',
+              password: '',
+              active: true,
+              department: 'Engineering',
+              position: 'Team Member',
+              phone: '+91 90000 10000',
+              type: 'Full-time',
+              manager: 'Sara Khan',
+              location: 'Mumbai',
+              scheduleId: 'sch1',
+              bank: '',
+            });
+            setModal({ kind: 'userForm' });
+          }}
+        >
+          <Plus size={14} /> New User Account
+        </button>
+      </>
     );
 
-    const filteredUsers = systemUsers.filter((u) =>
-      !query ||
-      [u.name, u.email, u.roleName, u.roleId].some((x) =>
-        String(x || '').toLowerCase().includes(query.toLowerCase())
-      )
+    const filteredUsers = systemUsers.filter(
+      (u) =>
+        (userRoleFilter === 'All' || (u.roleName || u.roleId).toLowerCase().includes(userRoleFilter.toLowerCase())) &&
+        (!query ||
+          [u.name, u.email, u.roleName, u.roleId, u.department, u.position].some((x) =>
+            String(x || '').toLowerCase().includes(query.toLowerCase())
+          ))
     );
 
-    const activeUser = systemUsers.find((u) => u.id === activeId) || filteredUsers[0];
-
-    leftSlot = (
-      <MasterList
-        title="Accounts"
-        count={filteredUsers.length}
-        search={query}
-        onSearchChange={setQuery}
-        searchPlaceholder="Filter accounts…"
-      >
-        {filteredUsers.map((u) => {
-          const isSel = u.id === activeUser?.id;
-          return (
-            <MasterCard
-              key={u.id}
-              avatar={initials(u.name)}
-              title={u.name}
-              subtitle={u.email}
-              badge={u.roleName || u.roleId}
-              meta={u.active ? 'Active' : 'Inactive'}
-              active={isSel}
-              onClick={() => setActiveId(u.id)}
-            />
-          );
-        })}
-      </MasterList>
-    );
-
-    centerContent = (
-      <div className="space-y-4">
-        {activeUser && (
-          <div className="workora-card space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+    centerContent = userViewMode === 'grid' ? (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {filteredUsers.map((u) => (
+          <div
+            key={u.id}
+            onClick={() => setSelectedUserDrawer(u)}
+            className="workora-card hover:border-slate-400 hover:shadow-md transition-all cursor-pointer p-4 space-y-3 bg-white rounded-2xl border border-[#e5ded4]"
+          >
+            <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-2xl bg-[#f5efe6] border border-[#e5ded4] flex items-center justify-center font-bold text-sm text-[#8a7a6d]">
-                  {initials(activeUser.name)}
-                </div>
+                <Avatar name={u.name} />
                 <div>
-                  <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                    {activeUser.name}
-                    <span className={`text-[10px] px-2 py-0.5 rounded-full border font-bold ${ROLE_STYLES[activeUser.roleName || ''] || 'bg-slate-100 text-slate-700'}`}>
-                      {activeUser.roleName || activeUser.roleId}
-                    </span>
-                  </h2>
-                  <p className="text-xs text-slate-500">{activeUser.email}</p>
+                  <h3 className="font-bold text-slate-900 text-sm">{u.name}</h3>
+                  <p className="text-xs text-slate-500">{u.email}</p>
                 </div>
               </div>
-              <button
-                className="pill-btn !py-1.5 cursor-pointer"
-                onClick={() => {
-                  setUserFormData({
-                    id: activeUser.id,
-                    name: activeUser.name,
-                    email: activeUser.email,
-                    roleId: activeUser.roleId,
-                    employeeId: activeUser.employeeId || '',
-                    password: '',
-                    active: activeUser.active ?? true,
-                  });
-                  setModal({ kind: 'userForm' });
-                }}
-              >
-                Edit Account
-              </button>
+              <span className={`text-[10px] px-2 py-0.5 rounded-full border font-bold ${ROLE_STYLES[u.roleName || ''] || 'bg-slate-100 text-slate-700'}`}>
+                {u.roleName || u.roleId}
+              </span>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
-                <span className="text-[11px] text-slate-400">Assigned Role</span>
-                <span className="text-xs font-bold text-slate-900 block mt-0.5">
-                  {activeUser.roleName || activeUser.roleId}
-                </span>
+            <div className="grid grid-cols-2 gap-2 text-xs pt-2 border-t border-slate-100">
+              <div>
+                <span className="text-[10px] text-slate-400 block uppercase">Department</span>
+                <span className="font-semibold text-slate-800">{u.department || 'Engineering'}</span>
               </div>
-              <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
-                <span className="text-[11px] text-slate-400">Linked Staff Member</span>
-                <span className="text-xs font-bold text-slate-900 block mt-0.5">
-                  {activeUser.employeeId ? empName(activeUser.employeeId) : 'System Admin (None)'}
-                </span>
+              <div>
+                <span className="text-[10px] text-slate-400 block uppercase">Position</span>
+                <span className="font-semibold text-slate-800">{u.position || 'Team Member'}</span>
               </div>
-              <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
-                <span className="text-[11px] text-slate-400">Account Status</span>
-                <span className="text-xs font-bold text-slate-900 block mt-0.5">
-                  {activeUser.active ? 'Active' : 'Deactivated'}
-                </span>
-              </div>
+            </div>
+
+            <div className="flex items-center justify-between pt-1">
+              <span className={`inline-flex items-center gap-1.5 text-[11px] font-semibold ${u.active ? 'text-emerald-700' : 'text-slate-400'}`}>
+                <span className={`w-1.5 h-1.5 rounded-full ${u.active ? 'bg-emerald-500' : 'bg-slate-300'}`} />
+                {u.active ? 'Active Account' : 'Deactivated'}
+              </span>
+              <span className="text-xs text-[#c99a2e] font-semibold hover:underline">Inspect →</span>
             </div>
           </div>
-        )}
-
-        <DataTable
-          rows={filteredUsers}
-          columns={[
-            {
-              title: 'Account User',
-              render: (u) => (
-                <div className="flex items-center gap-2.5">
-                  <Avatar name={u.name} />
-                  <div>
-                    <span className="font-semibold text-slate-900 block">{u.name}</span>
-                    <span className="text-[11px] text-slate-400">{u.email}</span>
-                  </div>
-                </div>
-              ),
-            },
-            {
-              title: 'Role',
-              render: (u) => (
-                <span className={`px-2 py-0.5 rounded text-[11px] font-bold border ${ROLE_STYLES[u.roleName || ''] || 'bg-slate-100 text-slate-700'}`}>
-                  {u.roleName || u.roleId}
-                </span>
-              ),
-            },
-            {
-              title: 'Linked Employee',
-              render: (u) => (u.employeeId ? empName(u.employeeId) : <span className="text-slate-400">—</span>),
-            },
-            {
-              title: 'Status',
-              render: (u) => <Badge value={u.active ? 'Active' : 'Archived'} />,
-            },
-            {
-              title: 'Actions',
-              render: (u) => (
-                <button
-                  className="text-xs font-semibold text-[#c99a2e] hover:underline cursor-pointer"
-                  onClick={() => {
-                    setUserFormData({
-                      id: u.id,
-                      name: u.name,
-                      email: u.email,
-                      roleId: u.roleId,
-                      employeeId: u.employeeId || '',
-                      password: '',
-                      active: u.active ?? true,
-                    });
-                    setModal({ kind: 'userForm' });
-                  }}
-                >
-                  Edit →
-                </button>
-              ),
-            },
-          ]}
-        />
+        ))}
       </div>
+    ) : (
+      <DataTable
+        rows={filteredUsers}
+        onSelect={(u) => setSelectedUserDrawer(u)}
+        columns={[
+          {
+            title: 'Account User',
+            render: (u) => (
+              <div className="flex items-center gap-2.5">
+                <Avatar name={u.name} />
+                <div>
+                  <span className="font-semibold text-slate-900 block">{u.name}</span>
+                  <span className="text-[11px] text-slate-400">{u.email}</span>
+                </div>
+              </div>
+            ),
+          },
+          {
+            title: 'System Role',
+            render: (u) => (
+              <span className={`px-2 py-0.5 rounded text-[11px] font-bold border ${ROLE_STYLES[u.roleName || ''] || 'bg-slate-100 text-slate-700'}`}>
+                {u.roleName || u.roleId}
+              </span>
+            ),
+          },
+          {
+            title: 'Department',
+            render: (u) => u.department || 'Engineering',
+          },
+          {
+            title: 'Position',
+            render: (u) => u.position || 'Team Member',
+          },
+          {
+            title: 'Status',
+            render: (u) => <Badge value={u.active ? 'Active' : 'Archived'} />,
+          },
+          {
+            title: 'Actions',
+            render: (u) => (
+              <button
+                className="text-xs font-semibold text-[#c99a2e] hover:underline cursor-pointer"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSelectedUserDrawer(u);
+                }}
+              >
+                View Details →
+              </button>
+            ),
+          },
+        ]}
+      />
     );
-
-    if (activeUser) {
-      rightSlot = (
-        <DetailPanel
-          avatar={initials(activeUser.name)}
-          title={activeUser.name}
-          subtitle={activeUser.roleName || activeUser.roleId}
-          badge={activeUser.active ? 'Active' : 'Inactive'}
-        >
-          <DetailSection title="ACCOUNT PERMISSIONS">
-            <DetailRow label="Role Level" value={activeUser.roleName || activeUser.roleId} />
-            <DetailRow label="Access Scope" value={activeUser.roleId === 'admin' ? 'Universal Control' : activeUser.roleId === 'employee' ? 'Self-service Portal' : 'Department Operations'} />
-            <DetailRow label="Linked Profile" value={activeUser.employeeId ? empName(activeUser.employeeId) : 'None'} />
-          </DetailSection>
-
-          <DetailSection title="ROLE RESPONSIBILITIES">
-            <p className="text-xs text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-100 leading-relaxed">
-              {activeUser.roleId === 'admin'
-                ? 'Full system governance, security settings, user provisioning, role assignments, and all HR/Payroll modules.'
-                : activeUser.roleId === 'payroll_manager'
-                ? 'Authorized for payroll run creation, salary structures, rule authoring, validation, and final disbursement.'
-                : activeUser.roleId === 'payroll_user'
-                ? 'Authorized for contract review, calculating payslips, and computing draft payruns.'
-                : activeUser.roleId === 'hr_manager'
-                ? 'Authorized for employee profile creation, contract administration, attendance oversight, and approving time-off.'
-                : 'Self-service access to check-in attendance, view personal time off requests, and view generated monthly payslips.'}
-            </p>
-          </DetailSection>
-
-          <DetailSection title="ADMIN ACTIONS">
-            <button
-              className="doc-chip hover:bg-[#ede7de] transition-colors cursor-pointer"
-              onClick={() => {
-                setUserFormData({
-                  id: activeUser.id,
-                  name: activeUser.name,
-                  email: activeUser.email,
-                  roleId: activeUser.roleId,
-                  employeeId: activeUser.employeeId || '',
-                  password: '',
-                  active: activeUser.active ?? true,
-                });
-                setModal({ kind: 'userForm' });
-              }}
-            >
-              <Key className="size-3.5 text-[#c99a2e]" />
-              <span className="doc-chip-name">Change Password or Role</span>
-            </button>
-          </DetailSection>
-        </DetailPanel>
-      );
-    }
   }
 
   if (!mounted || !s) {
@@ -2576,6 +2538,203 @@ export default function Home() {
         {centerContent}
       </PageShell>
 
+      {/* ─── Slide-Over Right Drawer Overlay for Users ─── */}
+      {selectedUserDrawer && (
+        <div className="fixed inset-0 z-50 overflow-hidden">
+          <div
+            className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs transition-opacity"
+            onClick={() => setSelectedUserDrawer(null)}
+          />
+          <div className="fixed inset-y-0 right-0 max-w-full flex pl-10">
+            <div className="w-screen max-w-lg bg-white border-l border-[#e5ded4] shadow-2xl flex flex-col h-full animate-in slide-in-from-right duration-250">
+              
+              {/* Header */}
+              <div className="p-5 border-b border-[#e5ded4] bg-[#faf8f5] flex items-center justify-between shrink-0">
+                <div className="flex items-center gap-3">
+                  <Avatar name={selectedUserDrawer.name} />
+                  <div>
+                    <h2 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
+                      {selectedUserDrawer.name}
+                      <span className={`text-[10px] px-2 py-0.5 rounded-full border font-bold ${ROLE_STYLES[selectedUserDrawer.roleName || ''] || 'bg-slate-100 text-slate-700'}`}>
+                        {selectedUserDrawer.roleName || selectedUserDrawer.roleId}
+                      </span>
+                    </h2>
+                    <p className="text-xs text-slate-500">{selectedUserDrawer.email}</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setSelectedUserDrawer(null)}
+                  className="p-1.5 rounded-full hover:bg-slate-200/60 text-slate-500 cursor-pointer"
+                  title="Close Drawer"
+                >
+                  <XCircle size={20} />
+                </button>
+              </div>
+
+              {/* Body with Collapsible Accordion Dropdowns */}
+              <div className="flex-1 overflow-y-auto p-5 space-y-4">
+                <DetailSection title="ACCOUNT PERMISSIONS & SCOPE">
+                  <DetailRow label="Role Level" value={selectedUserDrawer.roleName || selectedUserDrawer.roleId} />
+                  <DetailRow
+                    label="Access Scope"
+                    value={
+                      selectedUserDrawer.roleId === 'admin'
+                        ? 'Universal Control'
+                        : selectedUserDrawer.roleId === 'employee'
+                        ? 'Self-service Portal'
+                        : 'Department Operations'
+                    }
+                  />
+                  <DetailRow label="Work Email" value={selectedUserDrawer.email} />
+                  <DetailRow label="Account Status" value={selectedUserDrawer.active ? 'Active Account' : 'Deactivated'} />
+                </DetailSection>
+
+                {/* COMPRESSED DROPDOWN ACCORDIONS */}
+                <details className="group border border-[#e5ded4] rounded-2xl bg-[#faf8f5]/60 overflow-hidden text-xs my-2">
+                  <summary className="flex items-center justify-between px-3.5 py-2.5 bg-[#f5efe6] hover:bg-[#ebdcc8]/60 cursor-pointer font-bold text-xs text-slate-800 transition-colors select-none">
+                    <span className="flex items-center gap-1.5">
+                      <ChevronDown className="size-4 text-[#c99a2e] transition-transform duration-200 group-open:rotate-180" />
+                      Basic Work & Profile Information
+                    </span>
+                    <span className="text-[10px] text-slate-500 font-semibold uppercase tracking-wide group-open:hidden">Expand</span>
+                    <span className="text-[10px] text-slate-500 font-semibold uppercase tracking-wide hidden group-open:inline">Collapse</span>
+                  </summary>
+
+                  <div className="p-3.5 space-y-3 border-t border-[#e5ded4] bg-white">
+                    <DetailRow label="Department" value={selectedUserDrawer.department || 'Engineering'} />
+                    <DetailRow label="Position" value={selectedUserDrawer.position || 'Team Member'} />
+                    <DetailRow label="Phone" value={selectedUserDrawer.phone || '+91 90000 10000'} />
+                    <DetailRow label="Employment Type" value={selectedUserDrawer.type || 'Full-time'} />
+                    <DetailRow label="Manager" value={selectedUserDrawer.manager || 'Sara Khan'} />
+                    <DetailRow label="Location" value={selectedUserDrawer.location || 'Mumbai'} />
+                    <DetailRow label="Bank Reference" value={selectedUserDrawer.bank || 'Standard Payroll Direct'} />
+                  </div>
+                </details>
+
+                <details className="group border border-[#e5ded4] rounded-2xl bg-[#faf8f5]/60 overflow-hidden text-xs my-2">
+                  <summary className="flex items-center justify-between px-3.5 py-2.5 bg-[#f5efe6] hover:bg-[#ebdcc8]/60 cursor-pointer font-bold text-xs text-slate-800 transition-colors select-none">
+                    <span className="flex items-center gap-1.5">
+                      <ChevronDown className="size-4 text-[#c99a2e] transition-transform duration-200 group-open:rotate-180" />
+                      Contracts & Work Policies
+                    </span>
+                    <span className="text-[10px] text-slate-500 font-semibold uppercase tracking-wide group-open:hidden">Expand</span>
+                    <span className="text-[10px] text-slate-500 font-semibold uppercase tracking-wide hidden group-open:inline">Collapse</span>
+                  </summary>
+
+                  <div className="p-3.5 space-y-3 border-t border-[#e5ded4] bg-white">
+                    <DocChip
+                      name={`Terms: ${money(85000)} /mo`}
+                      meta="Active Full-time Contract"
+                      onClick={() => {
+                        setSelectedUserDrawer(null);
+                        navigate('contracts');
+                      }}
+                    />
+                    <DocChip
+                      name="Standard Workweek Policy"
+                      meta="09:00 – 18:00 (Mon - Fri)"
+                      onClick={() => {
+                        setSelectedUserDrawer(null);
+                        navigate('schedules');
+                      }}
+                    />
+                  </div>
+                </details>
+
+                <details className="group border border-[#e5ded4] rounded-2xl bg-[#faf8f5]/60 overflow-hidden text-xs my-2">
+                  <summary className="flex items-center justify-between px-3.5 py-2.5 bg-[#f5efe6] hover:bg-[#ebdcc8]/60 cursor-pointer font-bold text-xs text-slate-800 transition-colors select-none">
+                    <span className="flex items-center gap-1.5">
+                      <ChevronDown className="size-4 text-[#c99a2e] transition-transform duration-200 group-open:rotate-180" />
+                      Attendance & Leave Statistics
+                    </span>
+                    <span className="text-[10px] text-slate-500 font-semibold uppercase tracking-wide group-open:hidden">Expand</span>
+                    <span className="text-[10px] text-slate-500 font-semibold uppercase tracking-wide hidden group-open:inline">Collapse</span>
+                  </summary>
+
+                  <div className="p-3.5 space-y-3 border-t border-[#e5ded4] bg-white">
+                    <StatBar
+                      label="Shift Attendance Rate"
+                      value={92}
+                      displayValue="92%"
+                      variant="gold"
+                    />
+                    <StatBar
+                      label="Approved Leave Balance"
+                      value={80}
+                      displayValue="16 days"
+                      variant="green"
+                    />
+                  </div>
+                </details>
+
+                <details className="group border border-[#e5ded4] rounded-2xl bg-[#faf8f5]/60 overflow-hidden text-xs my-2">
+                  <summary className="flex items-center justify-between px-3.5 py-2.5 bg-[#f5efe6] hover:bg-[#ebdcc8]/60 cursor-pointer font-bold text-xs text-slate-800 transition-colors select-none">
+                    <span className="flex items-center gap-1.5">
+                      <ChevronDown className="size-4 text-[#c99a2e] transition-transform duration-200 group-open:rotate-180" />
+                      Role Responsibilities Overview
+                    </span>
+                    <span className="text-[10px] text-slate-500 font-semibold uppercase tracking-wide group-open:hidden">Expand</span>
+                    <span className="text-[10px] text-slate-500 font-semibold uppercase tracking-wide hidden group-open:inline">Collapse</span>
+                  </summary>
+
+                  <div className="p-3.5 border-t border-[#e5ded4] bg-white">
+                    <p className="text-xs text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-100 leading-relaxed">
+                      {selectedUserDrawer.roleId === 'admin'
+                        ? 'Full system governance, security settings, user provisioning, role assignments, and all HR/Payroll modules.'
+                        : selectedUserDrawer.roleId === 'payroll_manager'
+                        ? 'Authorized for payroll run creation, salary structures, rule authoring, validation, and final disbursement.'
+                        : selectedUserDrawer.roleId === 'payroll_user'
+                        ? 'Authorized for contract review, calculating payslips, and computing draft payruns.'
+                        : selectedUserDrawer.roleId === 'hr_manager'
+                        ? 'Authorized for employee profile creation, contract administration, attendance oversight, and approving time-off.'
+                        : 'Self-service access to check-in attendance, view personal time off requests, and view generated monthly payslips.'}
+                    </p>
+                  </div>
+                </details>
+              </div>
+
+              {/* Footer */}
+              <div className="p-4 border-t border-[#e5ded4] bg-[#faf8f5] flex items-center justify-between shrink-0">
+                <button
+                  className="pill-btn pill-btn-black !py-2 justify-center text-xs font-semibold cursor-pointer"
+                  onClick={() => {
+                    const targetUser = selectedUserDrawer;
+                    setSelectedUserDrawer(null);
+                    setUserFormData({
+                      id: targetUser.id,
+                      name: targetUser.name,
+                      email: targetUser.email,
+                      roleId: targetUser.roleId,
+                      employeeId: targetUser.employeeId || '',
+                      password: '',
+                      active: targetUser.active ?? true,
+                      department: targetUser.department || 'Engineering',
+                      position: targetUser.position || 'Team Member',
+                      phone: targetUser.phone || '+91 90000 10000',
+                      type: targetUser.type || 'Full-time',
+                      manager: targetUser.manager || 'Sara Khan',
+                      location: targetUser.location || 'Mumbai',
+                      scheduleId: targetUser.scheduleId || 'sch1',
+                      bank: targetUser.bank || '',
+                    });
+                    setModal({ kind: 'userForm' });
+                  }}
+                >
+                  Edit Account Details
+                </button>
+                <button
+                  className="pill-btn !py-2 cursor-pointer"
+                  onClick={() => setSelectedUserDrawer(null)}
+                >
+                  Close
+                </button>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ─── Modals and Dialogs ─── */}
       {modal && (
         <Dialog
@@ -2593,6 +2752,8 @@ export default function Home() {
               <DialogTitle className="text-base font-bold text-slate-900">
                 {modal?.kind === 'form'
                   ? (modal.record?.id ? 'Edit ' : 'New ') + (titles[modal.collection!] || 'Record')
+                  : modal?.kind === 'userForm'
+                  ? (userFormData.id ? 'Edit User Account' : 'New User Account')
                   : modal?.kind === 'wizard'
                   ? 'New Payrun Workflow'
                   : modal?.kind === 'slip'
@@ -2617,95 +2778,124 @@ export default function Home() {
 
           {error && <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-700 mb-3">{error}</div>}
 
-                      {modal?.kind === 'userForm' && (
-              <form onSubmit={handleSaveUser} className="space-y-4 pt-2">
-                <Field label="Full Name">
+          {modal?.kind === 'userForm' && (
+            <form onSubmit={handleSaveUser} className="space-y-4 pt-2">
+              <Field label="Full Name">
+                <Input
+                  required
+                  value={userFormData.name}
+                  onChange={(e) => setUserFormData({ ...userFormData, name: e.target.value })}
+                  placeholder="e.g. Maya Lin"
+                  className="h-9 rounded-xl"
+                />
+              </Field>
+
+              <Field label="Work Email">
+                <Input
+                  type="email"
+                  required
+                  value={userFormData.email}
+                  onChange={(e) => setUserFormData({ ...userFormData, email: e.target.value })}
+                  placeholder="e.g. maya@oxp.example"
+                  className="h-9 rounded-xl"
+                />
+              </Field>
+
+              <Field label="System Role">
+                <select
+                  className="h-9 w-full rounded-xl border border-slate-200 px-3 text-xs bg-white outline-none"
+                  value={userFormData.roleId}
+                  onChange={(e) => setUserFormData({ ...userFormData, roleId: e.target.value })}
+                >
+                  <option value="admin">Admin</option>
+                  <option value="payroll_manager">HR Payroll Manager</option>
+                  <option value="payroll_user">HR Payroll User</option>
+                  <option value="hr_manager">HR Manager</option>
+                  <option value="employee">Employee</option>
+                </select>
+              </Field>
+
+              <div className="grid grid-cols-2 gap-3">
+                <Field label="Department">
                   <Input
-                    required
-                    value={userFormData.name}
-                    onChange={(e) => setUserFormData({ ...userFormData, name: e.target.value })}
-                    placeholder="e.g. Maya Lin"
+                    value={userFormData.department}
+                    onChange={(e) => setUserFormData({ ...userFormData, department: e.target.value })}
+                    placeholder="e.g. Engineering"
                     className="h-9 rounded-xl"
                   />
                 </Field>
 
-                <Field label="Work Email">
+                <Field label="Position / Title">
                   <Input
-                    type="email"
-                    required
-                    value={userFormData.email}
-                    onChange={(e) => setUserFormData({ ...userFormData, email: e.target.value })}
-                    placeholder="e.g. maya@oxp.example"
+                    value={userFormData.position}
+                    onChange={(e) => setUserFormData({ ...userFormData, position: e.target.value })}
+                    placeholder="e.g. Lead Designer"
                     className="h-9 rounded-xl"
                   />
                 </Field>
+              </div>
 
-                <Field label="System Role">
+              <div className="grid grid-cols-2 gap-3">
+                <Field label="Employment Type">
                   <select
                     className="h-9 w-full rounded-xl border border-slate-200 px-3 text-xs bg-white outline-none"
-                    value={userFormData.roleId}
-                    onChange={(e) => setUserFormData({ ...userFormData, roleId: e.target.value })}
+                    value={userFormData.type}
+                    onChange={(e) => setUserFormData({ ...userFormData, type: e.target.value })}
                   >
-                    <option value="admin">Admin</option>
-                    <option value="payroll_manager">HR Payroll Manager</option>
-                    <option value="payroll_user">HR Payroll User</option>
-                    <option value="hr_manager">HR Manager</option>
-                    <option value="employee">Employee</option>
+                    <option value="Full-time">Full-time</option>
+                    <option value="Part-time">Part-time</option>
+                    <option value="Intern">Intern</option>
+                    <option value="Contract">Contract</option>
                   </select>
                 </Field>
 
-                <Field label="Linked Employee Profile">
-                  <select
-                    className="h-9 w-full rounded-xl border border-slate-200 px-3 text-xs bg-white outline-none"
-                    value={userFormData.employeeId}
-                    onChange={(e) => setUserFormData({ ...userFormData, employeeId: e.target.value })}
-                  >
-                    <option value="">None (System / Admin Only)</option>
-                    {s?.employees.map((e) => (
-                      <option key={e.id} value={e.id}>
-                        {e.name} ({e.department} - {e.position})
-                      </option>
-                    ))}
-                  </select>
-                </Field>
-
-                <Field label={userFormData.id ? 'Password (leave blank to keep current)' : 'Account Password'}>
+                <Field label="Location / Office">
                   <Input
-                    type="password"
-                    required={!userFormData.id}
-                    value={userFormData.password}
-                    onChange={(e) => setUserFormData({ ...userFormData, password: e.target.value })}
-                    placeholder={userFormData.id ? '••••••••' : 'Enter password'}
+                    value={userFormData.location}
+                    onChange={(e) => setUserFormData({ ...userFormData, location: e.target.value })}
+                    placeholder="e.g. Mumbai"
                     className="h-9 rounded-xl"
                   />
                 </Field>
+              </div>
 
-                <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-slate-700">
-                  <Checkbox
-                    checked={userFormData.active}
-                    onCheckedChange={(v) => setUserFormData({ ...userFormData, active: !!v })}
-                  />
-                  Active account permitted to authenticate
-                </label>
+              <Field label={userFormData.id ? 'Password (leave blank to keep current)' : 'Account Password'}>
+                <Input
+                  type="password"
+                  required={!userFormData.id}
+                  value={userFormData.password}
+                  onChange={(e) => setUserFormData({ ...userFormData, password: e.target.value })}
+                  placeholder={userFormData.id ? '••••••••' : 'Enter password'}
+                  className="h-9 rounded-xl"
+                />
+              </Field>
 
-                <div className="flex justify-end gap-2 pt-3 border-t border-slate-100">
-                  <button
-                    type="button"
-                    className="pill-btn !py-1.5 cursor-pointer"
-                    onClick={() => setModal(null)}
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={busy}
-                    className="pill-btn pill-btn-black !py-1.5 cursor-pointer"
-                  >
-                    {busy ? 'Saving…' : 'Save User'}
-                  </button>
-                </div>
-              </form>
-            )}
+              <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-slate-700">
+                <Checkbox
+                  checked={userFormData.active}
+                  onCheckedChange={(v) => setUserFormData({ ...userFormData, active: !!v })}
+                />
+                Active account permitted to authenticate
+              </label>
+
+              <div className="flex justify-end gap-2 pt-3 border-t border-slate-100">
+                <button
+                  type="button"
+                  className="pill-btn !py-1.5 cursor-pointer"
+                  onClick={() => setModal(null)}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={busy}
+                  className="pill-btn pill-btn-black !py-1.5 cursor-pointer"
+                >
+                  {busy ? 'Saving…' : 'Save Account'}
+                </button>
+              </div>
+            </form>
+          )}
 
             {modal?.kind === 'form' && s && (
             <RecordForm
