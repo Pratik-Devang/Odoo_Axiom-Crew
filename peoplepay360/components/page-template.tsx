@@ -112,7 +112,7 @@ export function PageShell({
           className="workora-brand flex items-center gap-2.5 hover:opacity-90 transition-opacity shrink-0 select-none"
           onClick={(e) => {
             e.preventDefault();
-            onNavigate(currentUser?.role === 'Employee' ? 'attendance' : currentUser?.role === 'HR Manager' ? 'employees' : 'overview');
+            onNavigate(currentUser?.role === 'Employee' ? 'attendance' : currentUser?.role === 'HR Manager' ? 'users' : 'overview');
           }}
         >
           <img
@@ -136,7 +136,7 @@ export function PageShell({
               Overview
             </button>
           )}
-          {(!currentUser || canView(currentUser.role, 'employees')) && (
+          {(!currentUser || (currentUser.role !== 'Admin' && canView(currentUser.role, 'employees'))) && (
             <button
               className={`nav-pill ${isEmployees ? 'active' : ''}`}
               onClick={() => onNavigate('employees')}

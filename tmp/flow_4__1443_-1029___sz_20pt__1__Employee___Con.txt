@@ -1,0 +1,6 @@
+[1443,-1029 | sz:20pt] 1) Employee & Contract Flow
+[1483,-1028 | sz:12pt] Use arrows as navigation flow: user reaches Employee screens, opens a record, then accesses related Contract records.
+[1568,-920 | sz:13pt] Menus under Employees
+[1612,-887 | sz:11pt] Employees
+[1647,-890 | sz:14pt] contracts
+[1683,-896 | sz:14pt] departments
