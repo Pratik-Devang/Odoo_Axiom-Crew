@@ -1670,7 +1670,6 @@ export default function Home() {
                 render: (r) => (
                   <button
                     className="font-semibold text-slate-900 hover:underline cursor-pointer"
-                    onClick={() => {
                     onClick={(e) => {
                       e.stopPropagation();
                       setActiveId(r.id);
@@ -1690,7 +1689,6 @@ export default function Home() {
                 render: (r) => (
                   <button
                     className="inline-flex items-center gap-1 font-semibold text-slate-900 hover:underline cursor-pointer"
-                    onClick={() => {
                     onClick={(e) => {
                       e.stopPropagation();
                       setActiveId(r.id);
@@ -1715,7 +1713,6 @@ export default function Home() {
                 render: (r) => (
                   <button
                     className="font-semibold text-slate-900 hover:underline cursor-pointer"
-                    onClick={() => setModal({ kind: 'allocation', record: r })}
                     onClick={(e) => {
                       e.stopPropagation();
                       setActiveId(r.id);
@@ -1746,7 +1743,6 @@ export default function Home() {
                 render: (r) => (
                   <button
                     className="font-semibold text-slate-900 hover:underline cursor-pointer"
-                    onClick={() => openForm('leaveTypes', r)}
                     onClick={(e) => {
                       e.stopPropagation();
                       setActiveId(r.id);
