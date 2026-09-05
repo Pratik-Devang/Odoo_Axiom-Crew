@@ -17,11 +17,13 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { StatusBadge } from '@/components/ui/status-badge';
+import { canView, type AppUser } from '@/lib/domain';
+import { LogOut, Shield } from 'lucide-react';
 
 /* ─────────────────────────────────────────────────────────
    1. TYPES
    ───────────────────────────────────────────────────────── */
-export type ViewTab = 'overview' | 'employees' | 'contracts' | 'attendance' | 'requests' | 'payruns';
+export type ViewTab = 'overview' | 'employees' | 'contracts' | 'attendance' | 'requests' | 'payruns' | 'users';
 
 export interface PageShellProps {
   currentView: string;
@@ -40,6 +42,8 @@ export interface PageShellProps {
   error?: string;
   message?: string;
   onReload?: () => void;
+  currentUser?: AppUser | null;
+  onLogout?: () => void;
 }
 
 /* ─────────────────────────────────────────────────────────
@@ -62,13 +66,16 @@ export function PageShell({
   error,
   message,
   onReload,
+  currentUser,
+  onLogout,
 }: PageShellProps) {
-  const isOverview = currentView === 'overview';
+  const isOverview = currentView === 'overview' || currentView === 'payroll/dashboard';
   const isEmployees = currentView === 'employees' || currentView === 'employee';
   const isContracts = currentView === 'contracts' || currentView === 'schedules';
   const isAttendance = currentView === 'attendance';
   const isTimeOff = ['requests', 'allocations', 'leaveTypes'].includes(currentView);
   const isPayroll = ['payruns', 'run', 'payslips', 'structures', 'rules'].includes(currentView);
+  const isUsers = currentView === 'users' || currentView === 'admin/users';
 
   const hasLeft = Boolean(leftPanel);
   const hasRight = Boolean(rightPanel);
@@ -105,7 +112,7 @@ export function PageShell({
           className="workora-brand flex items-center gap-2.5 hover:opacity-90 transition-opacity shrink-0 select-none"
           onClick={(e) => {
             e.preventDefault();
-            onNavigate('overview');
+            onNavigate(currentUser?.role === 'Employee' ? 'attendance' : currentUser?.role === 'HR Manager' ? 'employees' : 'overview');
           }}
         >
           <img
@@ -119,61 +126,84 @@ export function PageShell({
         </a>
 
         {/* Center Navigation Pills */}
-        <nav className="workora-nav-pills" aria-label="Main Navigation">
-          <button
-            className={`nav-pill ${isOverview ? 'active' : ''}`}
-            onClick={() => onNavigate('overview')}
-          >
-            <LayoutGrid size={15} />
-            Overview
-          </button>
-          <button
-            className={`nav-pill ${isEmployees ? 'active' : ''}`}
-            onClick={() => onNavigate('employees')}
-          >
-            <Users size={15} />
-            Employees
-          </button>
-          <button
-            className={`nav-pill ${isContracts ? 'active' : ''}`}
-            onClick={() => onNavigate('contracts')}
-          >
-            <Briefcase size={15} />
-            Contracts
-          </button>
-          <button
-            className={`nav-pill ${isAttendance ? 'active' : ''}`}
-            onClick={() => onNavigate('attendance')}
-          >
-            <Clock3 size={15} />
-            Attendance
-          </button>
-          <button
-            className={`nav-pill ${isTimeOff ? 'active' : ''}`}
-            onClick={() => onNavigate('requests')}
-          >
-            <CalendarDays size={15} />
-            Time Off
-          </button>
-          <button
-            className={`nav-pill ${isPayroll ? 'active' : ''}`}
-            onClick={() => onNavigate('payruns')}
-          >
-            <Wallet size={15} />
-            Payroll
-          </button>
+        <nav className="workora-nav-pills flex-wrap" aria-label="Main Navigation">
+          {(!currentUser || canView(currentUser.role, 'payroll/dashboard')) && (
+            <button
+              className={`nav-pill ${isOverview ? 'active' : ''}`}
+              onClick={() => onNavigate('overview')}
+            >
+              <LayoutGrid size={15} />
+              Overview
+            </button>
+          )}
+          {(!currentUser || canView(currentUser.role, 'employees')) && (
+            <button
+              className={`nav-pill ${isEmployees ? 'active' : ''}`}
+              onClick={() => onNavigate('employees')}
+            >
+              <Users size={15} />
+              Employees
+            </button>
+          )}
+          {(!currentUser || canView(currentUser.role, 'contracts')) && (
+            <button
+              className={`nav-pill ${isContracts ? 'active' : ''}`}
+              onClick={() => onNavigate('contracts')}
+            >
+              <Briefcase size={15} />
+              Contracts
+            </button>
+          )}
+          {(!currentUser || canView(currentUser.role, 'attendance')) && (
+            <button
+              className={`nav-pill ${isAttendance ? 'active' : ''}`}
+              onClick={() => onNavigate('attendance')}
+            >
+              <Clock3 size={15} />
+              Attendance
+            </button>
+          )}
+          {(!currentUser || canView(currentUser.role, 'time-off')) && (
+            <button
+              className={`nav-pill ${isTimeOff ? 'active' : ''}`}
+              onClick={() => onNavigate('requests')}
+            >
+              <CalendarDays size={15} />
+              Time Off
+            </button>
+          )}
+          {(!currentUser || canView(currentUser.role, 'payroll/payruns') || canView(currentUser.role, 'payroll/payslips')) && (
+            <button
+              className={`nav-pill ${isPayroll ? 'active' : ''}`}
+              onClick={() => onNavigate(currentUser?.role === 'Employee' ? 'payslips' : 'payruns')}
+            >
+              <Wallet size={15} />
+              {currentUser?.role === 'Employee' ? 'My Payslips' : 'Payroll'}
+            </button>
+          )}
+          {currentUser && canView(currentUser.role, 'admin/users') && (
+            <button
+              className={`nav-pill ${isUsers ? 'active' : ''}`}
+              onClick={() => onNavigate('users')}
+            >
+              <Shield size={15} />
+              Users
+            </button>
+          )}
         </nav>
 
         {/* Right Action Utility Buttons */}
-        <div className="workora-top-actions">
-          <button
-            className={`circle-btn ${isCheckedIn ? 'clock-active' : ''}`}
-            title={isCheckedIn ? 'Checked in · Live Shift' : 'Attendance check-in'}
-            aria-label="Attendance check-in"
-            onClick={onClockClick}
-          >
-            <Clock3 size={17} />
-          </button>
+        <div className="workora-top-actions items-center gap-2">
+          {(!currentUser || currentUser.employeeId) && (
+            <button
+              className={`circle-btn ${isCheckedIn ? 'clock-active' : ''}`}
+              title={isCheckedIn ? 'Checked in · Live Shift' : 'Attendance check-in'}
+              aria-label="Attendance check-in"
+              onClick={onClockClick}
+            >
+              <Clock3 size={17} />
+            </button>
+          )}
           <button
             className="circle-btn"
             title="Notifications"
@@ -190,14 +220,44 @@ export function PageShell({
           >
             <HelpCircle size={17} />
           </button>
-          <button
-            className="circle-avatar"
-            title="Nisha Rao · Workspace Administrator"
-            aria-label="User profile"
-            onClick={onAboutClick}
-          >
-            NR
-          </button>
+          {currentUser ? (
+            <div className="flex items-center gap-2 pl-2 border-l border-[#e5ded4]">
+              <div className="text-right hidden sm:block">
+                <span className="font-bold text-xs text-slate-800 block leading-tight">
+                  {currentUser.name}
+                </span>
+                <span className="text-[10px] font-semibold text-[#8a7a6d] uppercase tracking-wide">
+                  {currentUser.role}
+                </span>
+              </div>
+              <div
+                className="circle-avatar cursor-pointer"
+                title={`${currentUser.name} · ${currentUser.role}`}
+                onClick={onAboutClick}
+              >
+                {currentUser.name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase()}
+              </div>
+              {onLogout && (
+                <button
+                  className="circle-btn hover:text-rose-600 hover:bg-rose-50 cursor-pointer"
+                  title="Sign Out"
+                  aria-label="Sign out"
+                  onClick={onLogout}
+                >
+                  <LogOut size={16} />
+                </button>
+              )}
+            </div>
+          ) : (
+            <button
+              className="circle-avatar"
+              title="Demo Session"
+              aria-label="User profile"
+              onClick={onAboutClick}
+            >
+              NR
+            </button>
+          )}
         </div>
       </header>
 
@@ -322,6 +382,7 @@ export interface MasterCardProps {
   title: string;
   subtitle?: string;
   badge?: string;
+  meta?: string | ReactNode;
   active?: boolean;
   onClick: () => void;
   progress?: {
@@ -337,6 +398,7 @@ export function MasterCard({
   title,
   subtitle,
   badge,
+  meta,
   active = false,
   onClick,
   progress,
@@ -360,6 +422,7 @@ export function MasterCard({
           {subtitle && <p className="emp-card-sub">{subtitle}</p>}
         </div>
         {badge && <StatusBadge value={badge} size="sm" showDot={false} />}
+        {meta && <span className="text-[11px] text-slate-400 font-medium ml-auto">{meta}</span>}
       </div>
 
       {progress && (

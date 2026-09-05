@@ -58,13 +58,23 @@ export function Avatar({name}:{name:string}){
   );
 }
 
-export function DataTable({columns,rows,empty='No records match your filters.'}:{columns:{title:string;render:(row:Row)=>ReactNode}[];rows:Row[];empty?:string}){
+export function DataTable({
+  columns,
+  rows,
+  empty = 'No records match your filters.',
+  onSelect,
+}: {
+  columns: { title: string; render: (row: Row) => ReactNode }[];
+  rows: Row[];
+  empty?: string;
+  onSelect?: (row: Row) => void;
+}) {
   return (
     <div className="overflow-x-auto w-full">
       <Table className="w-full">
         <TableHeader>
           <TableRow className="bg-slate-50/60 hover:bg-slate-50/60 border-b border-slate-100">
-            {columns.map((c,i)=>(
+            {columns.map((c, i) => (
               <TableHead key={i} className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider py-3.5 px-4">
                 {c.title}
               </TableHead>
@@ -72,16 +82,20 @@ export function DataTable({columns,rows,empty='No records match your filters.'}:
           </TableRow>
         </TableHeader>
         <TableBody>
-          {rows.map(r=>(
-            <TableRow key={r.id} className="hover:bg-slate-50/80 transition-colors border-b border-slate-100/80">
-              {columns.map((c,i)=>(
+          {rows.map((r) => (
+            <TableRow
+              key={r.id}
+              onClick={() => onSelect?.(r)}
+              className={`${onSelect ? 'cursor-pointer ' : ''}hover:bg-slate-50/80 transition-colors border-b border-slate-100/80`}
+            >
+              {columns.map((c, i) => (
                 <TableCell key={i} className="py-3 px-4 text-xs font-medium text-slate-700">
                   {c.render(r)}
                 </TableCell>
               ))}
             </TableRow>
           ))}
-          {!rows.length&&(
+          {!rows.length && (
             <TableRow>
               <TableCell colSpan={columns.length} className="py-10">
                 <Empty className="py-6">

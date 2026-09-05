@@ -44,6 +44,7 @@ export const users = pgTable('users', {
   name: text('name').notNull(),
   roleId: text('role_id').notNull().references(() => roles.id),
   employeeId: text('employee_id').references(() => employees.id),
+  password: text('password'),
   active: boolean('active').notNull().default(true),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
 });
@@ -113,6 +114,14 @@ export const leaveTypes = pgTable('leave_types', {
   name: text('name').notNull(),
   unit: text('unit').notNull().default('Days'),
   requiresAllocation: boolean('requires_allocation').notNull().default(true),
+  // Approval routing: 'Manager' | 'Officer' | 'No Validation'
+  approval: text('approval').notNull().default('Manager'),
+  // Payroll integration hint (e.g. 'Leave Work Entry')
+  payrollWorkEntry: text('payroll_work_entry'),
+  // Display color for calendar/badges
+  displayColor: text('display_color').notNull().default('Blue'),
+  // Whether this leave type is active
+  active: boolean('active').notNull().default(true),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
 });
 
@@ -125,6 +134,8 @@ export const leaveAllocations = pgTable('leave_allocations', {
   startDate: date('start_date').notNull(),
   endDate: date('end_date').notNull(),
   status: text('status').notNull().default('Approved'),
+  // Who approved this allocation
+  approver: text('approver'),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
 });
 
@@ -139,6 +150,8 @@ export const leaveRequests = pgTable('leave_requests', {
   reason: text('reason'),
   status: text('status').notNull().default('Pending'),
   approver: text('approver'),
+  // FK to the allocation that was consumed when this request was approved
+  allocationId: text('allocation_id').references(() => leaveAllocations.id),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
 });
 
@@ -149,6 +162,8 @@ export const payruns = pgTable('payruns', {
   period: text('period').notNull(),
   structureId: text('structure_id').references(() => salaryStructures.id),
   status: text('status').notNull().default('Draft'),
+  // Timestamp when status was set to 'Paid'
+  paidAt: timestamp('paid_at', { withTimezone: true }),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
 });
 
