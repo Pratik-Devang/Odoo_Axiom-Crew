@@ -16,7 +16,7 @@ Open the local URL printed by the development server (normally http://localhost:
 
 `npm.cmd` avoids PowerShell's script-execution restriction on `npm.ps1`. On macOS/Linux, use `npm` instead. Dependencies are already installed in this checkout; installation is needed for another machine or a fresh clone.
 
-The local database setup creates the schema only. The first API read inserts the fictional OXP sample company if no workspace exists. Reopening the app does not reset existing records. Wrangler and the development server share the local `.wrangler/state` database directory; run both from this project folder. No external database account is needed for local development.
+Create a local PostgreSQL database named `peoplepay360` and set `DATABASE_URL` in `.env.local` before running `db:setup`. The setup command creates the relational schema. The first API read inserts the fictional OXP sample company only when the employee tables are empty. Reopening the app does not reset existing records.
 
 ## Your build and checks
 
@@ -69,9 +69,9 @@ Changing contracts, attendance, salary rules, or structures invalidates unfinali
 
 ## Stack and source map
 
-- React 19 + TypeScript, using the Vinext/Vite scaffold.
+- Next.js 16 + React 19 + TypeScript, running on the local Node.js server.
 - CSS and the included Shadcn/Base UI primitives; Lucide icons.
-- Cloudflare D1-compatible local SQLite persistence and server route handlers.
+- Local PostgreSQL persistence through Node.js route handlers.
 - `app/page.tsx`: navigation, record screens, detail views, payrun wizard and dialogs.
 - `components/payroll-dashboard.tsx`: filtered aggregates and dashboard charts.
 - `components/record-form.tsx`: employee, contract, attendance, leave, rule and schedule forms.
@@ -81,10 +81,10 @@ Changing contracts, attendance, salary rules, or structures invalidates unfinali
 - `app/api/workspace/route.ts`: load and mutate API.
 - `db/store.ts`: persistence with optimistic revision checks.
 - `db/schema.ts`: Drizzle schema definition.
-- `db/bootstrap.sql`: local schema initialization.
+- `db/setup-postgres.sql` and `db/relational-migration.sql`: local PostgreSQL schema initialization.
 - `REQUIREMENTS.md`: source requirements, implemented scope and remaining work.
 
-For the prototype, the connected workspace is stored as one JSON aggregate in a SQLite row. A revision check makes each mutation atomic and rejects concurrent lost updates. This is deliberately simpler than a production relational HR schema. When expanding for the hackathon, split employees, contracts, attendance, allocations, requests, payruns and payslips into related tables with database constraints.
+Employees, contracts, attendance, leave, salary structures, payruns and payslips are stored in normalized PostgreSQL tables. The `workspace` row keeps the revision used to reject concurrent lost updates. API reads reconstruct the workspace from the relational tables, so committed changes made through pgAdmin appear after a reload.
 
 If two sessions edit concurrently, the later stale request returns a conflict. Reload the workspace, reopen the record and reapply the change. No client-provided whole-workspace replacement endpoint is exposed.
 
@@ -100,10 +100,8 @@ If two sessions edit concurrently, the later stale request returns a conflict. R
 - Department and employee-type reporting joins the current employee record; historical department snapshots are a follow-up.
 - Navigation uses URL hashes, so the workspace remains one React surface while individual screens are directly addressable.
 
-## Hosting later
+## Local runtime
 
-No build, publication, deployment, or completed-version testing was performed after your code-only instruction. A private, unpublished Sites registration was created earlier; its project ID is preserved in `.openai/hosting.json`. There is no deployed prototype URL. Local development does not require publishing.
-
-For future hosted schema work, run `npm.cmd run db:generate` and review the generated Drizzle migration before deployment. The local `db:setup` bootstrap is not a substitute for versioned production migrations.
+The prototype runs through `next dev` and connects directly to the PostgreSQL instance in `.env.local`. No Cloudflare, Wrangler, D1, Sites, or deployment configuration is required.
 
 One optional, feature-detected WebMCP navigation tool is included; unsupported browsers ignore it. Its registration has not been tested.

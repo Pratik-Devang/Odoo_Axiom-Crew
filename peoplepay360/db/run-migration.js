@@ -1,13 +1,16 @@
 import pg from 'pg';
 import fs from 'fs';
 import path from 'path';
-import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-dotenv.config({ path: path.resolve(__dirname, '../.env.local') });
+try {
+  process.loadEnvFile(path.resolve(__dirname, '../.env.local'));
+} catch {
+  // DATABASE_URL may already be supplied by the shell.
+}
 
 const connectionString = process.env.DATABASE_URL;
 if (!connectionString) {
@@ -19,13 +22,15 @@ const pool = new pg.Pool({ connectionString });
 
 async function run() {
   console.log('Connecting to PostgreSQL to run relational migration...');
-  const sqlPath = path.resolve(__dirname, 'relational-migration.sql');
-  const sql = fs.readFileSync(sqlPath, 'utf8');
+  const setupSql = fs.readFileSync(path.resolve(__dirname, 'setup-postgres.sql'), 'utf8');
+  const migrationSql = fs.readFileSync(path.resolve(__dirname, 'relational-migration.sql'), 'utf8');
 
   try {
     const client = await pool.connect();
-    console.log('Connected! Executing relational-migration.sql...');
-    await client.query(sql);
+    console.log('Connected! Creating the workspace table...');
+    await client.query(setupSql);
+    console.log('Executing relational-migration.sql...');
+    await client.query(migrationSql);
     console.log('Migration successfully executed!');
     
     // Check table counts
