@@ -23,6 +23,31 @@ async function ensureSchema(client: PoolClient) {
 
       ALTER TABLE attendance ADD COLUMN IF NOT EXISTS overtime NUMERIC(5,2) DEFAULT 0;
 
+      ALTER TABLE schedules ADD COLUMN IF NOT EXISTS company VARCHAR(100) NOT NULL DEFAULT 'My Company';
+      ALTER TABLE schedules ADD COLUMN IF NOT EXISTS timezone VARCHAR(100) NOT NULL DEFAULT 'Company timezone';
+      ALTER TABLE schedules ADD COLUMN IF NOT EXISTS status VARCHAR(50) NOT NULL DEFAULT 'Active';
+
+      INSERT INTO schedules (id, name, schedule_type, days, work_rows, start_time, end_time, break_hours, weekly_hours, company, timezone, status)
+      VALUES
+        ('sch1', 'Standard Full-Time (40h)', 'Fixed', '["Monday","Tuesday","Wednesday","Thursday","Friday"]'::jsonb, '[{"id":"Monday","day":"Monday","working":true,"start":"09:00","end":"18:00","breakHours":1},{"id":"Tuesday","day":"Tuesday","working":true,"start":"09:00","end":"18:00","breakHours":1},{"id":"Wednesday","day":"Wednesday","working":true,"start":"09:00","end":"18:00","breakHours":1},{"id":"Thursday","day":"Thursday","working":true,"start":"09:00","end":"18:00","breakHours":1},{"id":"Friday","day":"Friday","working":true,"start":"09:00","end":"18:00","breakHours":1}]'::jsonb, '09:00', '18:00', 1.0, 40.0, 'Axiom Crew Tech Pvt Ltd', 'Asia/Kolkata (IST)', 'Active'),
+        ('sch2', 'Night Shift NOC (35h)', 'Shift', '["Monday","Tuesday","Wednesday","Thursday","Friday"]'::jsonb, '[{"id":"Monday","day":"Monday","working":true,"start":"22:00","end":"06:00","breakHours":1},{"id":"Tuesday","day":"Tuesday","working":true,"start":"22:00","end":"06:00","breakHours":1},{"id":"Wednesday","day":"Wednesday","working":true,"start":"22:00","end":"06:00","breakHours":1},{"id":"Thursday","day":"Thursday","working":true,"start":"22:00","end":"06:00","breakHours":1},{"id":"Friday","day":"Friday","working":true,"start":"22:00","end":"06:00","breakHours":1}]'::jsonb, '22:00', '06:00', 1.0, 35.0, 'Axiom Crew Global Ops', 'Asia/Kolkata (IST)', 'Active'),
+        ('sch3', 'Retail & Weekend Shift (32h)', 'Shift', '["Thursday","Friday","Saturday","Sunday"]'::jsonb, '[{"id":"Thursday","day":"Thursday","working":true,"start":"10:00","end":"19:00","breakHours":1},{"id":"Friday","day":"Friday","working":true,"start":"10:00","end":"19:00","breakHours":1},{"id":"Saturday","day":"Saturday","working":true,"start":"10:00","end":"19:00","breakHours":1},{"id":"Sunday","day":"Sunday","working":true,"start":"10:00","end":"19:00","breakHours":1}]'::jsonb, '10:00', '19:00', 1.0, 32.0, 'Axiom Crew Retail', 'Asia/Kolkata (IST)', 'Active'),
+        ('sch4', 'Flexible Hybrid 4-Day (36h)', 'Flexible', '["Monday","Tuesday","Wednesday","Thursday"]'::jsonb, '[{"id":"Monday","day":"Monday","working":true,"start":"08:30","end":"18:00","breakHours":0.5},{"id":"Tuesday","day":"Tuesday","working":true,"start":"08:30","end":"18:00","breakHours":0.5},{"id":"Wednesday","day":"Wednesday","working":true,"start":"08:30","end":"18:00","breakHours":0.5},{"id":"Thursday","day":"Thursday","working":true,"start":"08:30","end":"18:00","breakHours":0.5}]'::jsonb, '08:30', '18:00', 0.5, 36.0, 'Axiom Crew Tech Pvt Ltd', 'Asia/Kolkata (IST)', 'Active'),
+        ('sch5', 'Morning Part-Time (20h)', 'Fixed', '["Monday","Tuesday","Wednesday","Thursday","Friday"]'::jsonb, '[{"id":"Monday","day":"Monday","working":true,"start":"09:00","end":"13:00","breakHours":0},{"id":"Tuesday","day":"Tuesday","working":true,"start":"09:00","end":"13:00","breakHours":0},{"id":"Wednesday","day":"Wednesday","working":true,"start":"09:00","end":"13:00","breakHours":0},{"id":"Thursday","day":"Thursday","working":true,"start":"09:00","end":"13:00","breakHours":0},{"id":"Friday","day":"Friday","working":true,"start":"09:00","end":"13:00","breakHours":0}]'::jsonb, '09:00', '13:00', 0.0, 20.0, 'Axiom Crew Tech Pvt Ltd', 'Asia/Kolkata (IST)', 'Active'),
+        ('sch6', 'Seasonal Logistics Standby (18h)', 'Flexible', '["Friday","Saturday","Sunday"]'::jsonb, '[{"id":"Friday","day":"Friday","working":true,"start":"12:00","end":"18:30","breakHours":0.5},{"id":"Saturday","day":"Saturday","working":true,"start":"12:00","end":"18:30","breakHours":0.5},{"id":"Sunday","day":"Sunday","working":true,"start":"12:00","end":"18:30","breakHours":0.5}]'::jsonb, '12:00', '18:30', 0.5, 18.0, 'Axiom Crew Logistics', 'Asia/Kolkata (IST)', 'Inactive')
+      ON CONFLICT (id) DO UPDATE SET
+        name = EXCLUDED.name,
+        schedule_type = EXCLUDED.schedule_type,
+        days = EXCLUDED.days,
+        work_rows = EXCLUDED.work_rows,
+        start_time = EXCLUDED.start_time,
+        end_time = EXCLUDED.end_time,
+        break_hours = EXCLUDED.break_hours,
+        weekly_hours = EXCLUDED.weekly_hours,
+        company = EXCLUDED.company,
+        timezone = EXCLUDED.timezone,
+        status = EXCLUDED.status;
+
       ALTER TABLE employees ADD COLUMN IF NOT EXISTS manager_employee_id VARCHAR(50);
       ALTER TABLE employees ADD COLUMN IF NOT EXISTS personal_email VARCHAR(255);
       ALTER TABLE employees ADD COLUMN IF NOT EXISTS personal_phone VARCHAR(50);
@@ -107,7 +132,7 @@ async function readRelational(client: PoolClient, options: WorkspaceReadOptions 
     `SELECT s.id, s.name, s.active, COALESCE(array_remove(array_agg(sr.rule_id ORDER BY r.sequence), NULL), ARRAY[]::text[]) AS "ruleIds" FROM salary_structures s LEFT JOIN salary_structure_rules sr ON s.id = sr.structure_id LEFT JOIN salary_rules r ON sr.rule_id = r.id GROUP BY s.id, s.name, s.active ORDER BY s.id`
   );
   const schedulesRes = await client.query(
-    'SELECT id, name, schedule_type AS type, days, work_rows AS "workRows", start_time AS "start", end_time AS "end", break_hours::float AS "breakHours", weekly_hours::float AS "weeklyHours" FROM schedules ORDER BY id'
+    'SELECT id, name, schedule_type AS type, days, work_rows AS "workRows", start_time AS "start", end_time AS "end", break_hours::float AS "breakHours", weekly_hours::float AS "weeklyHours", COALESCE(company, \'My Company\') AS company, COALESCE(timezone, \'Company timezone\') AS timezone, COALESCE(status, \'Active\') AS status FROM schedules ORDER BY id'
   );
   const payrunsRes = await client.query(
     `SELECT p.id, p.name, p.period, COALESCE(p.structure_id, '') AS "structureId", p.status, COALESCE(to_char(p.paid_at, 'YYYY-MM-DD"T"HH24:MI:SS"Z"'), '') AS "paidAt", COALESCE((SELECT array_agg(employee_id) FROM payrun_employees WHERE payrun_id = p.id), ARRAY[]::text[]) AS "employeeIds" FROM payruns p ORDER BY p.period`
@@ -163,7 +188,7 @@ async function syncRelational(client: PoolClient, data: Workspace) {
   if (data.schedules?.length) {
     await client.query(
       `
-      INSERT INTO schedules (id, name, schedule_type, days, work_rows, start_time, end_time, break_hours, weekly_hours)
+      INSERT INTO schedules (id, name, schedule_type, days, work_rows, start_time, end_time, break_hours, weekly_hours, company, timezone, status)
       SELECT
         x->>'id',
         x->>'name',
@@ -173,7 +198,10 @@ async function syncRelational(client: PoolClient, data: Workspace) {
         COALESCE(x->>'start', '09:00'),
         COALESCE(x->>'end', '18:00'),
         COALESCE((x->>'breakHours')::numeric, 1.0),
-        COALESCE((x->>'weeklyHours')::numeric, 0)
+        COALESCE((x->>'weeklyHours')::numeric, 0),
+        COALESCE(x->>'company', 'My Company'),
+        COALESCE(x->>'timezone', 'Company timezone'),
+        COALESCE(x->>'status', 'Active')
       FROM jsonb_array_elements($1::jsonb) AS x
       ON CONFLICT (id) DO UPDATE SET
         name = EXCLUDED.name,
@@ -183,7 +211,10 @@ async function syncRelational(client: PoolClient, data: Workspace) {
         start_time = EXCLUDED.start_time,
         end_time = EXCLUDED.end_time,
         break_hours = EXCLUDED.break_hours,
-        weekly_hours = EXCLUDED.weekly_hours;
+        weekly_hours = EXCLUDED.weekly_hours,
+        company = EXCLUDED.company,
+        timezone = EXCLUDED.timezone,
+        status = EXCLUDED.status;
     `,
       [JSON.stringify(data.schedules)]
     );
