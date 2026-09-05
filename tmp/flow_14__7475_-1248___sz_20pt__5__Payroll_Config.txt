@@ -1,0 +1,192 @@
+[7475,-1248 | sz:20pt] 5) Payroll Configuration — Salary Structures & Rules
+[7513,146 | sz:10pt] Configured structure is selected when a Payrun is created
+[7546,-1192 | sz:13pt] Employees ▼
+[7546,-1088 | sz:13pt] Contracts ▼
+[7546,-984 | sz:13pt] Attendance
+[7546,-888 | sz:13pt] Time Off ▼
+[7546,-792 | sz:13pt] Payroll
+[7548,-1228 | sz:12pt] HR
+[7554,-188 | sz:13pt] Employees ▼
+[7554,-84 | sz:13pt] Contracts ▼
+[7554,20 | sz:13pt] Attendance
+[7554,116 | sz:13pt] Time Off ▼
+[7554,212 | sz:13pt] Payroll
+[7556,-224 | sz:12pt] HR
+[7570,1743 | sz:13pt] Employees ▼
+[7570,1847 | sz:13pt] Contracts ▼
+[7570,1951 | sz:13pt] Attendance
+[7570,2047 | sz:13pt] Time Off ▼
+[7570,2143 | sz:13pt] Payroll
+[7572,1707 | sz:12pt] HR
+[7573,742 | sz:13pt] Employees ▼
+[7573,846 | sz:13pt] Contracts ▼
+[7573,950 | sz:13pt] Attendance
+[7573,1046 | sz:13pt] Time Off ▼
+[7573,1142 | sz:13pt] Payroll
+[7575,706 | sz:12pt] HR
+[7591,-1224 | sz:22pt] Salary Structures
+[7599,-220 | sz:22pt] Salary Structure / Regular Salary
+[7615,1711 | sz:22pt] Salary Rule / Basic Salary
+[7618,710 | sz:22pt] Salary Rules
+[7623,-1224 | sz:12pt] List view
+[7631,-220 | sz:12pt] Form view with its salary rules
+[7647,1711 | sz:12pt] Form view
+[7650,710 | sz:12pt] List view
+[7664,-1203 | sz:11pt] NEW
+[7664,-1142 | sz:11pt] Search structures…
+[7688,1728 | sz:11pt] EDIT
+[7691,731 | sz:11pt] NEW
+[7691,792 | sz:11pt] Search salary rules…
+[7691,1054 | sz:11pt] Regular Salary
+[7713,-220 | sz:10pt] Structure Name
+[7713,156 | sz:10pt] Active
+[7717,-96 | sz:10pt] Regular Salary
+[7717,280 | sz:10pt] True
+[7719,-1216 | sz:10pt] Structure Name
+[7719,-956 | sz:10pt] Rules
+[7719,-856 | sz:10pt] Employees
+[7719,-736 | sz:10pt] Active
+[7729,1711 | sz:10pt] Rule Name
+[7729,2057 | sz:10pt] Salary Structure
+[7733,1835 | sz:10pt] Basic Salary
+[7733,2181 | sz:10pt] Regular Salary
+[7746,718 | sz:10pt] Rule Name
+[7746,938 | sz:10pt] Code
+[7746,1028 | sz:10pt] Category
+[7746,1158 | sz:10pt] Structure
+[7746,1298 | sz:10pt] Sequence
+[7758,-1216 | sz:10pt] Regular Salary
+[7758,-956 | sz:10pt] 12 rules
+[7758,-856 | sz:10pt] 42 employees
+[7758,-736 | sz:10pt] Active
+[7765,-220 | sz:12pt] Salary Rules
+[7769,1711 | sz:10pt] Code
+[7769,2057 | sz:10pt] Computation
+[7773,1835 | sz:10pt] BASIC
+[7773,2181 | sz:10pt] Percentage of Wage
+[7783,718 | sz:10pt] Basic Salary
+[7783,938 | sz:10pt] BASIC
+[7783,1028 | sz:10pt] Basic
+[7783,1158 | sz:10pt] Regular Salary
+[7783,1298 | sz:10pt] 1
+[7802,-212 | sz:10pt] Rule Name
+[7802,68 | sz:10pt] Code
+[7802,168 | sz:10pt] Category
+[7802,298 | sz:10pt] Sequence
+[7804,-1216 | sz:10pt] Intern Salary
+[7804,-956 | sz:10pt] 8 rules
+[7804,-856 | sz:10pt] 6 employees
+[7804,-736 | sz:10pt] Active
+[7809,1711 | sz:10pt] Category
+[7809,2057 | sz:10pt] Percentage
+[7813,1835 | sz:10pt] Basic
+[7813,2181 | sz:10pt] 50%
+[7823,718 | sz:10pt] House Rent Allowance
+[7823,938 | sz:10pt] HRA
+[7823,1028 | sz:10pt] Allowance
+[7823,1158 | sz:10pt] Regular Salary
+[7823,1298 | sz:10pt] 10
+[7830,-213 | sz:9pt] Basic Salary
+[7830,67 | sz:9pt] BASIC
+[7830,167 | sz:9pt] Basic
+[7830,297 | sz:9pt] 1
+[7849,-430 | sz:16pt] open structure
+[7849,-213 | sz:9pt] House Rent Allowance
+[7849,67 | sz:9pt] HRA
+[7849,167 | sz:9pt] Allowance
+[7849,297 | sz:9pt] 10
+[7849,1711 | sz:10pt] Sequence
+[7849,2057 | sz:10pt] Quantity
+[7850,-1216 | sz:10pt] Contractor
+[7850,-956 | sz:10pt] 6 rules
+[7850,-856 | sz:10pt] 9 employees
+[7850,-736 | sz:10pt] Active
+[7853,1835 | sz:10pt] 1
+[7853,2181 | sz:10pt] 1
+[7863,718 | sz:10pt] Standard Allowance
+[7863,938 | sz:10pt] STD
+[7863,1028 | sz:10pt] Allowance
+[7863,1158 | sz:10pt] Regular Salary
+[7863,1298 | sz:10pt] 20
+[7868,-213 | sz:9pt] Standard Allowance
+[7868,67 | sz:9pt] STD
+[7868,167 | sz:9pt] Allowance
+[7868,297 | sz:9pt] 20
+[7869,1492 | sz:16pt] Open salary rule
+[7887,-213 | sz:9pt] Performance Bonus
+[7887,67 | sz:9pt] BONUS
+[7887,167 | sz:9pt] Allowance
+[7887,297 | sz:9pt] 30
+[7903,718 | sz:10pt] Performance Bonus
+[7903,938 | sz:10pt] BONUS
+[7903,1028 | sz:10pt] Allowance
+[7903,1158 | sz:10pt] Regular Salary
+[7903,1298 | sz:10pt] 30
+[7905,1711 | sz:12pt] Computation options from the source
+[7906,-213 | sz:9pt] Leave Travel Allowance
+[7906,67 | sz:9pt] LTA
+[7906,167 | sz:9pt] Allowance
+[7906,297 | sz:9pt] 40
+[7925,-213 | sz:9pt] Fixed Allowance
+[7925,67 | sz:9pt] FIX
+[7925,167 | sz:9pt] Allowance
+[7925,297 | sz:9pt] 50
+[7943,718 | sz:10pt] Leave Travel Allowance
+[7943,938 | sz:10pt] LTA
+[7943,1028 | sz:10pt] Allowance
+[7943,1158 | sz:10pt] Regular Salary
+[7943,1298 | sz:10pt] 40
+[7944,-213 | sz:9pt] Gross Salary
+[7944,67 | sz:9pt] GROSS
+[7944,167 | sz:9pt] Gross
+[7944,297 | sz:9pt] 60
+[7947,1727 | sz:11pt] Fixed Amount
+[7947,1907 | sz:11pt] Percentage of Wage
+[7947,2117 | sz:11pt] Python Code
+[7963,-213 | sz:9pt] LWF fund
+[7963,67 | sz:9pt] LWF
+[7963,167 | sz:9pt] Deduction
+[7963,297 | sz:9pt] 70
+[7982,-213 | sz:9pt] Provident Fund
+[7982,67 | sz:9pt] PF
+[7982,167 | sz:9pt] Deduction
+[7982,297 | sz:9pt] 80
+[7983,718 | sz:10pt] Fixed Allowance
+[7983,938 | sz:10pt] FIX
+[7983,1028 | sz:10pt] Allowance
+[7983,1158 | sz:10pt] Regular Salary
+[7983,1298 | sz:10pt] 50
+[7989,1727 | sz:10pt] Example expression: result = categories['BASIC']
+[8001,-213 | sz:9pt] ESIC
+[8001,67 | sz:9pt] ESIC
+[8001,167 | sz:9pt] Deduction
+[8001,297 | sz:9pt] 90
+[8015,-1224 | sz:12pt] Structures group salary rules; rules define the ordered salary computation used by a payslip. Both require List and Form views.
+[8020,-213 | sz:9pt] Professional Tax
+[8020,67 | sz:9pt] PT
+[8020,167 | sz:9pt] Deduction
+[8020,297 | sz:9pt] 100
+[8023,718 | sz:10pt] Gross Salary
+[8023,938 | sz:10pt] GROSS
+[8023,1028 | sz:10pt] Gross
+[8023,1158 | sz:10pt] Regular Salary
+[8023,1298 | sz:10pt] 60
+[8039,-213 | sz:9pt] Net Salary
+[8039,67 | sz:9pt] NET
+[8039,167 | sz:9pt] Net
+[8039,297 | sz:9pt] 110
+[8049,-1227 | sz:11pt] Useful note: the Salary Structure selected on a Payrun determines which set of salary rules will calculate each payslip.
+[8069,-220 | sz:12pt] Useful note: rule order matters. Keep sequence visible so participants understand the calculation order.
+Rules created here is just for reference
+[8074,710 | sz:12pt] Useful note: List view should expose name, code, category, structure and sequence — the fields needed to understand 
+a payroll rule quickly.
+[8085,1711 | sz:12pt] Useful note: a Salary Rule needs a clear computation method and category because these drive the lines displayed 
+hon the final payslip.
+[8164,-450 | sz:16pt] Continue into dashboard view
+[8169,1597 | sz:20pt] Computation Note:
+ - Fixed Amount: uses the exact value entered in the rule, e.g. Meal Allowance = 2,000.
+ - Percentage: calculates the rule as a percentage of a selected base such as Contract Wage,
+Basic Salary, or Gross Salary, e.g. HRA = 20% × Basic Salary.
+ - Python Code / Formula: is used for advanced calculations where fixed or percentage methods
+are not sufficient, such as attendance-based salary, overtime, unpaid leave deductions, or
+calculations using multiple salary-rule values.

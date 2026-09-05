@@ -1,0 +1,1719 @@
+
+================================================================================
+SECTION 0
+================================================================================
+=== Intro / Header ===
+
+================================================================================
+SECTION 1
+================================================================================
+### FLOW / SECTION: 0) Login & User Access Flow [y=495, x=-1055, 22pt]
+
+================================================================================
+SECTION 2
+================================================================================
+[y=529, x=-1055, size=12pt]:
+Administrators create user accounts and assign access. Employees use Login to enter the HR and Payroll application.
+
+  - HR Portal (y=597, x=-1030)
+  - User Management (y=598, x=-254)
+  - ADMIN ONLY (y=605, x=-84)
+  - Welcome back (y=659, x=-1029)
+  - +  New User (y=675, x=-298)
+  [y=676, x=-142, size=12pt]:
+Search users, employees or email…
+
+  - Role Filter (y=676, x=288)
+  - Open on New User (y=684, x=437)
+  [y=693, x=-1029, size=12pt]:
+Sign in to continue to your workspace.
+
+  - User (y=736, x=-286)
+  - Employee (y=736, x=-154)
+  - Work Email (y=736, x=-22)
+  - Role (y=736, x=155)
+  - Status (y=736, x=302)
+  - Create / Edit User (y=740, x=446)
+  - Work Email (y=741, x=-1029)
+  - Employee * (y=771, x=444)
+  - LOGIN / USER ACCESS NOTE (y=772, x=993)
+  - name@company.com (y=774, x=-1015)
+  - Aarav Mehta (y=784, x=-286)
+  - Aarav Mehta (y=784, x=-154)
+  - aarav@company.com (y=784, x=-22)
+  - Payroll User (y=784, x=155)
+  - Active (y=786, x=302)
+  - Select employee (y=799, x=456)
+  [y=808, x=984, size=16pt]:
+• In the ERP flow. User accounts are created by an Admin.
+• When creating a user, link the account to the relevant employee and assign one or more roles.
+• Roles control which modules, records and actions become available after login.
+• Users must not be able to assign or elevate their own roles.
+• Password reset, invitations, SSO, etc. can be added as enhancements.
+
+  - Password (y=816, x=-1029)
+  - Work Email * (y=836, x=444)
+  - Maya Shah (y=842, x=-286)
+  - Maya Shah (y=842, x=-154)
+  - maya@company.com (y=842, x=-22)
+  - Time Off Admin (y=842, x=155)
+  - Active (y=844, x=302)
+  - •••••••••• (y=849, x=-1015)
+  [y=853, x=-424, size=10.5pt]:
+User can
+now log in
+
+  - employee@company.com (y=864, x=456)
+  - Forgot password? (y=884, x=-575)
+  - Rohan Patel (y=900, x=-286)
+  - Rohan Patel (y=900, x=-154)
+  - rohan@company.com (y=900, x=-22)
+  - Time Off User (y=900, x=155)
+  - Roles * (y=901, x=444)
+  - Active (y=902, x=302)
+  - Employee (y=924, x=468)
+  - Sign In (y=931, x=-1029)
+  - Hr Manager (y=954, x=468)
+  - Nisha Rao (y=958, x=-286)
+  - Nisha Rao (y=958, x=-154)
+  - nisha@company.com (y=958, x=-22)
+  - Payroll Admin (y=958, x=155)
+  - Active (y=960, x=302)
+  - Hr Payroll User (y=984, x=468)
+  - Hr Payroll Admin (y=1007, x=471)
+  [y=1012, x=-298, size=10.5pt]:
+Select a user to edit access, or create a new user.
+
+  [y=1016, x=-1029, size=12pt]:
+Accounts are created by an administrator.
+
+  - Admin (y=1026, x=471)
+  - Account Status (y=1050, x=444)
+  - Active (y=1051, x=600)
+  [y=1082, x=-1029, size=11pt]:
+After sign-in, show only the modules and actions allowed by the user’s assigned role.
+
+  - Create User / Save Access (y=1099, x=444)
+  [y=1142, x=-298, size=10.5pt]:
+User accounts are separate from Employee records, but should be linked to an employee for access and ownership.
+
+  - Successful sign in (y=1222, x=-735)
+
+================================================================================
+SECTION 3
+================================================================================
+### FLOW / SECTION: Odoo HR Payroll Hackathon — Functional Screen Flow [y=1339, x=-1029, 30pt]
+
+================================================================================
+SECTION 4
+================================================================================
+
+
+================================================================================
+SECTION 5
+================================================================================
+### FLOW / SECTION: 1) Employee & Contract Flow [y=1443, x=-1029, 20pt]
+
+================================================================================
+SECTION 6
+================================================================================
+[y=1483, x=-1028, size=12pt]:
+Use arrows as navigation flow: user reaches Employee screens, opens a record, then accesses related Contract records.
+
+  - Menus under Employees (y=1568, x=-920)
+  - Employees (y=1612, x=-887)
+  - contracts (y=1647, x=-890)
+  - departments (y=1683, x=-896)
+  - Working Schedule (y=1717, x=-908)
+
+================================================================================
+SECTION 7
+================================================================================
+### FLOW / SECTION: Working Schedule — List & Form Views [y=1831, x=2853, 25.746211474169694pt]
+
+================================================================================
+SECTION 8
+================================================================================
+- Employees ▼ (y=1857, x=-1023)
+  - Contracts ▼ (y=1857, x=-915)
+  - Attendance (y=1857, x=-807)
+  - Time Off ▼ (y=1857, x=-707)
+  - Payroll (y=1857, x=-607)
+  - Employees ▼ (y=1857, x=-249)
+  - Contracts ▼ (y=1857, x=-141)
+  - Attendance (y=1857, x=-33)
+  - Time Off ▼ (y=1857, x=67)
+  - Payroll (y=1857, x=167)
+  - Employees ▼ (y=1857, x=525)
+  - Contracts ▼ (y=1857, x=633)
+  - Attendance (y=1857, x=741)
+  - Time Off ▼ (y=1857, x=841)
+  - Payroll (y=1857, x=941)
+  - HR (y=1859, x=-1059)
+  - HR (y=1859, x=-285)
+  - HR (y=1859, x=489)
+  - 40 Hours / Week (y=1884, x=3836)
+
+================================================================================
+SECTION 9
+================================================================================
+### FLOW / SECTION: Working Schedules [y=1885, x=2994, 20pt]
+
+================================================================================
+SECTION 10
+================================================================================
+- +  New Schedule (y=1886, x=2870)
+  - ←  Back to list (y=1887, x=3710)
+
+================================================================================
+SECTION 11
+================================================================================
+### FLOW / SECTION: Employees [y=1902, x=-1055, 22pt]
+
+================================================================================
+SECTION 12
+================================================================================
+
+
+================================================================================
+SECTION 13
+================================================================================
+### FLOW / SECTION: Employees [y=1902, x=-281, 22pt]
+
+================================================================================
+SECTION 14
+================================================================================
+
+
+================================================================================
+SECTION 15
+================================================================================
+### FLOW / SECTION: Employee / Aarav Mehta [y=1902, x=493, 22pt]
+
+================================================================================
+SECTION 16
+================================================================================
+- Default view: Kanban (y=1934, x=-1055)
+  [y=1934, x=-281, size=12pt]:
+List view for sort, filter and bulk scanning
+
+  [y=1934, x=493, size=12pt]:
+Main employee form with related HR actions
+
+  - List (y=1944, x=2863)
+  - Calendar (y=1944, x=2932)
+
+================================================================================
+SECTION 17
+================================================================================
+### FLOW / SECTION: Employee & Contract
+
+- Employees should be viewable in both Kanban and List views.
+- Opening an employee should show their HR details and related records such as Contracts,
+Attendance, Time Off, and Allocations.
+- An employee can have multiple contracts over time.
+- Payroll should use the contract applicable to the selected payroll period.
+
+Working Schedule
+- Working Schedules need List and Form views. Clicking a row should open that schedule.
+- List should surface name, calendar type, days/week, hours/week, company and status.
+- Form defines the weekly pattern: day, start/end time, optional break and hours. Weekly
+hours should be derived from the schedule.
+- A schedule can be assigned to an Employee/Contract and used by Attendance and Payroll.
+Shift, flexible-time and other rules are open to the participant. [y=1953, x=1357, 28pt]
+
+================================================================================
+SECTION 18
+================================================================================
+- Schedule Name (y=1956, x=3714)
+  - Company (y=1956, x=4106)
+  - Time Off 3 (y=1970, x=845)
+  - Contracts 2 (y=1971, x=953)
+  - Attendance 14 (y=1971, x=1061)
+  - NEW (y=1975, x=-1034)
+  - Search employees… (y=1975, x=-973)
+  - Kanban (y=1975, x=-511)
+  - List (y=1975, x=-420)
+  - NEW (y=1975, x=-260)
+  - Search employees… (y=1975, x=-199)
+  - Kanban (y=1975, x=265)
+  - List (y=1975, x=353)
+  - EDIT (y=1975, x=510)
+  - 40 Hours / Week (y=1986, x=3726)
+  - My Company (y=1986, x=4118)
+  - Search schedules… (y=1998, x=2877)
+  - Filter (y=1998, x=3339)
+  - Columns (y=1998, x=3437)
+  - Aarav Mehta (y=2028, x=581)
+  - Employee (y=2030, x=-273)
+  - Work Email (y=2030, x=-108)
+  - Job Position (y=2030, x=62)
+  - Department (y=2030, x=197)
+  - Status (y=2030, x=312)
+  - Aarav Mehta (y=2036, x=-985)
+  - Sara Khan (y=2036, x=-643)
+  - Days per Week (y=2040, x=3714)
+  - Hours per Week (y=2040, x=3906)
+  - Timezone (y=2040, x=4106)
+  - AM (y=2045, x=-1033)
+  - SK (y=2045, x=-691)
+  - AM (y=2052, x=515)
+  - Payroll Specialist (y=2058, x=-985)
+  - HR Officer (y=2058, x=-643)
+  - Payroll Specialist • Finance (y=2060, x=581)
+  - Aarav Mehta (y=2067, x=-273)
+  - aarav@oxp.com (y=2067, x=-108)
+  - Payroll Specialist (y=2067, x=62)
+  - Finance (y=2067, x=197)
+  - Active (y=2067, x=312)
+  - Schedule Name (y=2067, x=2882)
+  - Days / Week (y=2067, x=3187)
+  - Hours / Week (y=2067, x=3281)
+  - Company (y=2067, x=3382)
+  - Status (y=2067, x=3522)
+  - 5 (y=2070, x=3726)
+  - 40h (y=2070, x=3918)
+  - Company timezone (y=2070, x=4118)
+  [y=2082, x=581, size=11pt]:
+aarav@oxp.com | +91 98765 43210
+
+  - Finance (y=2092, x=-1041)
+  - HR (y=2092, x=-699)
+  - Sara Khan (y=2109, x=-273)
+  - sara@oxp.com (y=2109, x=-108)
+  - HR Officer (y=2109, x=62)
+  - HR (y=2109, x=197)
+  - Active (y=2109, x=312)
+  - ● Active (y=2110, x=-1041)
+  - ● Active (y=2110, x=-699)
+  - Work Information (y=2122, x=493)
+  - Private Information (y=2122, x=663)
+  - 40 Hours / Week (y=2125, x=2882)
+  - 5 (y=2125, x=3197)
+  - 40h (y=2125, x=3291)
+  - My Company (y=2125, x=3382)
+  - Active (y=2126, x=3531)
+  - Weekly Schedule (y=2128, x=3714)
+  - +  Add Day (y=2128, x=4688)
+  - John Dsouza (y=2151, x=-273)
+  - john@oxp.com (y=2151, x=-108)
+  - Developer (y=2151, x=62)
+  - Engineering (y=2151, x=197)
+  - Active (y=2151, x=312)
+  - Department (y=2168, x=493)
+  - Job Position (y=2168, x=829)
+  - Finance (y=2172, x=617)
+  - Payroll Specialist (y=2172, x=953)
+  - Day (y=2184, x=3764)
+  - Start Time (y=2184, x=3964)
+  - End Time (y=2184, x=4124)
+  - Break (y=2184, x=4284)
+  - Hours (y=2184, x=4434)
+  - Open schedule (y=2191, x=3607)
+  - John Dsouza (y=2192, x=-985)
+  - Neha Patel (y=2192, x=-643)
+  - Neha Patel (y=2193, x=-273)
+  - neha@oxp.com (y=2193, x=-108)
+  - Recruiter (y=2193, x=62)
+  - HR (y=2193, x=197)
+  - Active (y=2193, x=312)
+  - Night Shift (y=2197, x=2882)
+  - 5 (y=2197, x=3197)
+  - 40h (y=2197, x=3291)
+  - My Company (y=2197, x=3382)
+  - Active (y=2198, x=3531)
+  - JD (y=2201, x=-1033)
+  - NP (y=2201, x=-691)
+  - Manager (y=2208, x=493)
+  - Work Location (y=2208, x=829)
+  - Sara Khan (y=2212, x=617)
+  - Mumbai (y=2212, x=953)
+  - Developer (y=2214, x=-985)
+  - Recruiter (y=2214, x=-643)
+  - Working Schedule (y=2225, x=2743)
+  - × (y=2229, x=4669)
+  - Monday (y=2230, x=3764)
+  - 8h (y=2230, x=4439)
+  - 9:00 AM (y=2232, x=3958)
+  - 6:00 PM (y=2232, x=4118)
+  - 1h (y=2232, x=4278)
+  - Engineering (y=2248, x=-1041)
+  - HR (y=2248, x=-699)
+  - Working Schedule (y=2248, x=493)
+  - Status (y=2248, x=829)
+  - 40 Hours / Week (y=2252, x=617)
+  - Active (y=2252, x=953)
+  - ● Active (y=2266, x=-1041)
+  - ● Active (y=2266, x=-699)
+  - Retail Weekend (y=2269, x=2882)
+  - 5 (y=2269, x=3197)
+  - 40h (y=2269, x=3291)
+  - My Company (y=2269, x=3382)
+  - Active (y=2270, x=3531)
+  - × (y=2283, x=4669)
+  - Tuesday (y=2284, x=3764)
+  - 8h (y=2284, x=4439)
+  - 9:00 AM (y=2286, x=3958)
+  - 6:00 PM (y=2286, x=4118)
+  - 1h (y=2286, x=4278)
+  - Company (y=2288, x=493)
+  - Work Email (y=2288, x=829)
+  - OXP Pvt Ltd (y=2292, x=617)
+  - aarav@oxp.com (y=2292, x=953)
+  - × (y=2337, x=4669)
+  - Wednesday (y=2338, x=3764)
+  - 8h (y=2338, x=4439)
+  - 9:00 AM (y=2340, x=3958)
+  - 6:00 PM (y=2340, x=4118)
+  - 1h (y=2340, x=4278)
+  - Flexible Hybrid (y=2341, x=2882)
+  - 5 (y=2341, x=3197)
+  - 37.5h (y=2341, x=3291)
+  - My Company (y=2341, x=3382)
+  - Active (y=2342, x=3531)
+  [y=2360, x=-1055, size=11.5pt]:
+Useful note: Kanban is good for browsing; clicking a card should open the same Employee Form used everywhere else.
+
+  [y=2360, x=-281, size=11.5pt]:
+Useful note: the list view is the main entry point for opening a specific employee record quickly.
+
+  [y=2368, x=476, size=11.5pt]:
+Useful note: smart buttons should open related Contracts, Attendance and Time Off records filtered for the current employee.
+
+  - × (y=2391, x=4669)
+  - Thursday (y=2392, x=3764)
+  - 8h (y=2392, x=4439)
+  - 9:00 AM (y=2394, x=3958)
+  - 6:00 PM (y=2394, x=4118)
+  - 1h (y=2394, x=4278)
+  - Part-time 20h (y=2413, x=2882)
+  - 4 (y=2413, x=3197)
+  - 20h (y=2413, x=3291)
+  - My Company (y=2413, x=3382)
+  - Inactive (y=2414, x=3531)
+  - × (y=2445, x=4669)
+  - Friday (y=2446, x=3764)
+  - 8h (y=2446, x=4439)
+  - 9:00 AM (y=2448, x=3958)
+  - 6:00 PM (y=2448, x=4118)
+  - 1h (y=2448, x=4278)
+  - Open related contracts (y=2450, x=-55)
+  - Employees ▼ (y=2493, x=-249)
+  - Contracts ▼ (y=2493, x=-141)
+  - Attendance (y=2493, x=-33)
+  - Time Off ▼ (y=2493, x=67)
+  - Payroll (y=2493, x=167)
+  - Employees ▼ (y=2493, x=525)
+  - Contracts ▼ (y=2493, x=633)
+  - Attendance (y=2493, x=741)
+  - Time Off ▼ (y=2493, x=841)
+  - Payroll (y=2493, x=941)
+  - HR (y=2495, x=-285)
+  - HR (y=2495, x=489)
+  - Total Weekly Hours: (y=2504, x=4434)
+  - 40h (y=2504, x=4629)
+  - Contracts (y=2538, x=-281)
+  - Contract / CON/2026/0042 (y=2538, x=493)
+  [y=2570, x=-281, size=12pt]:
+List view of employee contracts
+
+  - Form view of one contract (y=2570, x=493)
+  [y=2584, x=3714, size=11pt]:
+Use this schedule as the employee/contract working pattern.
+
+  [y=2584, x=2867, size=11pt]:
+Select a schedule to open its Form view
+
+  - NEW (y=2611, x=-260)
+  - Search contracts… (y=2612, x=-195)
+  - Employee (y=2648, x=493)
+  - Department (y=2648, x=829)
+  - Aarav Mehta (y=2652, x=617)
+  - Finance (y=2652, x=953)
+  - Contract (y=2666, x=-273)
+  - Employee (y=2666, x=-143)
+  - Start (y=2666, x=2)
+  - End (y=2666, x=87)
+  - Wage / Month (y=2666, x=172)
+  - Status (y=2666, x=284)
+  [y=2670, x=2867, size=14.853583542790208pt]:
+WORKING SCHEDULE NOTE
+• Required views: List and Form. The List is for finding/opening schedules; the Form defines one schedule.
+• A schedule should capture the weekly working pattern (days, working time and total weekly hours). Breaks or variable shifts can be handled in your own way.
+• Employee/Contract can reference a Working Schedule. Attendance and Payroll may use it as the expected working time.
+
+  - Start Date (y=2688, x=493)
+  - Job Position (y=2688, x=829)
+  - 01-Jan-2026 (y=2692, x=617)
+  - Payroll Specialist (y=2692, x=953)
+  - CON/2026/0042 (y=2706, x=-273)
+  - Aarav Mehta (y=2706, x=-143)
+  - 01-Jan-26 (y=2706, x=2)
+  - — (y=2706, x=87)
+  - ₹85,000 (y=2706, x=172)
+  - Running (y=2706, x=284)
+  - End Date (y=2728, x=493)
+  - Wage / Month (y=2728, x=829)
+  - — (y=2732, x=617)
+  - ₹85,000 (y=2732, x=953)
+  - CON/2025/0018 (y=2754, x=-273)
+  - Aarav Mehta (y=2754, x=-143)
+  - 01-Jul-25 (y=2754, x=2)
+  - 31-Dec-25 (y=2754, x=87)
+  - ₹78,000 (y=2754, x=172)
+  - Expired (y=2754, x=284)
+  - Status (y=2768, x=493)
+  - Working Schedule (y=2768, x=829)
+  - Running (y=2772, x=617)
+  - 40 Hours / Week (y=2772, x=953)
+  - CON/2026/0031 (y=2802, x=-273)
+  - Sara Khan (y=2802, x=-143)
+  - 01-Jan-26 (y=2802, x=2)
+  - — (y=2802, x=87)
+  - ₹95,000 (y=2802, x=172)
+  - Running (y=2802, x=284)
+  - Salary Structure / Notes (y=2836, x=505)
+  [y=2862, x=505, size=11pt]:
+Structure Type: Employee Salary
+This running contract is the source for payroll calculation in the active period.
+
+  [y=2948, x=-281, size=11.5pt]:
+Useful note: retain contract history, but make the active Running contract obvious because payroll depends on it.
+
+  [y=2948, x=493, size=11.5pt]:
+Useful note: for the problem statement, one employee should not have multiple Running contracts for the same period.
+
+================================================================================
+SECTION 19
+================================================================================
+### FLOW / SECTION: 2) Attendance Flow [y=3323, x=-782, 20pt]
+
+================================================================================
+SECTION 20
+================================================================================
+[y=3345, x=-782, size=12pt]:
+Attendance records can be opened from the Attendance menu or from the Employee Form smart button.
+
+  - Attendance Widget (y=3417, x=1299)
+  - ⏱ (y=3421, x=1777)
+  - Employees ▼ (y=3426, x=-732)
+  - Contracts ▼ (y=3426, x=-624)
+  - Attendance (y=3426, x=-516)
+  - Time Off ▼ (y=3426, x=-416)
+  - Payroll (y=3426, x=-316)
+  - Employees ▼ (y=3426, x=202)
+  - Contracts ▼ (y=3426, x=310)
+  - Attendance (y=3426, x=418)
+  - Time Off ▼ (y=3426, x=518)
+  - Payroll (y=3426, x=618)
+  - HR (y=3428, x=-768)
+  - HR (y=3428, x=166)
+
+================================================================================
+SECTION 21
+================================================================================
+### FLOW / SECTION: Attendance [y=3471, x=-764, 22pt]
+
+================================================================================
+SECTION 22
+================================================================================
+
+
+================================================================================
+SECTION 23
+================================================================================
+### FLOW / SECTION: Attendance / Aarav Mehta / 02-Sep-2026 [y=3471, x=170, 22pt]
+
+================================================================================
+SECTION 24
+================================================================================
+- Welcome back (y=3477, x=1309)
+  [y=3503, x=-764, size=12pt]:
+List view of employee attendance records
+
+  [y=3503, x=170, size=12pt]:
+Form view of one attendance record
+
+  - User Name! (y=3511, x=1309)
+  - i (y=3541, x=1898)
+  - NEW (y=3544, x=-743)
+  - Search attendance… (y=3544, x=-682)
+  - Today (y=3544, x=-388)
+  - Employee: Aarav (y=3544, x=-296)
+  - EDIT (y=3544, x=187)
+  [y=3546, x=1902, size=16pt]:
+Clicking the attendance icon
+opens the Check In / Check Out
+popup.
+
+================================================================================
+SECTION 25
+================================================================================
+### FLOW / SECTION: Attendances: 
+
+- Attendance can be accessed globally or from an individual employee.
+- Store check-in, check-out, worked hours, and attendance status.
+- When opened from an employee, only that employee’s attendance should be shown.
+- Attendance data should be usable later for reporting/dashboard insights. [y=3578, x=2365, 28pt]
+
+================================================================================
+SECTION 26
+================================================================================
+- Employee (y=3581, x=170)
+  - Department (y=3581, x=566)
+  - Aarav Mehta (y=3585, x=294)
+  - Finance (y=3585, x=690)
+  - 9:48 AM (y=3593, x=1309)
+  - —  Now (y=3593, x=1443)
+  - 6h56 (y=3593, x=1713)
+  - Employee (y=3599, x=-756)
+  - Check In (y=3599, x=-576)
+  - Check Out (y=3599, x=-416)
+  - Worked Hours (y=3599, x=-256)
+  - Status (y=3599, x=-136)
+  - Check In (y=3621, x=170)
+  - Manager (y=3621, x=566)
+  - 02-Sep-2026 09:05 (y=3625, x=294)
+  - Sara Khan (y=3625, x=690)
+  - Aarav Mehta (y=3637, x=-756)
+  - 09:05 (y=3637, x=-576)
+  - 18:10 (y=3637, x=-416)
+  - 9.08 (y=3637, x=-256)
+  - Present (y=3637, x=-136)
+  - Today (y=3655, x=1309)
+  - 6h56 (y=3655, x=1713)
+  - Check Out (y=3661, x=170)
+  - Status (y=3661, x=566)
+  - 02-Sep-2026 18:10 (y=3665, x=294)
+  - Present (y=3665, x=690)
+  - Sara Khan (y=3681, x=-756)
+  - 09:15 (y=3681, x=-576)
+  - 18:02 (y=3681, x=-416)
+  - 8.78 (y=3681, x=-256)
+  - Present (y=3681, x=-136)
+  [y=3683, x=144, size=11pt]:
+Open selected attendance record
+
+  - Worked Hours (y=3701, x=170)
+  - Overtime (y=3701, x=566)
+  - 9.08 (y=3705, x=294)
+  - 0.50 hrs (y=3705, x=690)
+  - Check Out (y=3717, x=1487)
+  - John Dsouza (y=3725, x=-756)
+  - 09:32 (y=3725, x=-576)
+  - 17:58 (y=3725, x=-416)
+  - 8.43 (y=3725, x=-256)
+  - Present (y=3725, x=-136)
+  [y=3767, x=1309, size=12pt]:
+Employees can mark attendance from the quick widget and review records from the Attendance module.
+
+  - Neha Patel (y=3769, x=-756)
+  - — (y=3769, x=-576)
+  - — (y=3769, x=-416)
+  - 0.00 (y=3769, x=-256)
+  - Absent (y=3769, x=-136)
+  - Notes (y=3773, x=182)
+  [y=3797, x=182, size=11pt]:
+System-generated from check in/out or manually corrected by an authorized user.
+
+  - ATTENDANCE QUICK ACTION NOTE (y=3836, x=1319)
+  [y=3867, x=-764, size=11.5pt]:
+Useful note: list view should help users review raw check-in / check-out data and identify missing punches quickly.
+
+  [y=3867, x=170, size=11.5pt]:
+Useful note: worked hours and overtime should be easy to read because they may later influence payroll or reporting.
+
+  [y=3870, x=1319, size=13pt]:
+• Clicking the red attendance icon should open a popup.
+• If there is no active session, show Check In.
+• If the user is already checked in, show Check Out.
+• The popup should display elapsed time till now.
+• After successful Check In, the status indicator changes to green.
+
+================================================================================
+SECTION 27
+================================================================================
+### FLOW / SECTION: 3) Time Off Flow [y=4095, x=-785, 20pt]
+
+================================================================================
+SECTION 28
+================================================================================
+[y=4117, x=-785, size=12pt]:
+Requests, Allocations and Time Off Types must be reached from Time Off ▼ in the navbar. Do not add separate page buttons for them.
+
+================================================================================
+SECTION 29
+================================================================================
+### FLOW / SECTION: Time Off:
+
+- Requests should support a simple approval flow.
+- For leave types that require allocation, approved leave should reduce the
+employee’s available balance.
+- Time Off Types should define how each leave type behaves. The exact
+policies and validations are open to interpretation. [y=4174, x=227, 28pt]
+
+================================================================================
+SECTION 30
+================================================================================
+- Menus under Time Off (y=4192, x=-646)
+  - Dashboard (y=4250, x=-602)
+  - Time offs (y=4294, x=-597)
+  - Time off Types (y=4334, x=-622)
+  - Allocations (y=4377, x=-601)
+  - Employees ▼ (y=4561, x=664)
+  - Contracts ▼ (y=4561, x=772)
+  - Attendance (y=4561, x=880)
+  - Time Off ▼ (y=4561, x=980)
+  - Payroll (y=4561, x=1080)
+  - HR (y=4563, x=628)
+  - Employees ▼ (y=4567, x=-127)
+  - Contracts ▼ (y=4567, x=-19)
+  - Attendance (y=4567, x=89)
+  - Time Off ▼ (y=4567, x=189)
+  - Payroll (y=4567, x=289)
+  - HR (y=4569, x=-163)
+  - Employees ▼ (y=4576, x=-961)
+  - Contracts ▼ (y=4576, x=-856)
+  - Attendance (y=4576, x=-751)
+  - Time Off ▼ (y=4576, x=-654)
+  - Payroll (y=4576, x=-557)
+  - Employees ▼ (y=4576, x=1476)
+  - Contracts ▼ (y=4576, x=1584)
+  - Attendance (y=4576, x=1692)
+  - Time Off ▼ (y=4576, x=1792)
+  - Payroll (y=4576, x=1892)
+  - HR (y=4578, x=-996)
+  - HR (y=4578, x=1440)
+  - Allocations (y=4606, x=632)
+
+================================================================================
+SECTION 31
+================================================================================
+### FLOW / SECTION: Time Off Request / Aarav Mehta [y=4612, x=-159, 22pt]
+
+================================================================================
+SECTION 32
+================================================================================
+
+
+================================================================================
+SECTION 33
+================================================================================
+### FLOW / SECTION: Time Off Requests [y=4619, x=-992, 21.390856265610026pt]
+
+================================================================================
+SECTION 34
+================================================================================
+- Allocation / Aarav Mehta (y=4621, x=1444)
+  [y=4638, x=632, size=12pt]:
+List view opened from Time Off ▼ → Allocations
+
+  - Form view of one request (y=4644, x=-159)
+  [y=4651, x=-992, size=11.66773978124183pt]:
+List view opened from Time Off ▼ → Requests
+
+  [y=4653, x=1444, size=12pt]:
+Form view of one allocation record
+
+  - NEW (y=4679, x=653)
+  - Search allocations… (y=4679, x=714)
+  - Approve (y=4681, x=-143)
+  - Refuse (y=4682, x=-78)
+  - NEW (y=4690, x=-972)
+  - Search requests… (y=4690, x=-913)
+  - My Team (y=4690, x=-689)
+  - Approve (y=4694, x=1457)
+  - EDIT (y=4694, x=1461)
+  - Refuse (y=4695, x=1525)
+  - Employee (y=4722, x=-159)
+  - Duration (y=4722, x=147)
+  - Aarav Mehta (y=4726, x=-35)
+  - 3 Days (y=4726, x=271)
+  - Employee (y=4731, x=1444)
+  - Taken (y=4731, x=1750)
+  - Employee (y=4734, x=640)
+  - Type (y=4734, x=790)
+  - Allocated (y=4734, x=910)
+  - Taken (y=4734, x=1000)
+  - Remaining (y=4734, x=1080)
+  - Status (y=4734, x=1170)
+  - Aarav Mehta (y=4735, x=1568)
+  - 8 Days (y=4735, x=1874)
+  - Employee (y=4744, x=-985)
+  - Type (y=4744, x=-849)
+  - Start (y=4744, x=-742)
+  - End (y=4744, x=-658)
+  - Duration (y=4744, x=-574)
+  - Status (y=4744, x=-487)
+  - Time Off Type (y=4762, x=-159)
+  - Status (y=4762, x=147)
+  - Paid Time Off (y=4766, x=-35)
+  - Approved (y=4766, x=271)
+  - open allocation (y=4767, x=1288)
+  - Time Off Type (y=4771, x=1444)
+  - Remaining (y=4771, x=1750)
+  - Aarav Mehta (y=4772, x=640)
+  - Paid Time Off (y=4772, x=790)
+  - 20 days (y=4772, x=910)
+  - 8 days (y=4772, x=1000)
+  - 12 days (y=4772, x=1080)
+  - Approved (y=4772, x=1170)
+  - Paid Time Off (y=4775, x=1568)
+  - 12 Days (y=4775, x=1874)
+  - Aarav Mehta (y=4781, x=-985)
+  - Paid Time Off (y=4781, x=-849)
+  - 12-Sep (y=4781, x=-742)
+  - 14-Sep (y=4781, x=-658)
+  - 3 Days (y=4781, x=-574)
+  - Approved (y=4781, x=-487)
+  - Approve (y=4783, x=-406)
+  - Refuse (y=4784, x=-372)
+  - Start Date (y=4802, x=-159)
+  - Approver (y=4802, x=147)
+  - 12-Sep-2026 (y=4806, x=-35)
+  - Sara Khan (y=4806, x=271)
+  - Allocated (y=4811, x=1444)
+  - Approver (y=4811, x=1750)
+  - 20 Days (y=4815, x=1568)
+  - Sara Khan (y=4815, x=1874)
+  - Sara Khan (y=4816, x=640)
+  - Paid Time Off (y=4816, x=790)
+  - 18 days (y=4816, x=910)
+  - 4 days (y=4816, x=1000)
+  - 14 days (y=4816, x=1080)
+  - Approved (y=4816, x=1170)
+  - Sara Khan (y=4824, x=-985)
+  - Sick Leave (y=4824, x=-849)
+  - 18-Sep (y=4824, x=-742)
+  - 18-Sep (y=4824, x=-658)
+  - 1 Day (y=4824, x=-574)
+  - Approved (y=4824, x=-487)
+  - Approve (y=4825, x=-406)
+  - Refuse (y=4825, x=-370)
+  - End Date (y=4842, x=-159)
+  - Allocation Used (y=4842, x=147)
+  - Open time off (y=4843, x=-298)
+  - 14-Sep-2026 (y=4846, x=-35)
+  - Paid Time Off 2026 (y=4846, x=271)
+  - Status (y=4851, x=1444)
+  - Validity (y=4851, x=1750)
+  - Approved (y=4855, x=1568)
+  - 2026 Annual Balance (y=4855, x=1874)
+  - Neha Patel (y=4860, x=640)
+  - Comp Off (y=4860, x=790)
+  - 2 days (y=4860, x=910)
+  - 1 day (y=4860, x=1000)
+  - 1 day (y=4860, x=1080)
+  - To Approve (y=4860, x=1170)
+  - John Dsouza (y=4866, x=-985)
+  - Comp Off (y=4866, x=-849)
+  - 27-Sep (y=4866, x=-742)
+  - 27-Sep (y=4866, x=-658)
+  - 1 Day (y=4866, x=-574)
+  - To Approve (y=4866, x=-487)
+  - Approve (y=4868, x=-403)
+  - Refuse (y=4869, x=-367)
+  - Reason (y=4912, x=-147)
+  - Description (y=4921, x=1456)
+  - Family vacation (y=4938, x=-147)
+  [y=4947, x=1456, size=11pt]:
+Annual leave balance granted at start of policy year.
+
+  [y=4966, x=632, size=11.5pt]:
+Useful note: the list should expose the balance math at a glance — Allocated, Taken and Remaining.
+
+  [y=4969, x=-992, size=11.181583957023422pt]:
+Useful note: request status should show the approval lifecycle clearly.
+
+  [y=4987, x=-159, size=9.309523809523613pt]:
+Useful note: if the selected type requires allocation, the request should clearly show which balance was consumed.
+
+  [y=4988, x=1444, size=11.5pt]:
+Useful note: approved allocation is what creates available leave balance for the employee.
+
+  - Open selected allocation (y=5018, x=853)
+  - Employees ▼ (y=5141, x=31)
+  - Contracts ▼ (y=5141, x=139)
+  - Attendance (y=5141, x=247)
+  - Time Off ▼ (y=5141, x=347)
+  - Payroll (y=5141, x=447)
+  - HR (y=5143, x=-5)
+  - Employees ▼ (y=5149, x=770)
+  - Contracts ▼ (y=5149, x=878)
+  - Attendance (y=5149, x=986)
+  - Time Off ▼ (y=5149, x=1086)
+  - Payroll (y=5149, x=1186)
+  - HR (y=5151, x=734)
+
+================================================================================
+SECTION 35
+================================================================================
+### FLOW / SECTION: Time Off Types [y=5186, x=-1, 22pt]
+
+================================================================================
+SECTION 36
+================================================================================
+
+
+================================================================================
+SECTION 37
+================================================================================
+### FLOW / SECTION: Time Off Type / Paid Time Off [y=5194, x=738, 22pt]
+
+================================================================================
+SECTION 38
+================================================================================
+[y=5218, x=-1, size=12pt]:
+List view opened from Time Off ▼ → Time Off Types
+
+  - Form view of one time off type (y=5226, x=738)
+  - NEW (y=5259, x=20)
+  - Search time off types… (y=5259, x=81)
+  - EDIT (y=5267, x=755)
+  - Type Name (y=5304, x=738)
+  - Approval (y=5304, x=1044)
+  - Paid Time Off (y=5308, x=862)
+  - Manager (y=5308, x=1168)
+  - Type (y=5314, x=7)
+  - Unit (y=5314, x=177)
+  - Allocation (y=5314, x=267)
+  - Approval (y=5314, x=377)
+  - Status (y=5314, x=487)
+  - Unit (y=5344, x=738)
+  - Payroll / Work Entry (y=5344, x=1044)
+  - Days (y=5348, x=862)
+  - Leave Work Entry (y=5348, x=1168)
+  - Open selected type (y=5348, x=609)
+  - Paid Time Off (y=5352, x=7)
+  - Days (y=5352, x=177)
+  - Required (y=5352, x=267)
+  - Manager (y=5352, x=377)
+  - Active (y=5352, x=487)
+  - Requires Allocation (y=5384, x=738)
+  - Display Color (y=5384, x=1044)
+  - Yes (y=5388, x=862)
+  - Blue (y=5388, x=1168)
+  - Sick Leave (y=5396, x=7)
+  - Days (y=5396, x=177)
+  - No (y=5396, x=267)
+  - Manager (y=5396, x=377)
+  - Active (y=5396, x=487)
+  - Active (y=5424, x=738)
+  - True (y=5428, x=862)
+  - Comp Off (y=5440, x=7)
+  - Hours (y=5440, x=177)
+  - Required (y=5440, x=267)
+  - Officer (y=5440, x=377)
+  - Active (y=5440, x=487)
+  - Configuration Notes (y=5494, x=750)
+  [y=5520, x=750, size=11pt]:
+Standard annual leave. Balance comes from approved allocations.
+
+  [y=5546, x=-1, size=11.5pt]:
+Useful note: this list defines policy rules, not employee transactions.
+
+  [y=5554, x=738, size=11.5pt]:
+Useful note: Time Off Type drives approval behavior and whether a request needs an allocation.
+
+================================================================================
+SECTION 39
+================================================================================
+### FLOW / SECTION: 4) Payroll — Payrun & Payslips [y=5722, x=-763, 36pt]
+
+================================================================================
+SECTION 40
+================================================================================
+
+
+================================================================================
+SECTION 41
+================================================================================
+### FLOW / SECTION: Menus under Payroll [y=5903, x=-313, 23.727030456852784pt]
+
+================================================================================
+SECTION 42
+================================================================================
+
+
+================================================================================
+SECTION 43
+================================================================================
+### FLOW / SECTION: Payrun Creation:
+
+Creating a Payrun happens in two steps:
+
+- Select the payroll scope, such as employee type, salary structure, and period.
+- Select the employees to include.
+- Continue only moves to employee selection. A Payrun is created only after clicking “Create
+Payrun”.
+Only the selected employees should be included in that Payrun.
+
+
+Payruns & Payslips:
+
+A Payrun represents payroll processing for a particular period.
+Each selected employee should have a Payslip linked to the Payrun.
+Computing payroll should use the employee’s applicable contract and selected salary structure.
+Payslips should show understandable components such as Basic, Allowances, Deductions, Gross,
+and Net Salary.
+Payroll issues, such as missing required information or duplicate payslips, should be visible to the
+user.
+
+
+Payroll Workflow:
+
+The intended flow is broadly:
+
+Draft → Compute → Validate → Mark Paid
+
+Paid/finalised payroll should remain available as historical data.
+
+
+Salary Structures & Salary Rules:
+
+A Salary Structure contains the rules used to calculate salary.
+Salary Rules can represent Basic Salary, Allowances, Deductions, Gross, Net, etc.
+Rules should be processed according to their sequence.
+Different calculation methods may be supported, such as fixed amounts, percentages, or formulas.
+
+Participants are free to design the calculation engine as long as salary rules actually drive Payslip
+calculations.
+
+
+Payslip PDF:
+
+Users should be able to generate/print a Payslip showing the employee’s payroll calculation for
+that period.
+Sending Payslips can also be supported from the Payrun.
+
+
+Payroll Dashboard:
+
+The dashboard should use actual data created through the HR and Payroll flows rather than
+hardcoded values.
+
+It should provide useful payroll/HR insights such as:
+
+Salary totals
+Payslip status
+Salary by department
+Salary trends
+Attendance overview
+Time Off overview
+Payroll warnings or items requiring attention
+
+Filters such as Period, Department, Employee Type, or Company should affect the relevant
+dashboard data. [y=5940, x=2615, 28pt]
+
+================================================================================
+SECTION 44
+================================================================================
+
+
+================================================================================
+SECTION 45
+================================================================================
+### FLOW / SECTION: Dashboard [y=5986, x=-251, 21.090693739424697pt]
+
+================================================================================
+SECTION 46
+================================================================================
+- Payruns (y=6048, x=-244)
+  - Payslips (y=6103, x=-248)
+  - Structures (y=6169, x=-253)
+  - Rules (y=6230, x=-247)
+  [y=6311, x=770, size=24.0213008715189pt]:
+The Payrun is created only after employee selection.
+
+  - × (y=6368, x=1545)
+
+================================================================================
+SECTION 47
+================================================================================
+### FLOW / SECTION: Select Employee Records [y=6370, x=430, 24pt]
+
+================================================================================
+SECTION 48
+================================================================================
+- Search employees... (y=6434, x=822)
+  - 1–22 / 22 (y=6436, x=1362)
+  - New Pay Run (y=6464, x=-640)
+  - × (y=6471, x=9)
+  - ✓ (y=6489, x=440)
+  - Employee (y=6489, x=490)
+  - Working Hours (y=6489, x=750)
+  - Start Date (y=6489, x=970)
+  - Wage (y=6489, x=1160)
+  - Pay Structure (y=6528, x=-629)
+  - ☐ (y=6529, x=440)
+  - Anita Oliver (y=6529, x=490)
+  - 40 hours/week (y=6529, x=750)
+  - Jan 1 (y=6529, x=970)
+  - $ 4,500.00 (y=6529, x=1160)
+  - United States: Regular Pay (y=6532, x=-487)
+  - → (y=6557, x=-323)
+  - Sep 1 (y=6559, x=-485)
+  - Sep 30 (y=6559, x=-269)
+  - on continue (y=6563, x=187)
+  - ☐ (y=6571, x=440)
+  - Audrey Peterson (y=6571, x=490)
+  - 40 hours/week (y=6571, x=750)
+  - Jan 1 (y=6571, x=970)
+  - $ 4,000.00 (y=6571, x=1160)
+  - Period (y=6590, x=-629)
+  - ☐ (y=6613, x=440)
+  - Billy Kyle (y=6613, x=490)
+  - 40 hours/week (y=6613, x=750)
+  - Sep 2 (y=6613, x=970)
+  - $ 3,100.00 (y=6613, x=1160)
+  - ☐ (y=6655, x=440)
+  - Eli Lambert (y=6655, x=490)
+  - 40 hours/week (y=6655, x=750)
+  - Jan 1 (y=6655, x=970)
+  - $ 4,350.00 (y=6655, x=1160)
+  - Continue (y=6655, x=-615)
+  - Discard (y=6657, x=-493)
+  - ☐ (y=6697, x=440)
+  - Paul Williams (y=6697, x=490)
+  - 40 hours/week (y=6697, x=750)
+  - Jul 1 (y=6697, x=970)
+  - $ 3,950.00 (y=6697, x=1160)
+  - Create Payrun (y=6714, x=431)
+  - Create payrun (y=6750, x=450)
+  - Back (y=6753, x=610)
+  [y=6754, x=-698, size=16pt]:
+Participant note: this popup collects the payrun scope only. Continue should not create the Payrun yet.
+
+  [y=6813, x=542, size=16pt]:
+Participant note: user selects one or more eligible employees, then clicks Create Payrun. The created Payrun should contain only the selected employees.
+
+  - Employees ▼ (y=6888, x=-1192)
+  - Contracts ▼ (y=6888, x=-1088)
+  - Attendance (y=6888, x=-984)
+  - Time Off ▼ (y=6888, x=-888)
+  - Payroll (y=6888, x=-792)
+  - HR (y=6890, x=-1228)
+  - Employees ▼ (y=6896, x=-188)
+  - Contracts ▼ (y=6896, x=-84)
+  - Attendance (y=6896, x=20)
+  - Time Off ▼ (y=6896, x=116)
+  - Payroll (y=6896, x=212)
+  - HR (y=6898, x=-224)
+  - Employees ▼ (y=6912, x=1743)
+  - Contracts ▼ (y=6912, x=1847)
+  - Attendance (y=6912, x=1951)
+  - Time Off ▼ (y=6912, x=2047)
+  - Payroll (y=6912, x=2143)
+  - HR (y=6914, x=1707)
+  - Employees ▼ (y=6915, x=742)
+  - Contracts ▼ (y=6915, x=846)
+  - Attendance (y=6915, x=950)
+  - Time Off ▼ (y=6915, x=1046)
+  - Payroll (y=6915, x=1142)
+  - HR (y=6917, x=706)
+  - Payruns (y=6933, x=-1224)
+  - Payrun / February 2026 (y=6941, x=-220)
+  [y=6957, x=1711, size=22pt]:
+Payslip / Aarav Mehta / February 2026
+
+  - Payslips (y=6960, x=710)
+  [y=6965, x=-1224, size=12pt]:
+Payrun view for payroll periods
+
+  [y=6973, x=-220, size=12pt]:
+Open one Payrun to compute and manage its payslips
+
+  [y=6989, x=1711, size=12pt]:
+Detailed salary computation for one employee
+
+  - List view of employee payslips (y=6992, x=710)
+  - NEW (y=7006, x=-1203)
+  - Search payruns… (y=7006, x=-1142)
+  - 2026 (y=7006, x=-890)
+  - VALIDATE (y=7014, x=-78)
+  - MARK PAID (y=7014, x=31)
+  - SEND PAYSLIPS (y=7014, x=308)
+  - COMPUTE (y=7015, x=-193)
+  - COMPUTE (y=7030, x=1738)
+  - MARK PAID (y=7030, x=1836)
+  - PRINT PAYSLIP (y=7031, x=1936)
+  - NEW (y=7033, x=731)
+  - Search payslips… (y=7033, x=792)
+  - Period: Feb 2026 (y=7033, x=1044)
+  - Name (y=7055, x=-220)
+  - February 2026 (y=7059, x=-96)
+  - January 2026 (y=7065, x=-1208)
+  - 42 employees (y=7066, x=-918)
+  - Paid (y=7066, x=-728)
+  - Employee (y=7071, x=1711)
+  - Period (y=7071, x=2047)
+  - Aarav Mehta (y=7075, x=1835)
+  - 01-Feb — 28-Feb (y=7075, x=2171)
+  - Employee (y=7087, x=716)
+  - Warning (y=7087, x=841)
+  - Period (y=7087, x=951)
+  - Basic (y=7087, x=1061)
+  - Gross (y=7087, x=1136)
+  - Net (y=7087, x=1211)
+  - Structure (y=7087, x=1286)
+  - Status (y=7087, x=1391)
+  - ↗ (y=7087, x=-574)
+  - 01-Jan-2026 — 31-Jan-2026 (y=7089, x=-1208)
+  - 1 warning (y=7091, x=-728)
+  - Salary Structure (y=7095, x=-220)
+  - Regular Salary (y=7099, x=-96)
+  - Salary Structure (y=7111, x=1711)
+  - Status (y=7111, x=2047)
+  - Regular Salary (y=7115, x=1835)
+  - Done (y=7115, x=2171)
+  - Aarav Mehta (y=7124, x=716)
+  - — (y=7124, x=841)
+  - 01-Feb — 28-Feb (y=7124, x=951)
+  - ₹50k (y=7124, x=1061)
+  - ₹80k (y=7124, x=1136)
+  - ₹75k (y=7124, x=1211)
+  - Regular (y=7124, x=1286)
+  - Done (y=7124, x=1391)
+  - Period (y=7135, x=-220)
+  - 01-Feb — 28-Feb (y=7139, x=-96)
+  - Pay Run (y=7151, x=1711)
+  - Worked Days (y=7151, x=2047)
+  - February 2026 (y=7155, x=1835)
+  - 22 (y=7155, x=2171)
+  - Sara Khan (y=7166, x=716)
+  - A/C missing (y=7166, x=841)
+  - 01-Feb — 28-Feb (y=7166, x=951)
+  - ₹60k (y=7166, x=1061)
+  - ₹96k (y=7166, x=1136)
+  - ₹88k (y=7166, x=1211)
+  - Regular (y=7166, x=1286)
+  - Done (y=7166, x=1391)
+  - February 2026 (y=7167, x=-1208)
+  - 42 employees (y=7168, x=-918)
+  - Validated (y=7168, x=-728)
+  - Status (y=7175, x=-220)
+  - Validated (y=7179, x=-96)
+  - ↗ (y=7189, x=-574)
+  - 01-Feb-2026 — 28-Feb-2026 (y=7191, x=-1208)
+  - 2 warnings (y=7193, x=-728)
+  - Open Payrun (y=7208, x=-421)
+  - John Dsouza (y=7208, x=716)
+  - Duplicate (y=7208, x=841)
+  - 01-Feb — 28-Feb (y=7208, x=951)
+  - ₹45k (y=7208, x=1061)
+  - ₹72k (y=7208, x=1136)
+  - ₹66k (y=7208, x=1211)
+  - Regular (y=7208, x=1286)
+  - Draft (y=7208, x=1391)
+  - Salary Computation (y=7213, x=1711)
+  - Payslips in this Payrun (y=7223, x=-220)
+  - Open payslip (y=7224, x=1506)
+  - Neha Patel (y=7250, x=716)
+  - — (y=7250, x=841)
+  - 01-Feb — 28-Feb (y=7250, x=951)
+  - ₹40k (y=7250, x=1061)
+  - ₹64k (y=7250, x=1136)
+  - ₹59k (y=7250, x=1211)
+  - Regular (y=7250, x=1286)
+  - Done (y=7250, x=1391)
+  - Rule (y=7250, x=1719)
+  - Category (y=7250, x=1979)
+  - Amount (y=7250, x=2109)
+  - Code (y=7250, x=2229)
+  - Employee (y=7260, x=-214)
+  - Warning (y=7260, x=-84)
+  - Worked (y=7260, x=36)
+  - Basic (y=7260, x=106)
+  - Gross (y=7260, x=186)
+  - Net (y=7260, x=266)
+  - Status (y=7260, x=346)
+  - PDF (y=7260, x=426)
+  - March 2026 (y=7269, x=-1208)
+  - 42 employees (y=7270, x=-918)
+  - Draft (y=7270, x=-728)
+  - Basic Salary (y=7280, x=1719)
+  - Basic (y=7280, x=1979)
+  - ₹50,000 (y=7280, x=2109)
+  - BASIC (y=7280, x=2229)
+  - ↗ (y=7291, x=-574)
+  - 01-Mar-2026 — 31-Mar-2026 (y=7293, x=-1208)
+  - Aarav Mehta (y=7295, x=-214)
+  - — (y=7295, x=-84)
+  - 22 (y=7295, x=36)
+  - ₹50k (y=7295, x=106)
+  - ₹80k (y=7295, x=186)
+  - ₹75k (y=7295, x=266)
+  - Done (y=7295, x=346)
+  - PDF (y=7295, x=426)
+  - No warnings (y=7295, x=-728)
+  - Open selected payslip (y=7298, x=1360)
+  - House Rent Allowance (y=7304, x=1719)
+  - Allowance (y=7304, x=1979)
+  - ₹20,000 (y=7304, x=2109)
+  - HRA (y=7304, x=2229)
+  - Standard Allowance (y=7328, x=1719)
+  - Allowance (y=7328, x=1979)
+  - ₹10,000 (y=7328, x=2109)
+  - STD (y=7328, x=2229)
+  - Sara Khan (y=7333, x=-214)
+  - A/C missing (y=7333, x=-84)
+  - 22 (y=7333, x=36)
+  - ₹60k (y=7333, x=106)
+  - ₹96k (y=7333, x=186)
+  - ₹88k (y=7333, x=266)
+  - Done (y=7333, x=346)
+  - PDF (y=7333, x=426)
+  - Gross Salary (y=7352, x=1719)
+  - Gross (y=7352, x=1979)
+  - ₹80,000 (y=7352, x=2109)
+  - GROSS (y=7352, x=2229)
+  - John Dsouza (y=7371, x=-214)
+  - Duplicate (y=7371, x=-84)
+  - 20 (y=7371, x=36)
+  - ₹45k (y=7371, x=106)
+  - ₹72k (y=7371, x=186)
+  - ₹66k (y=7371, x=266)
+  - Draft (y=7371, x=346)
+  - PDF (y=7371, x=426)
+  - Provident Fund (y=7376, x=1719)
+  - Deduction (y=7376, x=1979)
+  - -₹3,000 (y=7376, x=2109)
+  - PF (y=7376, x=2229)
+  [y=7389, x=-1224, size=11.5pt]:
+Useful note: each Payrun represents one payroll period and groups the payslips generated for that period.
+
+  - Professional Tax (y=7400, x=1719)
+  - Deduction (y=7400, x=1979)
+  - -₹2,000 (y=7400, x=2109)
+  - PT (y=7400, x=2229)
+  [y=7416, x=710, size=11.5pt]:
+Useful note: selecting any payslip opens the detailed salary computation and PDF action for that employee.
+
+  [y=7416, x=-235, size=11.185904655072314pt]:
+Useful note: warnings such as missing account data or duplicate payslips should be visible before payroll is finalized.
+
+  - Net Salary (y=7424, x=1719)
+  - Net (y=7424, x=1979)
+  - ₹75,000 (y=7424, x=2109)
+  - NET (y=7424, x=2229)
+  [y=7447, x=1711, size=11.5pt]:
+Useful note: the Print action generates the employee payslip as PDF; that PDF can be sent from the parent Payrun.
+
+================================================================================
+SECTION 49
+================================================================================
+### FLOW / SECTION: 5) Payroll Configuration — Salary Structures & Rules [y=7475, x=-1248, 20pt]
+
+================================================================================
+SECTION 50
+================================================================================
+[y=7513, x=146, size=10.5pt]:
+Configured structure is selected when a Payrun is created
+
+  - Employees ▼ (y=7546, x=-1192)
+  - Contracts ▼ (y=7546, x=-1088)
+  - Attendance (y=7546, x=-984)
+  - Time Off ▼ (y=7546, x=-888)
+  - Payroll (y=7546, x=-792)
+  - HR (y=7548, x=-1228)
+  - Employees ▼ (y=7554, x=-188)
+  - Contracts ▼ (y=7554, x=-84)
+  - Attendance (y=7554, x=20)
+  - Time Off ▼ (y=7554, x=116)
+  - Payroll (y=7554, x=212)
+  - HR (y=7556, x=-224)
+  - Employees ▼ (y=7570, x=1743)
+  - Contracts ▼ (y=7570, x=1847)
+  - Attendance (y=7570, x=1951)
+  - Time Off ▼ (y=7570, x=2047)
+  - Payroll (y=7570, x=2143)
+  - HR (y=7572, x=1707)
+  - Employees ▼ (y=7573, x=742)
+  - Contracts ▼ (y=7573, x=846)
+  - Attendance (y=7573, x=950)
+  - Time Off ▼ (y=7573, x=1046)
+  - Payroll (y=7573, x=1142)
+  - HR (y=7575, x=706)
+  - Salary Structures (y=7591, x=-1224)
+  [y=7599, x=-220, size=22pt]:
+Salary Structure / Regular Salary
+
+  - Salary Rule / Basic Salary (y=7615, x=1711)
+  - Salary Rules (y=7618, x=710)
+  - List view (y=7623, x=-1224)
+  [y=7631, x=-220, size=12pt]:
+Form view with its salary rules
+
+  - Form view (y=7647, x=1711)
+  - List view (y=7650, x=710)
+  - NEW (y=7664, x=-1203)
+  - Search structures… (y=7664, x=-1142)
+  - EDIT (y=7688, x=1728)
+  - NEW (y=7691, x=731)
+  - Search salary rules… (y=7691, x=792)
+  - Regular Salary (y=7691, x=1054)
+  - Structure Name (y=7713, x=-220)
+  - Active (y=7713, x=156)
+  - Regular Salary (y=7717, x=-96)
+  - True (y=7717, x=280)
+  - Structure Name (y=7719, x=-1216)
+  - Rules (y=7719, x=-956)
+  - Employees (y=7719, x=-856)
+  - Active (y=7719, x=-736)
+  - Rule Name (y=7729, x=1711)
+  - Salary Structure (y=7729, x=2057)
+  - Basic Salary (y=7733, x=1835)
+  - Regular Salary (y=7733, x=2181)
+  - Rule Name (y=7746, x=718)
+  - Code (y=7746, x=938)
+  - Category (y=7746, x=1028)
+  - Structure (y=7746, x=1158)
+  - Sequence (y=7746, x=1298)
+  - Regular Salary (y=7758, x=-1216)
+  - 12 rules (y=7758, x=-956)
+  - 42 employees (y=7758, x=-856)
+  - Active (y=7758, x=-736)
+  - Salary Rules (y=7765, x=-220)
+  - Code (y=7769, x=1711)
+  - Computation (y=7769, x=2057)
+  - BASIC (y=7773, x=1835)
+  - Percentage of Wage (y=7773, x=2181)
+  - Basic Salary (y=7783, x=718)
+  - BASIC (y=7783, x=938)
+  - Basic (y=7783, x=1028)
+  - Regular Salary (y=7783, x=1158)
+  - 1 (y=7783, x=1298)
+  - Rule Name (y=7802, x=-212)
+  - Code (y=7802, x=68)
+  - Category (y=7802, x=168)
+  - Sequence (y=7802, x=298)
+  - Intern Salary (y=7804, x=-1216)
+  - 8 rules (y=7804, x=-956)
+  - 6 employees (y=7804, x=-856)
+  - Active (y=7804, x=-736)
+  - Category (y=7809, x=1711)
+  - Percentage (y=7809, x=2057)
+  - Basic (y=7813, x=1835)
+  - 50% (y=7813, x=2181)
+  - House Rent Allowance (y=7823, x=718)
+  - HRA (y=7823, x=938)
+  - Allowance (y=7823, x=1028)
+  - Regular Salary (y=7823, x=1158)
+  - 10 (y=7823, x=1298)
+  - Basic Salary (y=7830, x=-213)
+  - BASIC (y=7830, x=67)
+  - Basic (y=7830, x=167)
+  - 1 (y=7830, x=297)
+  - open structure (y=7849, x=-430)
+  - House Rent Allowance (y=7849, x=-213)
+  - HRA (y=7849, x=67)
+  - Allowance (y=7849, x=167)
+  - 10 (y=7849, x=297)
+  - Sequence (y=7849, x=1711)
+  - Quantity (y=7849, x=2057)
+  - Contractor (y=7850, x=-1216)
+  - 6 rules (y=7850, x=-956)
+  - 9 employees (y=7850, x=-856)
+  - Active (y=7850, x=-736)
+  - 1 (y=7853, x=1835)
+  - 1 (y=7853, x=2181)
+  - Standard Allowance (y=7863, x=718)
+  - STD (y=7863, x=938)
+  - Allowance (y=7863, x=1028)
+  - Regular Salary (y=7863, x=1158)
+  - 20 (y=7863, x=1298)
+  - Standard Allowance (y=7868, x=-213)
+  - STD (y=7868, x=67)
+  - Allowance (y=7868, x=167)
+  - 20 (y=7868, x=297)
+  - Open salary rule (y=7869, x=1492)
+  - Performance Bonus (y=7887, x=-213)
+  - BONUS (y=7887, x=67)
+  - Allowance (y=7887, x=167)
+  - 30 (y=7887, x=297)
+  - Performance Bonus (y=7903, x=718)
+  - BONUS (y=7903, x=938)
+  - Allowance (y=7903, x=1028)
+  - Regular Salary (y=7903, x=1158)
+  - 30 (y=7903, x=1298)
+  [y=7905, x=1711, size=12pt]:
+Computation options from the source
+
+  - Leave Travel Allowance (y=7906, x=-213)
+  - LTA (y=7906, x=67)
+  - Allowance (y=7906, x=167)
+  - 40 (y=7906, x=297)
+  - Fixed Allowance (y=7925, x=-213)
+  - FIX (y=7925, x=67)
+  - Allowance (y=7925, x=167)
+  - 50 (y=7925, x=297)
+  - Leave Travel Allowance (y=7943, x=718)
+  - LTA (y=7943, x=938)
+  - Allowance (y=7943, x=1028)
+  - Regular Salary (y=7943, x=1158)
+  - 40 (y=7943, x=1298)
+  - Gross Salary (y=7944, x=-213)
+  - GROSS (y=7944, x=67)
+  - Gross (y=7944, x=167)
+  - 60 (y=7944, x=297)
+  - Fixed Amount (y=7947, x=1727)
+  - Percentage of Wage (y=7947, x=1907)
+  - Python Code (y=7947, x=2117)
+  - LWF fund (y=7963, x=-213)
+  - LWF (y=7963, x=67)
+  - Deduction (y=7963, x=167)
+  - 70 (y=7963, x=297)
+  - Provident Fund (y=7982, x=-213)
+  - PF (y=7982, x=67)
+  - Deduction (y=7982, x=167)
+  - 80 (y=7982, x=297)
+  - Fixed Allowance (y=7983, x=718)
+  - FIX (y=7983, x=938)
+  - Allowance (y=7983, x=1028)
+  - Regular Salary (y=7983, x=1158)
+  - 50 (y=7983, x=1298)
+  [y=7989, x=1727, size=10.5pt]:
+Example expression: result = categories['BASIC']
+
+  - ESIC (y=8001, x=-213)
+  - ESIC (y=8001, x=67)
+  - Deduction (y=8001, x=167)
+  - 90 (y=8001, x=297)
+  [y=8015, x=-1224, size=12pt]:
+Structures group salary rules; rules define the ordered salary computation used by a payslip. Both require List and Form views.
+
+  - Professional Tax (y=8020, x=-213)
+  - PT (y=8020, x=67)
+  - Deduction (y=8020, x=167)
+  - 100 (y=8020, x=297)
+  - Gross Salary (y=8023, x=718)
+  - GROSS (y=8023, x=938)
+  - Gross (y=8023, x=1028)
+  - Regular Salary (y=8023, x=1158)
+  - 60 (y=8023, x=1298)
+  - Net Salary (y=8039, x=-213)
+  - NET (y=8039, x=67)
+  - Net (y=8039, x=167)
+  - 110 (y=8039, x=297)
+  [y=8049, x=-1227, size=11.268574909547901pt]:
+Useful note: the Salary Structure selected on a Payrun determines which set of salary rules will calculate each payslip.
+
+  [y=8069, x=-220, size=11.5pt]:
+Useful note: rule order matters. Keep sequence visible so participants understand the calculation order.
+Rules created here is just for reference
+
+  [y=8074, x=710, size=11.5pt]:
+Useful note: List view should expose name, code, category, structure and sequence — the fields needed to understand 
+a payroll rule quickly.
+
+  [y=8085, x=1711, size=11.5pt]:
+Useful note: a Salary Rule needs a clear computation method and category because these drive the lines displayed 
+hon the final payslip.
+
+  - Continue into dashboard view (y=8164, x=-450)
+  [y=8169, x=1597, size=20pt]:
+Computation Note:
+ - Fixed Amount: uses the exact value entered in the rule, e.g. Meal Allowance = 2,000.
+ - Percentage: calculates the rule as a percentage of a selected base such as Contract Wage,
+Basic Salary, or Gross Salary, e.g. HRA = 20% × Basic Salary.
+ - Python Code / Formula: is used for advanced calculations where fixed or percentage methods
+are not sufficient, such as attendance-based salary, overtime, unpaid leave deductions, or
+calculations using multiple salary-rule values.
+
+================================================================================
+SECTION 51
+================================================================================
+### FLOW / SECTION: 6) Payroll Dashboard [y=8223, x=-1242, 28pt]
+
+================================================================================
+SECTION 52
+================================================================================
+[y=8255, x=-1242, size=18pt]:
+Dashboard challenge: combine Payroll with HR data from multiple models and present useful insights with cards, charts, and summaries.
+
+  - Employees (y=8296, x=-1156)
+  - Attendance (y=8296, x=-1016)
+  - Time Off (y=8296, x=-872)
+  - Payroll (y=8296, x=-732)
+  - HR (y=8297, x=-1214)
+
+================================================================================
+SECTION 53
+================================================================================
+### FLOW / SECTION: Payroll Dashboard [y=8355, x=-1218, 26pt]
+
+================================================================================
+SECTION 54
+================================================================================
+[y=8389, x=-1218, size=16pt]:
+Dashboard should help payroll/HR users understand payments, staffing impact, leave patterns, and attendance quality for the selected period.
+
+  - Period (y=8475, x=-1218)
+  - Department (y=8475, x=-958)
+  - Employee Type (y=8475, x=-698)
+  - Company (y=8475, x=-438)
+  - Sep 2026 (y=8503, x=-1208)
+  - All Departments (y=8503, x=-948)
+  - All Types (y=8503, x=-688)
+  - OXP Pvt Ltd (y=8503, x=-428)
+  - Total Net Salary Paid (y=8571, x=-1200)
+  - Payslips Generated (y=8571, x=-682)
+  - Avg Salary / Employee (y=8571, x=-164)
+  - Approved Time Off Days (y=8571, x=354)
+  - Attendance Health (y=8571, x=872)
+  - ₹ 18.4L (y=8599, x=-1200)
+  - 148 (y=8599, x=-682)
+  - ₹ 12,432 (y=8599, x=-164)
+  - 34 Days (y=8599, x=354)
+  - 94% (y=8599, x=872)
+  - +8.5% vs previous month (y=8639, x=-1200)
+  - 142 paid, 6 pending (y=8639, x=-682)
+  - Based on current payrun (y=8639, x=-164)
+  - Across selected period (y=8639, x=354)
+  - Present / reviewed records (y=8639, x=872)
+  - Salary Cost by Department (y=8721, x=-1200)
+  - Monthly Net Salary Trend (y=8721, x=-252)
+
+================================================================================
+SECTION 55
+================================================================================
+### FLOW / SECTION: Payslip Status & Payroll Alerts [y=8721, x=536, 20pt]
+
+================================================================================
+SECTION 56
+================================================================================
+[y=8749, x=-1200, size=14pt]:
+Source: Payslips + Employee Department
+
+  [y=8749, x=-252, size=14pt]:
+Source: historical Payslips / Payruns
+
+  [y=8749, x=536, size=14pt]:
+Source: Payrun + Payslip validation
+
+  - ₹ 170k (y=8765, x=-528)
+  - ₹ 150k (y=8785, x=-942)
+  - Status split (y=8793, x=542)
+  - Current alerts (y=8793, x=1102)
+  - ₹ 130k (y=8805, x=-666)
+  - ₹ 110k (y=8825, x=-1080)
+  [y=8825, x=1102, size=15pt]:
+• 2 employees missing bank account
+
+  - ₹ 90k (y=8845, x=-804)
+  - • 1 duplicate payslip warning (y=8857, x=1102)
+  - 15.0L (y=8883, x=140)
+  - Paid (y=8884, x=570)
+  - • 4 drafts still not validated (y=8889, x=1102)
+  - Done (y=8912, x=570)
+  [y=8921, x=1102, size=15pt]:
+• 3 contracts expiring this month
+
+  - Pending (y=8940, x=570)
+  - HR (y=8967, x=-1076)
+  - Sales (y=8967, x=-938)
+  - Support (y=8967, x=-800)
+  - Finance (y=8967, x=-662)
+  - IT (y=8967, x=-524)
+  - Warning (y=8968, x=570)
+  - Apr (y=8969, x=-178)
+  - May (y=8969, x=-68)
+  - Jun (y=8969, x=42)
+  - Jul (y=8969, x=152)
+  - Aug (y=8969, x=262)
+  - Sep (y=8969, x=372)
+  - 15.2L (y=9039, x=-78)
+
+================================================================================
+SECTION 57
+================================================================================
+### FLOW / SECTION: Attendance Overview [y=9047, x=-1200, 20pt]
+
+================================================================================
+SECTION 58
+================================================================================
+
+
+================================================================================
+SECTION 59
+================================================================================
+### FLOW / SECTION: Time Off Overview [y=9047, x=-552, 20pt]
+
+================================================================================
+SECTION 60
+================================================================================
+- Department Overview (y=9047, x=196)
+  - Models to Aggregate (y=9047, x=844)
+  - 14.8L (y=9049, x=-188)
+  - 14.3L (y=9069, x=32)
+  - Source: Attendance (y=9075, x=-1200)
+  [y=9075, x=-552, size=14pt]:
+Source: Time Off Requests + Allocations
+
+  [y=9075, x=196, size=14pt]:
+Source: Employee + Contract + Payslip totals
+
+  [y=9075, x=844, size=14pt]:
+This is the actual challenge behind the dashboard.
+
+  - 18.4L (y=9079, x=362)
+  - 17.1L (y=9089, x=252)
+  - 94 (y=9097, x=-1168)
+  - Department (y=9103, x=208)
+  - Headcount (y=9103, x=399)
+  - Monthly Salary (y=9103, x=504)
+  [y=9111, x=844, size=15pt]:
+• Employees / Departments → headcount, ownership, grouping
+
+  - Type (y=9117, x=-542)
+  - Approved Days (y=9117, x=-362)
+  - Pending (y=9117, x=-212)
+  - Remaining Balance (y=9117, x=-92)
+  - 22 (y=9121, x=-778)
+  [y=9127, x=-798, size=15pt]:
+Missing check-outs: 5
+Manual attendance edits: 7
+Attendance coverage: 94%
+
+  - IT (y=9133, x=208)
+  - 18 (y=9133, x=399)
+  - ₹ 4.2L (y=9133, x=504)
+  [y=9137, x=844, size=15pt]:
+• Contracts → wage, schedule, active employees
+
+  - Paid Time Off (y=9151, x=-542)
+  - 24 (y=9151, x=-362)
+  - 3 (y=9151, x=-212)
+  - 118 Days (y=9151, x=-92)
+  - Sales (y=9160, x=208)
+  - 22 (y=9160, x=399)
+  - ₹ 5.7L (y=9160, x=504)
+  [y=9163, x=844, size=15pt]:
+• Payruns / Payslips → salary totals, paid vs pending, trend data
+
+  - 18 (y=9173, x=-1038)
+  - 9 (y=9182, x=-908)
+  - Sick Leave (y=9185, x=-542)
+  - 6 (y=9185, x=-362)
+  - 1 (y=9185, x=-212)
+  - N/A (y=9185, x=-92)
+  - HR (y=9188, x=208)
+  - 8 (y=9188, x=399)
+  - ₹ 1.9L (y=9188, x=504)
+  [y=9189, x=844, size=15pt]:
+• Attendance → presence, absences, late entries, overtime
+
+  [y=9215, x=844, size=15pt]:
+• Time Off Requests / Allocations → leave taken and leave balances
+
+  - Support (y=9216, x=208)
+  - 14 (y=9216, x=399)
+  - ₹ 3.1L (y=9216, x=504)
+  - Present (y=9219, x=-1174)
+  - Late (y=9219, x=-1044)
+  - Absent (y=9219, x=-914)
+  - Overtime (y=9219, x=-784)
+  - Comp Off (y=9219, x=-542)
+  - 4 (y=9219, x=-362)
+  - 2 (y=9219, x=-212)
+  - 11 Days (y=9219, x=-92)

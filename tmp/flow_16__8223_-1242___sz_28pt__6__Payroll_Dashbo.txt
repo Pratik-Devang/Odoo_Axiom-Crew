@@ -1,0 +1,125 @@
+[8223,-1242 | sz:28pt] 6) Payroll Dashboard
+[8255,-1242 | sz:18pt] Dashboard challenge: combine Payroll with HR data from multiple models and present useful insights with cards, charts, and summaries.
+[8296,-1156 | sz:18pt] Employees
+[8296,-1016 | sz:18pt] Attendance
+[8296,-872 | sz:18pt] Time Off
+[8296,-732 | sz:18pt] Payroll
+[8297,-1214 | sz:18pt] HR
+[8355,-1218 | sz:26pt] Payroll Dashboard
+[8389,-1218 | sz:16pt] Dashboard should help payroll/HR users understand payments, staffing impact, leave patterns, and attendance quality for the selected period.
+[8475,-1218 | sz:15pt] Period
+[8475,-958 | sz:15pt] Department
+[8475,-698 | sz:15pt] Employee Type
+[8475,-438 | sz:15pt] Company
+[8503,-1208 | sz:15pt] Sep 2026
+[8503,-948 | sz:15pt] All Departments
+[8503,-688 | sz:15pt] All Types
+[8503,-428 | sz:15pt] OXP Pvt Ltd
+[8571,-1200 | sz:16pt] Total Net Salary Paid
+[8571,-682 | sz:16pt] Payslips Generated
+[8571,-164 | sz:16pt] Avg Salary / Employee
+[8571,354 | sz:16pt] Approved Time Off Days
+[8571,872 | sz:16pt] Attendance Health
+[8599,-1200 | sz:28pt] ₹ 18.4L
+[8599,-682 | sz:28pt] 148
+[8599,-164 | sz:28pt] ₹ 12,432
+[8599,354 | sz:28pt] 34 Days
+[8599,872 | sz:28pt] 94%
+[8639,-1200 | sz:14pt] +8.5% vs previous month
+[8639,-682 | sz:14pt] 142 paid, 6 pending
+[8639,-164 | sz:14pt] Based on current payrun
+[8639,354 | sz:14pt] Across selected period
+[8639,872 | sz:14pt] Present / reviewed records
+[8721,-1200 | sz:20pt] Salary Cost by Department
+[8721,-252 | sz:20pt] Monthly Net Salary Trend
+[8721,536 | sz:20pt] Payslip Status & Payroll Alerts
+[8749,-1200 | sz:14pt] Source: Payslips + Employee Department
+[8749,-252 | sz:14pt] Source: historical Payslips / Payruns
+[8749,536 | sz:14pt] Source: Payrun + Payslip validation
+[8765,-528 | sz:13pt] ₹ 170k
+[8785,-942 | sz:13pt] ₹ 150k
+[8793,542 | sz:16pt] Status split
+[8793,1102 | sz:16pt] Current alerts
+[8805,-666 | sz:13pt] ₹ 130k
+[8825,-1080 | sz:13pt] ₹ 110k
+[8825,1102 | sz:15pt] • 2 employees missing bank account
+[8845,-804 | sz:13pt] ₹ 90k
+[8857,1102 | sz:15pt] • 1 duplicate payslip warning
+[8883,140 | sz:13pt] 15.0L
+[8884,570 | sz:15pt] Paid
+[8889,1102 | sz:15pt] • 4 drafts still not validated
+[8912,570 | sz:15pt] Done
+[8921,1102 | sz:15pt] • 3 contracts expiring this month
+[8940,570 | sz:15pt] Pending
+[8967,-1076 | sz:14pt] HR
+[8967,-938 | sz:14pt] Sales
+[8967,-800 | sz:14pt] Support
+[8967,-662 | sz:14pt] Finance
+[8967,-524 | sz:14pt] IT
+[8968,570 | sz:15pt] Warning
+[8969,-178 | sz:13pt] Apr
+[8969,-68 | sz:13pt] May
+[8969,42 | sz:13pt] Jun
+[8969,152 | sz:13pt] Jul
+[8969,262 | sz:13pt] Aug
+[8969,372 | sz:13pt] Sep
+[9039,-78 | sz:13pt] 15.2L
+[9047,-1200 | sz:20pt] Attendance Overview
+[9047,-552 | sz:20pt] Time Off Overview
+[9047,196 | sz:20pt] Department Overview
+[9047,844 | sz:20pt] Models to Aggregate
+[9049,-188 | sz:13pt] 14.8L
+[9069,32 | sz:13pt] 14.3L
+[9075,-1200 | sz:14pt] Source: Attendance
+[9075,-552 | sz:14pt] Source: Time Off Requests + Allocations
+[9075,196 | sz:14pt] Source: Employee + Contract + Payslip totals
+[9075,844 | sz:14pt] This is the actual challenge behind the dashboard.
+[9079,362 | sz:13pt] 18.4L
+[9089,252 | sz:13pt] 17.1L
+[9097,-1168 | sz:13pt] 94
+[9103,208 | sz:13pt] Department
+[9103,399 | sz:13pt] Headcount
+[9103,504 | sz:13pt] Monthly Salary
+[9111,844 | sz:15pt] • Employees / Departments → headcount, ownership, grouping
+[9117,-542 | sz:15pt] Type
+[9117,-362 | sz:15pt] Approved Days
+[9117,-212 | sz:15pt] Pending
+[9117,-92 | sz:15pt] Remaining Balance
+[9121,-778 | sz:13pt] 22
+[9127,-798 | sz:15pt] Missing check-outs: 5
+Manual attendance edits: 7
+Attendance coverage: 94%
+[9133,208 | sz:13pt] IT
+[9133,399 | sz:13pt] 18
+[9133,504 | sz:13pt] ₹ 4.2L
+[9137,844 | sz:15pt] • Contracts → wage, schedule, active employees
+[9151,-542 | sz:15pt] Paid Time Off
+[9151,-362 | sz:15pt] 24
+[9151,-212 | sz:15pt] 3
+[9151,-92 | sz:15pt] 118 Days
+[9160,208 | sz:13pt] Sales
+[9160,399 | sz:13pt] 22
+[9160,504 | sz:13pt] ₹ 5.7L
+[9163,844 | sz:15pt] • Payruns / Payslips → salary totals, paid vs pending, trend data
+[9173,-1038 | sz:13pt] 18
+[9182,-908 | sz:13pt] 9
+[9185,-542 | sz:15pt] Sick Leave
+[9185,-362 | sz:15pt] 6
+[9185,-212 | sz:15pt] 1
+[9185,-92 | sz:15pt] N/A
+[9188,208 | sz:13pt] HR
+[9188,399 | sz:13pt] 8
+[9188,504 | sz:13pt] ₹ 1.9L
+[9189,844 | sz:15pt] • Attendance → presence, absences, late entries, overtime
+[9215,844 | sz:15pt] • Time Off Requests / Allocations → leave taken and leave balances
+[9216,208 | sz:13pt] Support
+[9216,399 | sz:13pt] 14
+[9216,504 | sz:13pt] ₹ 3.1L
+[9219,-1174 | sz:13pt] Present
+[9219,-1044 | sz:13pt] Late
+[9219,-914 | sz:13pt] Absent
+[9219,-784 | sz:13pt] Overtime
+[9219,-542 | sz:15pt] Comp Off
+[9219,-362 | sz:15pt] 4
+[9219,-212 | sz:15pt] 2
+[9219,-92 | sz:15pt] 11 Days

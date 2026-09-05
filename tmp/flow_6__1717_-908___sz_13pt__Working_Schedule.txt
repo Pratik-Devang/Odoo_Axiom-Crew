@@ -1,0 +1,283 @@
+[1717,-908 | sz:13pt] Working Schedule
+[1831,2853 | sz:26pt] Working Schedule — List & Form Views
+[1857,-1023 | sz:13pt] Employees ▼
+[1857,-915 | sz:13pt] Contracts ▼
+[1857,-807 | sz:13pt] Attendance
+[1857,-707 | sz:13pt] Time Off ▼
+[1857,-607 | sz:13pt] Payroll
+[1857,-249 | sz:13pt] Employees ▼
+[1857,-141 | sz:13pt] Contracts ▼
+[1857,-33 | sz:13pt] Attendance
+[1857,67 | sz:13pt] Time Off ▼
+[1857,167 | sz:13pt] Payroll
+[1857,525 | sz:13pt] Employees ▼
+[1857,633 | sz:13pt] Contracts ▼
+[1857,741 | sz:13pt] Attendance
+[1857,841 | sz:13pt] Time Off ▼
+[1857,941 | sz:13pt] Payroll
+[1859,-1059 | sz:12pt] HR
+[1859,-285 | sz:12pt] HR
+[1859,489 | sz:12pt] HR
+[1884,3836 | sz:20pt] 40 Hours / Week
+[1885,2994 | sz:20pt] Working Schedules
+[1886,2870 | sz:12pt] +  New Schedule
+[1887,3710 | sz:12pt] ←  Back to list
+[1902,-1055 | sz:22pt] Employees
+[1902,-281 | sz:22pt] Employees
+[1902,493 | sz:22pt] Employee / Aarav Mehta
+[1934,-1055 | sz:12pt] Default view: Kanban
+[1934,-281 | sz:12pt] List view for sort, filter and bulk scanning
+[1934,493 | sz:12pt] Main employee form with related HR actions
+[1944,2863 | sz:13pt] List
+[1944,2932 | sz:13pt] Calendar
+[1953,1357 | sz:28pt] Employee & Contract
+
+- Employees should be viewable in both Kanban and List views.
+- Opening an employee should show their HR details and related records such as Contracts,
+Attendance, Time Off, and Allocations.
+- An employee can have multiple contracts over time.
+- Payroll should use the contract applicable to the selected payroll period.
+
+Working Schedule
+- Working Schedules need List and Form views. Clicking a row should open that schedule.
+- List should surface name, calendar type, days/week, hours/week, company and status.
+- Form defines the weekly pattern: day, start/end time, optional break and hours. Weekly
+hours should be derived from the schedule.
+- A schedule can be assigned to an Employee/Contract and used by Attendance and Payroll.
+Shift, flexible-time and other rules are open to the participant.
+[1956,3714 | sz:11pt] Schedule Name
+[1956,4106 | sz:11pt] Company
+[1970,845 | sz:11pt] Time Off 3
+[1971,953 | sz:11pt] Contracts 2
+[1971,1061 | sz:11pt] Attendance 14
+[1975,-1034 | sz:11pt] NEW
+[1975,-973 | sz:11pt] Search employees…
+[1975,-511 | sz:11pt] Kanban
+[1975,-420 | sz:11pt] List
+[1975,-260 | sz:11pt] NEW
+[1975,-199 | sz:11pt] Search employees…
+[1975,265 | sz:11pt] Kanban
+[1975,353 | sz:11pt] List
+[1975,510 | sz:11pt] EDIT
+[1986,3726 | sz:12pt] 40 Hours / Week
+[1986,4118 | sz:12pt] My Company
+[1998,2877 | sz:12pt] Search schedules…
+[1998,3339 | sz:12pt] Filter
+[1998,3437 | sz:12pt] Columns
+[2028,581 | sz:20pt] Aarav Mehta
+[2030,-273 | sz:10pt] Employee
+[2030,-108 | sz:10pt] Work Email
+[2030,62 | sz:10pt] Job Position
+[2030,197 | sz:10pt] Department
+[2030,312 | sz:10pt] Status
+[2036,-985 | sz:14pt] Aarav Mehta
+[2036,-643 | sz:14pt] Sara Khan
+[2040,3714 | sz:11pt] Days per Week
+[2040,3906 | sz:11pt] Hours per Week
+[2040,4106 | sz:11pt] Timezone
+[2045,-1033 | sz:13pt] AM
+[2045,-691 | sz:13pt] SK
+[2052,515 | sz:16pt] AM
+[2058,-985 | sz:11pt] Payroll Specialist
+[2058,-643 | sz:11pt] HR Officer
+[2060,581 | sz:12pt] Payroll Specialist • Finance
+[2067,-273 | sz:10pt] Aarav Mehta
+[2067,-108 | sz:10pt] aarav@oxp.com
+[2067,62 | sz:10pt] Payroll Specialist
+[2067,197 | sz:10pt] Finance
+[2067,312 | sz:10pt] Active
+[2067,2882 | sz:11pt] Schedule Name
+[2067,3187 | sz:11pt] Days / Week
+[2067,3281 | sz:11pt] Hours / Week
+[2067,3382 | sz:11pt] Company
+[2067,3522 | sz:11pt] Status
+[2070,3726 | sz:12pt] 5
+[2070,3918 | sz:12pt] 40h
+[2070,4118 | sz:12pt] Company timezone
+[2082,581 | sz:11pt] aarav@oxp.com | +91 98765 43210
+[2092,-1041 | sz:11pt] Finance
+[2092,-699 | sz:11pt] HR
+[2109,-273 | sz:10pt] Sara Khan
+[2109,-108 | sz:10pt] sara@oxp.com
+[2109,62 | sz:10pt] HR Officer
+[2109,197 | sz:10pt] HR
+[2109,312 | sz:10pt] Active
+[2110,-1041 | sz:11pt] ● Active
+[2110,-699 | sz:11pt] ● Active
+[2122,493 | sz:11pt] Work Information
+[2122,663 | sz:11pt] Private Information
+[2125,2882 | sz:12pt] 40 Hours / Week
+[2125,3197 | sz:12pt] 5
+[2125,3291 | sz:12pt] 40h
+[2125,3382 | sz:12pt] My Company
+[2126,3531 | sz:11pt] Active
+[2128,3714 | sz:17pt] Weekly Schedule
+[2128,4688 | sz:12pt] +  Add Day
+[2151,-273 | sz:10pt] John Dsouza
+[2151,-108 | sz:10pt] john@oxp.com
+[2151,62 | sz:10pt] Developer
+[2151,197 | sz:10pt] Engineering
+[2151,312 | sz:10pt] Active
+[2168,493 | sz:10pt] Department
+[2168,829 | sz:10pt] Job Position
+[2172,617 | sz:10pt] Finance
+[2172,953 | sz:10pt] Payroll Specialist
+[2184,3764 | sz:11pt] Day
+[2184,3964 | sz:11pt] Start Time
+[2184,4124 | sz:11pt] End Time
+[2184,4284 | sz:11pt] Break
+[2184,4434 | sz:11pt] Hours
+[2191,3607 | sz:12pt] Open schedule
+[2192,-985 | sz:14pt] John Dsouza
+[2192,-643 | sz:14pt] Neha Patel
+[2193,-273 | sz:10pt] Neha Patel
+[2193,-108 | sz:10pt] neha@oxp.com
+[2193,62 | sz:10pt] Recruiter
+[2193,197 | sz:10pt] HR
+[2193,312 | sz:10pt] Active
+[2197,2882 | sz:12pt] Night Shift
+[2197,3197 | sz:12pt] 5
+[2197,3291 | sz:12pt] 40h
+[2197,3382 | sz:12pt] My Company
+[2198,3531 | sz:11pt] Active
+[2201,-1033 | sz:13pt] JD
+[2201,-691 | sz:13pt] NP
+[2208,493 | sz:10pt] Manager
+[2208,829 | sz:10pt] Work Location
+[2212,617 | sz:10pt] Sara Khan
+[2212,953 | sz:10pt] Mumbai
+[2214,-985 | sz:11pt] Developer
+[2214,-643 | sz:11pt] Recruiter
+[2225,2743 | sz:12pt] Working Schedule
+[2229,4669 | sz:15pt] ×
+[2230,3764 | sz:12pt] Monday
+[2230,4439 | sz:12pt] 8h
+[2232,3958 | sz:11pt] 9:00 AM
+[2232,4118 | sz:11pt] 6:00 PM
+[2232,4278 | sz:11pt] 1h
+[2248,-1041 | sz:11pt] Engineering
+[2248,-699 | sz:11pt] HR
+[2248,493 | sz:10pt] Working Schedule
+[2248,829 | sz:10pt] Status
+[2252,617 | sz:10pt] 40 Hours / Week
+[2252,953 | sz:10pt] Active
+[2266,-1041 | sz:11pt] ● Active
+[2266,-699 | sz:11pt] ● Active
+[2269,2882 | sz:12pt] Retail Weekend
+[2269,3197 | sz:12pt] 5
+[2269,3291 | sz:12pt] 40h
+[2269,3382 | sz:12pt] My Company
+[2270,3531 | sz:11pt] Active
+[2283,4669 | sz:15pt] ×
+[2284,3764 | sz:12pt] Tuesday
+[2284,4439 | sz:12pt] 8h
+[2286,3958 | sz:11pt] 9:00 AM
+[2286,4118 | sz:11pt] 6:00 PM
+[2286,4278 | sz:11pt] 1h
+[2288,493 | sz:10pt] Company
+[2288,829 | sz:10pt] Work Email
+[2292,617 | sz:10pt] OXP Pvt Ltd
+[2292,953 | sz:10pt] aarav@oxp.com
+[2337,4669 | sz:15pt] ×
+[2338,3764 | sz:12pt] Wednesday
+[2338,4439 | sz:12pt] 8h
+[2340,3958 | sz:11pt] 9:00 AM
+[2340,4118 | sz:11pt] 6:00 PM
+[2340,4278 | sz:11pt] 1h
+[2341,2882 | sz:12pt] Flexible Hybrid
+[2341,3197 | sz:12pt] 5
+[2341,3291 | sz:12pt] 37.5h
+[2341,3382 | sz:12pt] My Company
+[2342,3531 | sz:11pt] Active
+[2360,-1055 | sz:12pt] Useful note: Kanban is good for browsing; clicking a card should open the same Employee Form used everywhere else.
+[2360,-281 | sz:12pt] Useful note: the list view is the main entry point for opening a specific employee record quickly.
+[2368,476 | sz:12pt] Useful note: smart buttons should open related Contracts, Attendance and Time Off records filtered for the current employee.
+[2391,4669 | sz:15pt] ×
+[2392,3764 | sz:12pt] Thursday
+[2392,4439 | sz:12pt] 8h
+[2394,3958 | sz:11pt] 9:00 AM
+[2394,4118 | sz:11pt] 6:00 PM
+[2394,4278 | sz:11pt] 1h
+[2413,2882 | sz:12pt] Part-time 20h
+[2413,3197 | sz:12pt] 4
+[2413,3291 | sz:12pt] 20h
+[2413,3382 | sz:12pt] My Company
+[2414,3531 | sz:11pt] Inactive
+[2445,4669 | sz:15pt] ×
+[2446,3764 | sz:12pt] Friday
+[2446,4439 | sz:12pt] 8h
+[2448,3958 | sz:11pt] 9:00 AM
+[2448,4118 | sz:11pt] 6:00 PM
+[2448,4278 | sz:11pt] 1h
+[2450,-55 | sz:11pt] Open related contracts
+[2493,-249 | sz:13pt] Employees ▼
+[2493,-141 | sz:13pt] Contracts ▼
+[2493,-33 | sz:13pt] Attendance
+[2493,67 | sz:13pt] Time Off ▼
+[2493,167 | sz:13pt] Payroll
+[2493,525 | sz:13pt] Employees ▼
+[2493,633 | sz:13pt] Contracts ▼
+[2493,741 | sz:13pt] Attendance
+[2493,841 | sz:13pt] Time Off ▼
+[2493,941 | sz:13pt] Payroll
+[2495,-285 | sz:12pt] HR
+[2495,489 | sz:12pt] HR
+[2504,4434 | sz:12pt] Total Weekly Hours:
+[2504,4629 | sz:13pt] 40h
+[2538,-281 | sz:22pt] Contracts
+[2538,493 | sz:22pt] Contract / CON/2026/0042
+[2570,-281 | sz:12pt] List view of employee contracts
+[2570,493 | sz:12pt] Form view of one contract
+[2584,3714 | sz:11pt] Use this schedule as the employee/contract working pattern.
+[2584,2867 | sz:11pt] Select a schedule to open its Form view
+[2611,-260 | sz:11pt] NEW
+[2612,-195 | sz:11pt] Search contracts…
+[2648,493 | sz:10pt] Employee
+[2648,829 | sz:10pt] Department
+[2652,617 | sz:10pt] Aarav Mehta
+[2652,953 | sz:10pt] Finance
+[2666,-273 | sz:10pt] Contract
+[2666,-143 | sz:10pt] Employee
+[2666,2 | sz:10pt] Start
+[2666,87 | sz:10pt] End
+[2666,172 | sz:10pt] Wage / Month
+[2666,284 | sz:10pt] Status
+[2670,2867 | sz:15pt] WORKING SCHEDULE NOTE
+• Required views: List and Form. The List is for finding/opening schedules; the Form defines one schedule.
+• A schedule should capture the weekly working pattern (days, working time and total weekly hours). Breaks or variable shifts can be handled in your own way.
+• Employee/Contract can reference a Working Schedule. Attendance and Payroll may use it as the expected working time.
+[2688,493 | sz:10pt] Start Date
+[2688,829 | sz:10pt] Job Position
+[2692,617 | sz:10pt] 01-Jan-2026
+[2692,953 | sz:10pt] Payroll Specialist
+[2706,-273 | sz:10pt] CON/2026/0042
+[2706,-143 | sz:10pt] Aarav Mehta
+[2706,2 | sz:10pt] 01-Jan-26
+[2706,87 | sz:10pt] —
+[2706,172 | sz:10pt] ₹85,000
+[2706,284 | sz:10pt] Running
+[2728,493 | sz:10pt] End Date
+[2728,829 | sz:10pt] Wage / Month
+[2732,617 | sz:10pt] —
+[2732,953 | sz:10pt] ₹85,000
+[2754,-273 | sz:10pt] CON/2025/0018
+[2754,-143 | sz:10pt] Aarav Mehta
+[2754,2 | sz:10pt] 01-Jul-25
+[2754,87 | sz:10pt] 31-Dec-25
+[2754,172 | sz:10pt] ₹78,000
+[2754,284 | sz:10pt] Expired
+[2768,493 | sz:10pt] Status
+[2768,829 | sz:10pt] Working Schedule
+[2772,617 | sz:10pt] Running
+[2772,953 | sz:10pt] 40 Hours / Week
+[2802,-273 | sz:10pt] CON/2026/0031
+[2802,-143 | sz:10pt] Sara Khan
+[2802,2 | sz:10pt] 01-Jan-26
+[2802,87 | sz:10pt] —
+[2802,172 | sz:10pt] ₹95,000
+[2802,284 | sz:10pt] Running
+[2836,505 | sz:11pt] Salary Structure / Notes
+[2862,505 | sz:11pt] Structure Type: Employee Salary
+This running contract is the source for payroll calculation in the active period.
+[2948,-281 | sz:12pt] Useful note: retain contract history, but make the active Running contract obvious because payroll depends on it.
+[2948,493 | sz:12pt] Useful note: for the problem statement, one employee should not have multiple Running contracts for the same period.
