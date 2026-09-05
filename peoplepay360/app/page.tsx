@@ -30,6 +30,7 @@ import {
   Eye,
   Key,
   Mail,
+  ChevronRight,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -218,7 +219,8 @@ export default function Home() {
   // Admin users state
   const [systemUsers, setSystemUsers] = useState<any[]>([]);
   const [systemRoles, setSystemRoles] = useState<any[]>([]);
-  const [userFormData, setUserFormData] = useState({
+  const [selectedUserDrawer, setSelectedUserDrawer] = useState<any | null>(null);
+  const [userFormData, setUserFormData] = useState<any>({
     id: '',
     name: '',
     email: '',
