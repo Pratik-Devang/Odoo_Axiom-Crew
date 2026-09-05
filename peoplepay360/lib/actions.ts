@@ -1,4 +1,4 @@
-import {type Workspace,type Row,uid,activeContract,computeSlip,warnings,allocationBalance,formula,monthEnd,workingDaysBetween,scheduleRows,scheduleWeeklyHours,employeeSchedule,scheduleRowForDate} from './domain';
+import {type Workspace,type Row,uid,round,activeContract,computeSlip,warnings,allocationBalance,formula,monthEnd,workingDaysBetween,scheduleRows,scheduleWeeklyHours,employeeSchedule,scheduleRowForDate} from './domain';
 const requireThat=(ok:unknown,message:string)=>{if(!ok)throw new Error(message);};
 const text=(v:unknown)=>typeof v==='string'&&v.trim().length>0&&v.length<500;
 const date=(v:unknown)=>typeof v==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(v)&&!Number.isNaN(Date.parse(v))&&new Date(v).toISOString().slice(0,10)===v;
@@ -14,14 +14,14 @@ export function mutate(source:Workspace,action:string,p:Record<string,any>,actor
   if(['employees','leaveTypes','rules','structures','schedules'].includes(collection))requireThat(text(r.name),'Name is required.');
   if(['contracts','attendance','requests','allocations'].includes(collection))requireThat(exists(s.employees,r.employeeId),'Select a valid employee.');
   if(collection==='employees'){
-   requireThat(text(r.email)&&/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(r.email),'Enter a valid work email.');requireThat(!s.employees.some(e=>e.id!==r.id&&e.email.toLowerCase()===r.email.toLowerCase()),'This email is already in use.');requireThat(text(r.department)&&text(r.position),'Department and job position are required.');requireThat(['Active','Archived'].includes(r.status),'Invalid employee status.');requireThat(['Full-time','Contract','Intern'].includes(r.type),'Invalid employee type.');requireThat(exists(s.schedules,r.scheduleId),'Select a working schedule.');
+   requireThat(text(r.email)&&/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(r.email),'Enter a valid work email.');requireThat(!s.employees.some(e=>e.id!==r.id&&e.email.toLowerCase()===r.email.toLowerCase()),'This email is already in use.');requireThat(text(r.department)&&text(r.position),'Department and job position are required.');requireThat(['Active','Archived'].includes(r.status),'Invalid employee status.');requireThat(['Full-time','Contract','Intern'].includes(r.type),'Invalid employee type.');requireThat(exists(s.schedules,r.scheduleId),'Select a working schedule.');requireThat(!r.managerEmployeeId||r.managerEmployeeId!==r.id&&exists(s.employees,r.managerEmployeeId),'Select a valid manager other than the employee.');r.manager=r.managerEmployeeId?s.employees.find(e=>e.id===r.managerEmployeeId)?.name||'':'';
   }
   if(collection==='contracts'){
    requireThat(date(r.start)&&(!r.end||date(r.end)&&r.end>=r.start),'Enter a valid contract date range.');requireThat(numeric(r.wage)&&+r.wage>0,'Wage must be greater than zero.');r.wage=+r.wage;requireThat(exists(s.structures,r.structureId)&&exists(s.schedules,r.scheduleId),'Select a salary structure and schedule.');requireThat(!s.contracts.some(c=>c.id!==r.id&&c.employeeId===r.employeeId&&c.start<=(r.end||'9999-12-31')&&r.start<=(c.end||'9999-12-31')),'Contract dates overlap an existing contract.');
    if(old){const finalized=s.payruns.filter(run=>['Validated','Paid'].includes(run.status)&&run.slips.some((sl:Row)=>sl.contractId===old.id));requireThat(!finalized.length||(r.employeeId===old.employeeId&&r.start===old.start&&r.wage===old.wage&&r.structureId===old.structureId&&r.scheduleId===old.scheduleId&&finalized.every(run=>!r.end||r.end>=monthEnd(run.period))),'Preserve the terms and date coverage used by finalized payroll. You may end this contract after its finalized periods, then create a successor.');}
   }
   if(collection==='attendance'){
-   const time=(t:any)=>!t||typeof t==='string'&&/^([01]\d|2[0-3]):[0-5]\d$/.test(t);requireThat(date(r.date)&&time(r.checkIn)&&time(r.checkOut),'Enter valid attendance date and times.');requireThat(!r.checkOut||r.checkIn&&r.checkOut>r.checkIn,'Check-out must be after check-in; overnight shifts are outside prototype scope.');requireThat(!s.attendance.some(a=>a.id!==r.id&&a.employeeId===r.employeeId&&a.date===r.date),'Attendance already exists for this employee and date.');r.edited=!!old;
+   const time=(t:any)=>!t||typeof t==='string'&&/^([01]\d|2[0-3]):[0-5]\d$/.test(t);requireThat(date(r.date)&&time(r.checkIn)&&time(r.checkOut),'Enter valid attendance date and times.');requireThat(!r.checkOut||r.checkIn&&r.checkOut>r.checkIn,'Check-out must be after check-in; overnight shifts are outside prototype scope.');requireThat(!s.attendance.some(a=>a.id!==r.id&&a.employeeId===r.employeeId&&a.date===r.date),'Attendance already exists for this employee and date.');if(r.overtime!==undefined&&r.overtime!=='')requireThat(numeric(r.overtime)&&+r.overtime<=24,'Overtime must be a number between 0 and 24 hours.');r.overtime=r.overtime!==undefined&&r.overtime!==''?round(+r.overtime):undefined;r.edited=!!old;
   }
   if(collection==='requests'||collection==='allocations'){
    requireThat(exists(s.leaveTypes,r.typeId),'Select a time off type.');requireThat(date(r.start)&&date(r.end)&&r.end>=r.start,'Enter a valid date range.');requireThat(!old||old.status==='Pending','Approved or refused records cannot be edited.');r.status='Pending';
@@ -61,12 +61,17 @@ export function mutate(source:Workspace,action:string,p:Record<string,any>,actor
   s.payruns.forEach(run=>{if(run.status==='Computed'){run.status='Draft';run.slips=[];}});
  }
  else if(action==='createPayrun'){
-  requireThat(period(p.period),'Select a valid payroll month.');requireThat(exists(s.structures,p.structureId),'Select a salary structure.');requireThat(Array.isArray(p.employeeIds)&&p.employeeIds.length,'Select at least one employee.');const ids=[...new Set<string>(p.employeeIds)];ids.forEach(id=>{requireThat(s.employees.some(e=>e.id===id&&e.status==='Active'),'Select active employees only.');const c=activeContract(s,id,p.period);requireThat(c.structureId===p.structureId,'Employee contract does not match the selected structure.');requireThat(!s.payruns.some(r=>r.period===p.period&&r.employeeIds.includes(id)),'An employee is already in a payrun for this period.');});s.payruns.push({id:uid(),name:new Date(p.period+'-01').toLocaleDateString('en-US',{month:'long',year:'numeric',timeZone:'UTC'}),period:p.period,structureId:p.structureId,employeeIds:ids,status:'Draft',slips:[]});
+  requireThat(period(p.period),'Select a valid payroll month.');requireThat(exists(s.structures,p.structureId),'Select a salary structure.');requireThat(Array.isArray(p.employeeIds)&&p.employeeIds.length,'Select at least one employee.');const ids=[...new Set<string>(p.employeeIds)];ids.forEach(id=>{requireThat(s.employees.some(e=>e.id===id&&e.status==='Active'),'Select active employees only.');const c=activeContract(s,id,p.period);requireThat(c.structureId===p.structureId||c.start>p.period+'-01'||(c.end&&c.end<monthEnd(p.period)),'Employee contract does not match the selected structure.');requireThat(!s.payruns.some(r=>r.period===p.period&&r.employeeIds.includes(id)),'An employee is already in a payrun for this period.');});s.payruns.push({id:uid(),name:new Date(p.period+'-01').toLocaleDateString('en-US',{month:'long',year:'numeric',timeZone:'UTC'}),period:p.period,structureId:p.structureId,employeeIds:ids,status:'Draft',slips:[]});
  }
  else if(['compute','validate','markPaid'].includes(action)){
   const r=s.payruns.find(x=>x.id===p.id);requireThat(r,'Payrun not found.');
   if(action==='compute'){requireThat(['Draft','Computed'].includes(r!.status),'Finalized payroll cannot be recomputed.');r!.slips=r!.employeeIds.map((id:string)=>computeSlip(s,id,r!.period,r!.structureId));r!.status='Computed';}
-  if(action==='validate'){requireThat(r!.status==='Computed'&&r!.slips.length===r!.employeeIds.length,'Compute all payslips before validation.');requireThat(!warnings(s,r!).length,warnings(s,r!).join('; '));r!.status='Validated';}
+  if(action==='validate'){
+   requireThat(r!.status==='Computed'&&r!.slips.length===r!.employeeIds.length,'Compute all payslips before validation.');
+   const blocking=warnings(s,r!).filter(w=>!w.includes('missing bank details'));
+   requireThat(!blocking.length,blocking.join('; '));
+   r!.status='Validated';
+  }
   if(action==='markPaid'){requireThat(r!.status==='Validated','Validate payroll before marking it paid.');r!.status='Paid';r!.paidAt=new Date().toISOString();}
  }
  else if(action==='clock'){

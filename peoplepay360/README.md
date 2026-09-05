@@ -87,7 +87,8 @@ Changing contracts, attendance, salary rules, or structures invalidates unfinali
 - `app/api/workspace/route.ts`: load and mutate API.
 - `db/store.ts`: persistence with optimistic revision checks.
 - `db/schema.ts`: Drizzle schema definition.
-- `db/setup-postgres.sql` and `db/relational-migration.sql`: local PostgreSQL schema initialization.
+- `db/setup-postgres.sql` and `db/relational-migration.sql`: local PostgreSQL baseline initialization.
+- `db/migrations/`: ordered, one-time relational upgrades tracked in `schema_migrations`.
 - `REQUIREMENTS.md`: source requirements, implemented scope and remaining work.
 
 Employees, contracts, attendance, leave, salary structures, payruns and payslips are stored in normalized PostgreSQL tables. The `workspace` row keeps the revision used to reject concurrent lost updates. API reads reconstruct the workspace from the relational tables, so committed changes made through pgAdmin appear after a reload.

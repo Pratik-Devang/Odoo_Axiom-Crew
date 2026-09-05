@@ -2,10 +2,38 @@ import { seed, type Workspace } from '@/lib/domain';
 import { getPgPool } from './index';
 import type { PoolClient } from 'pg';
 
+let schemaEnsured = false;
+
+async function ensureSchema(client: PoolClient) {
+  if (schemaEnsured) return;
+  try {
+    await client.query(`
+      ALTER TABLE leave_types ADD COLUMN IF NOT EXISTS approval_workflow VARCHAR(50) NOT NULL DEFAULT 'HR Approval';
+      ALTER TABLE leave_types ADD COLUMN IF NOT EXISTS payroll_impact VARCHAR(50) NOT NULL DEFAULT 'Paid';
+      ALTER TABLE leave_types ADD COLUMN IF NOT EXISTS payroll_work_entry VARCHAR(255) DEFAULT '';
+      ALTER TABLE leave_types ADD COLUMN IF NOT EXISTS display_color VARCHAR(50) DEFAULT 'Blue';
+      ALTER TABLE leave_types ADD COLUMN IF NOT EXISTS active BOOLEAN NOT NULL DEFAULT true;
+
+      ALTER TABLE leave_requests ADD COLUMN IF NOT EXISTS approver VARCHAR(255) DEFAULT '';
+      ALTER TABLE leave_requests ADD COLUMN IF NOT EXISTS allocation_id VARCHAR(255) DEFAULT '';
+
+      ALTER TABLE leave_allocations ADD COLUMN IF NOT EXISTS approver VARCHAR(255) DEFAULT '';
+
+      ALTER TABLE payruns ADD COLUMN IF NOT EXISTS paid_at TIMESTAMPTZ;
+
+      ALTER TABLE attendance ADD COLUMN IF NOT EXISTS overtime NUMERIC(5,2) DEFAULT 0;
+    `);
+    schemaEnsured = true;
+  } catch (err) {
+    console.warn('Auto-schema check warning:', err);
+  }
+}
+
 /**
  * Read the entire workspace from normalized PostgreSQL relational tables.
  */
 async function readRelational(client: PoolClient): Promise<Workspace> {
+  await ensureSchema(client);
   const employeesRes = await client.query(
     'SELECT id, name, email, COALESCE(phone, \'\') AS phone, department, position, type, status, COALESCE(manager, \'\') AS manager, COALESCE(location, \'Mumbai\') AS location, COALESCE(schedule_id, \'sch1\') AS "scheduleId", COALESCE(bank, \'\') AS bank FROM employees ORDER BY id'
   );
@@ -80,6 +108,7 @@ async function readRelational(client: PoolClient): Promise<Workspace> {
  * Synchronize all entities from Workspace into PostgreSQL relational tables.
  */
 async function syncRelational(client: PoolClient, data: Workspace) {
+  await ensureSchema(client);
   // 1. Schedules
   if (data.schedules?.length) {
     await client.query(
@@ -409,13 +438,14 @@ async function syncRelational(client: PoolClient, data: Workspace) {
 
     await client.query(
       `
-      INSERT INTO payrun_employees (payrun_id, employee_id)
+      INSERT INTO payrun_employees (payrun_id, employee_id, period)
       SELECT
         p->>'id',
-        e.employee_id
+        e.employee_id,
+        p->>'period'
       FROM jsonb_array_elements($1::jsonb) AS p,
       LATERAL jsonb_array_elements_text(p->'employeeIds') AS e(employee_id)
-      ON CONFLICT (payrun_id, employee_id) DO NOTHING
+      ON CONFLICT (payrun_id, employee_id) DO UPDATE SET period = EXCLUDED.period
     `,
       [JSON.stringify(data.payruns)]
     );

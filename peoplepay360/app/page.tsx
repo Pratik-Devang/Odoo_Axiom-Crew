@@ -338,15 +338,33 @@ export default function Home() {
   }, []);
 
   function navigate(v: string, id?: string) {
-    setView(v);
-    setActiveId(id || '');
+    let resolvedView = v;
+    let resolvedId = id || '';
+    let newQuery = '';
+
+    if (resolvedId.startsWith('dept:')) {
+      const deptName = resolvedId.replace('dept:', '');
+      setDepartment(deptName);
+      newQuery = deptName;
+      resolvedId = '';
+    } else if (resolvedId.startsWith('stat:')) {
+      const statName = resolvedId.replace('stat:', '');
+      newQuery = statName === 'present' ? 'Present' : statName === 'late' ? 'Late' : statName === 'absent' ? 'Absent' : '';
+      resolvedId = '';
+    } else if (resolvedId.startsWith('period:')) {
+      setPeriod(resolvedId.replace('period:', ''));
+      resolvedId = '';
+    }
+
+    setView(resolvedView);
+    setActiveId(resolvedId);
     setFilterId('');
-    setQuery('');
+    setQuery(newQuery);
     setModal(null);
     setError('');
     setMessage('');
-    const targetHash = v === 'users' ? 'admin/users' : v === 'overview' ? 'payroll/dashboard' : v;
-    window.history.replaceState(null, '', '#' + targetHash + (id ? '/' + encodeURIComponent(id) : ''));
+    const targetHash = resolvedView === 'users' ? 'admin/users' : resolvedView === 'overview' ? 'payroll/dashboard' : resolvedView;
+    window.history.replaceState(null, '', '#' + targetHash + (resolvedId ? '/' + encodeURIComponent(resolvedId) : ''));
   }
 
   function related(v: string, id: string) {
@@ -560,7 +578,7 @@ export default function Home() {
         <div className="w-full max-w-md bg-white rounded-3xl border border-[#e5ded4] shadow-sm p-8 space-y-6">
           <div className="text-center space-y-2">
             <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-amber-50 border border-amber-200/60 shadow-2xs mb-1">
-              <img src="/logo.jpg" alt="PeoplePay360" className="w-10 h-10 rounded-xl object-contain" />
+              <img src="/favicon.png" alt="PeoplePay360" className="w-10 h-10 rounded-xl object-contain" />
             </div>
             <h1 className="text-xl font-extrabold tracking-tight text-slate-900">
               peoplepay<span className="text-[#e6a817]">360</span>
@@ -1261,7 +1279,21 @@ export default function Home() {
       : s.attendance;
 
     const filteredAttendance = baseAttendance
-      .filter((a) => (!filterId || a.employeeId === filterId) && (!period || a.date.startsWith(period)))
+      .filter((a) => {
+        const matchesEmpFilter = !filterId || a.employeeId === filterId;
+        const matchesPeriod = !period || a.date.startsWith(period);
+        const emp = employee(a.employeeId);
+        const matchesDept = department === 'All' || emp?.department === department;
+        const status = attendanceStatus(a);
+        const hoursWorked = hours(a);
+        const matchesQuery =
+          !query ||
+          [emp?.name, emp?.department, a.date, status].some((x) =>
+            String(x || '').toLowerCase().includes(query.toLowerCase())
+          ) ||
+          (query.toLowerCase() === 'over9' && hoursWorked > 9);
+        return matchesEmpFilter && matchesPeriod && matchesDept && matchesQuery;
+      })
       .sort((a, b) => b.date.localeCompare(a.date));
 
     leftSlot = (
@@ -1738,12 +1770,33 @@ export default function Home() {
       centerContent = (
         <div className="space-y-4">
           <div className="workora-card space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100 flex-wrap gap-2">
               <div>
                 <h2 className="text-base font-bold text-slate-900">{run.name}</h2>
                 <p className="text-xs text-slate-500 mt-0.5">Disbursement workflow for {run.period}</p>
               </div>
-              <Badge value={run.status} />
+              <div className="flex items-center gap-1 bg-[#fcfbf9] p-1 rounded-xl border border-[#e5ded4]">
+                {(['Draft', 'Computed', 'Validated', 'Paid'] as const).map((st, idx) => {
+                  const isCurrent = run.status === st;
+                  const isPast = ['Draft', 'Computed', 'Validated', 'Paid'].indexOf(run.status) >= idx;
+                  return (
+                    <div key={st} className="flex items-center gap-1">
+                      {idx > 0 && <span className="text-[10px] text-slate-300">→</span>}
+                      <span
+                        className={`px-2.5 py-0.5 rounded-lg text-xs font-semibold ${
+                          isCurrent
+                            ? 'bg-[#1a1a1a] text-white shadow-2xs'
+                            : isPast
+                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                            : 'text-slate-400'
+                        }`}
+                      >
+                        {st}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -1769,16 +1822,37 @@ export default function Home() {
               </div>
             </div>
 
+            {(() => {
+              const runWarns = warnings(s, run);
+              if (!runWarns.length) return null;
+              return (
+                <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-900 space-y-1">
+                  <div className="font-bold flex items-center gap-1.5 text-amber-800">
+                    <AlertCircle size={14} /> Advisory Payroll Notices ({runWarns.length}):
+                  </div>
+                  <ul className="list-disc list-inside text-[11px] text-amber-700 space-y-0.5 pl-1">
+                    {runWarns.map((w, i) => (
+                      <li key={i}>{w}</li>
+                    ))}
+                  </ul>
+                </div>
+              );
+            })()}
+
             <div className="flex flex-wrap gap-2 pt-2">
               <button
-                className="pill-btn pill-btn-black !py-1.5 cursor-pointer"
+                className={`pill-btn !py-1.5 cursor-pointer ${
+                  run.status === 'Draft' ? 'pill-btn-black' : ''
+                }`}
                 disabled={busy || !['Draft', 'Computed'].includes(run.status)}
                 onClick={() => void act('compute', { id: run.id }, 'Payslips computed.')}
               >
                 <RefreshCw size={13} /> Compute Slips
               </button>
               <button
-                className="pill-btn !py-1.5 cursor-pointer"
+                className={`pill-btn !py-1.5 cursor-pointer ${
+                  run.status === 'Computed' ? 'pill-btn-black' : ''
+                }`}
                 disabled={busy || run.status !== 'Computed' || currentUser.role === 'HR Payroll User'}
                 title={currentUser.role === 'HR Payroll User' ? 'Requires HR Payroll Manager authorization' : ''}
                 onClick={() => void act('validate', { id: run.id }, 'Payrun validated.')}
@@ -1786,7 +1860,9 @@ export default function Home() {
                 <Check size={13} /> Validate Run
               </button>
               <button
-                className="pill-btn !py-1.5 cursor-pointer"
+                className={`pill-btn !py-1.5 cursor-pointer ${
+                  run.status === 'Validated' ? 'pill-btn-black' : ''
+                }`}
                 disabled={busy || run.status !== 'Validated' || currentUser.role === 'HR Payroll User'}
                 title={currentUser.role === 'HR Payroll User' ? 'Requires HR Payroll Manager authorization' : ''}
                 onClick={() => void act('markPaid', { id: run.id }, 'Payrun marked paid.')}
@@ -1884,7 +1960,12 @@ export default function Home() {
 
           {view === 'payslips' && (
             <DataTable
-              rows={filtered(allSlips).filter((p) => !period || p.period === period)}
+              rows={filtered(allSlips).filter((p) => {
+                const matchesPeriod = !period || p.period === period;
+                const emp = employee(p.employeeId);
+                const matchesDept = department === 'All' || emp?.department === department;
+                return matchesPeriod && matchesDept;
+              })}
               columns={[
                 { title: 'Period', render: (p) => niceMonth(p.period) },
                 ...runSlipColumns.slice(0, -1),
@@ -2903,7 +2984,7 @@ export default function Home() {
             <div className="space-y-4 text-xs text-slate-600">
               <div className="flex flex-col items-center justify-center p-4 bg-amber-50/50 rounded-2xl border border-amber-100/80 text-center">
                 <img
-                  src="/logo.jpg"
+                  src="/favicon.png"
                   alt="PeoplePay360"
                   className="w-24 h-24 rounded-2xl object-contain shadow-xs border border-amber-200/60 bg-white mb-2"
                 />
