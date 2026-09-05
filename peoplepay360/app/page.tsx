@@ -1759,12 +1759,33 @@ export default function Home() {
       centerContent = (
         <div className="space-y-4">
           <div className="workora-card space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100 flex-wrap gap-2">
               <div>
                 <h2 className="text-base font-bold text-slate-900">{run.name}</h2>
                 <p className="text-xs text-slate-500 mt-0.5">Disbursement workflow for {run.period}</p>
               </div>
-              <Badge value={run.status} />
+              <div className="flex items-center gap-1 bg-[#fcfbf9] p-1 rounded-xl border border-[#e5ded4]">
+                {(['Draft', 'Computed', 'Validated', 'Paid'] as const).map((st, idx) => {
+                  const isCurrent = run.status === st;
+                  const isPast = ['Draft', 'Computed', 'Validated', 'Paid'].indexOf(run.status) >= idx;
+                  return (
+                    <div key={st} className="flex items-center gap-1">
+                      {idx > 0 && <span className="text-[10px] text-slate-300">→</span>}
+                      <span
+                        className={`px-2.5 py-0.5 rounded-lg text-xs font-semibold ${
+                          isCurrent
+                            ? 'bg-[#1a1a1a] text-white shadow-2xs'
+                            : isPast
+                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                            : 'text-slate-400'
+                        }`}
+                      >
+                        {st}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -1790,16 +1811,37 @@ export default function Home() {
               </div>
             </div>
 
+            {(() => {
+              const runWarns = warnings(s, run);
+              if (!runWarns.length) return null;
+              return (
+                <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-900 space-y-1">
+                  <div className="font-bold flex items-center gap-1.5 text-amber-800">
+                    <AlertCircle size={14} /> Advisory Payroll Notices ({runWarns.length}):
+                  </div>
+                  <ul className="list-disc list-inside text-[11px] text-amber-700 space-y-0.5 pl-1">
+                    {runWarns.map((w, i) => (
+                      <li key={i}>{w}</li>
+                    ))}
+                  </ul>
+                </div>
+              );
+            })()}
+
             <div className="flex flex-wrap gap-2 pt-2">
               <button
-                className="pill-btn pill-btn-black !py-1.5 cursor-pointer"
+                className={`pill-btn !py-1.5 cursor-pointer ${
+                  run.status === 'Draft' ? 'pill-btn-black' : ''
+                }`}
                 disabled={busy || !['Draft', 'Computed'].includes(run.status)}
                 onClick={() => void act('compute', { id: run.id }, 'Payslips computed.')}
               >
                 <RefreshCw size={13} /> Compute Slips
               </button>
               <button
-                className="pill-btn !py-1.5 cursor-pointer"
+                className={`pill-btn !py-1.5 cursor-pointer ${
+                  run.status === 'Computed' ? 'pill-btn-black' : ''
+                }`}
                 disabled={busy || run.status !== 'Computed' || currentUser.role === 'HR Payroll User'}
                 title={currentUser.role === 'HR Payroll User' ? 'Requires HR Payroll Manager authorization' : ''}
                 onClick={() => void act('validate', { id: run.id }, 'Payrun validated.')}
@@ -1807,7 +1849,9 @@ export default function Home() {
                 <Check size={13} /> Validate Run
               </button>
               <button
-                className="pill-btn !py-1.5 cursor-pointer"
+                className={`pill-btn !py-1.5 cursor-pointer ${
+                  run.status === 'Validated' ? 'pill-btn-black' : ''
+                }`}
                 disabled={busy || run.status !== 'Validated' || currentUser.role === 'HR Payroll User'}
                 title={currentUser.role === 'HR Payroll User' ? 'Requires HR Payroll Manager authorization' : ''}
                 onClick={() => void act('markPaid', { id: run.id }, 'Payrun marked paid.')}
