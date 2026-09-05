@@ -109,7 +109,7 @@ export function PageShell({
       <header className="workora-topbar">
         <a
           href="#overview"
-          className="workora-brand flex items-center gap-2.5 hover:opacity-90 transition-opacity"
+          className="workora-brand flex items-center gap-2.5 hover:opacity-90 transition-opacity shrink-0 select-none"
           onClick={(e) => {
             e.preventDefault();
             onNavigate(currentUser?.role === 'Employee' ? 'attendance' : currentUser?.role === 'HR Manager' ? 'employees' : 'overview');
@@ -118,9 +118,9 @@ export function PageShell({
           <img
             src="/logo.jpg"
             alt="PeoplePay360 Logo"
-            className="w-7 h-7 rounded-lg object-contain border border-amber-200/60 shadow-2xs"
+            className="w-8 h-8 rounded-lg object-contain border border-amber-200/60 shadow-2xs shrink-0"
           />
-          <span className="font-extrabold tracking-tight text-slate-900 text-[17px] flex items-center">
+          <span className="font-extrabold tracking-tight text-slate-900 text-[18px] leading-none flex items-center">
             peoplepay<span className="text-[#e6a817]">360</span>
           </span>
         </a>

@@ -106,6 +106,8 @@ const DEMO_ACCOUNTS = [
   { role: 'Employee', email: 'john@oxp.example', password: 'employee123', desc: 'Self-service attendance, requests & payslips' },
 ];
 
+const DEFAULT_LOGIN = DEMO_ACCOUNTS[0];
+
 const ROLE_STYLES: Record<string, string> = {
   Admin: 'bg-rose-50 text-rose-700 border-rose-200',
   'HR Payroll Manager': 'bg-amber-50 text-amber-800 border-amber-200',
@@ -143,8 +145,8 @@ export default function Home() {
   // Authentication & RBAC states
   const [currentUser, setCurrentUser] = useState<AppUser | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
-  const [loginEmail, setLoginEmail] = useState('');
-  const [loginPassword, setLoginPassword] = useState('');
+  const [loginEmail, setLoginEmail] = useState(DEFAULT_LOGIN.email);
+  const [loginPassword, setLoginPassword] = useState(DEFAULT_LOGIN.password);
   const [loginError, setLoginError] = useState('');
   const [loginBusy, setLoginBusy] = useState(false);
 
@@ -236,6 +238,8 @@ export default function Home() {
     setCurrentUser(null);
     setS(null);
     setRevision(0);
+    setLoginEmail(DEFAULT_LOGIN.email);
+    setLoginPassword(DEFAULT_LOGIN.password);
     setView('overview');
     window.location.hash = '';
   }
@@ -556,6 +560,8 @@ export default function Home() {
               <div className="pill-search !py-2 w-full bg-slate-50 border border-slate-200 focus-within:border-slate-400 focus-within:bg-white transition-all">
                 <input
                   type="email"
+                  name="email"
+                  autoComplete="username"
                   required
                   value={loginEmail}
                   onChange={(e) => setLoginEmail(e.target.value)}
@@ -570,6 +576,8 @@ export default function Home() {
               <div className="pill-search !py-2 w-full bg-slate-50 border border-slate-200 focus-within:border-slate-400 focus-within:bg-white transition-all">
                 <input
                   type="password"
+                  name="password"
+                  autoComplete="current-password"
                   required
                   value={loginPassword}
                   onChange={(e) => setLoginPassword(e.target.value)}
@@ -787,7 +795,7 @@ export default function Home() {
         onSearchChange={setQuery}
         searchPlaceholder="Search employee…"
         filters={
-          <div className="flex items-center gap-2">
+          <div className="grid grid-cols-2 gap-2 w-full">
             <Picker label="Dept" value={department} onChange={setDepartment} options={['All', ...departments]} />
             <Picker
               label="Type"
