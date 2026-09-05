@@ -19,28 +19,28 @@ The files were treated as product references. The user's request defines deliver
 | Employee Kanban/list/form | Cards and table open the same employee profile. Editable work details, bank reference, type and active/archive status. |
 | Employee smart buttons | Filtered contracts, attendance, leave requests and allocations. |
 | Contracts and history | Create/edit contracts, dates, wages, salary structure and schedule. Overlapping date ranges are rejected; finalized payroll terms are protected. |
-| Working schedules | Configurable days, shift times and breaks; calculated weekly hours. |
+| Working schedules | Fixed, flexible and shift schedules with per-day working flags, times and breaks; calculated weekly hours drive attendance and leave calculations. |
 | Attendance | Recorded check-in/out, worked hours, absence, lateness, missing check-out and manual edit indication. |
 | Attendance quick widget | Check-in/out for demo administrator with elapsed time and active indicator. |
 | Time Off navigation | Requests, Allocations and Types are reached through the top navigation dropdown. |
-| Leave approval and consumption | Pending → Approved/Refused requests; pending → Approved allocations. Approval checks policy, validity and remaining balance. |
+| Leave approval and consumption | Scheduled-day duration, configurable approval policy and payroll treatment; Pending → Approved/Refused requests and pending → Approved allocations. Approval checks validity and remaining balance. |
 | Two-step payrun wizard | Scope/period first; explicit eligible employee selection second. No payrun is saved by Continue. |
 | Salary structures and rules | Editable structures group selected rules; rule order controls computation. |
 | Flexible salary calculation | Fixed amounts, percentages of WAGE/earlier codes, restricted arithmetic formulas. No arbitrary code execution. |
 | Payrun lifecycle | Draft → Computed → Validated → Paid, with recomputation restrictions and immutable finalized salary snapshots. |
-| Payslip detail and output | Salary component breakdown, gross/deduction/net totals, browser print/Save PDF and CSV exports. |
+| Payslip detail and output | Salary component breakdown, gross/deduction/net totals, scheduled/payable days and unpaid-leave deductions, downloadable PDF and CSV exports. |
 | Persistence | Normalized local PostgreSQL tables, revision conflict detection and bounded internal action history. |
+| Authentication and permissions | Local password login, admin-managed users, role-based mutation checks and employee-scoped records. |
+| Payslip delivery | Individual PDF downloads and bulk SMTP delivery of generated payslip attachments. |
 
 ## Explicitly deferred
 
-1. Admin-created accounts, authentication, and server-side role/record permissions.
-2. Email delivery and bulk PDF attachments.
-3. Payroll regulations, tax localization, contributions and real payment integrations.
-4. Partial-month contract changes, proration, overtime and unpaid-leave payroll integration.
-5. Multiple shifts, overnight attendance, leave holidays and business-day duration policies.
-6. Richer rule categories and attendance variables; Python snippets are not executed.
-7. Multi-company support and historical employee/department snapshots.
-8. Automated tests, browser QA, production build, migration generation and deployment, left to the team as requested.
+1. Payroll regulations, tax localization, contributions and real payment integrations.
+2. Partial-month contract changes, general proration and overtime calculations.
+3. Multiple daily shifts, overnight attendance, public-holiday calendars and multi-stage approval chains.
+4. Richer rule categories and attendance variables; Python snippets are not executed.
+5. Multi-company support and historical employee/department snapshots.
+6. Automated tests, browser QA, production build, migration generation and deployment, left to the team as requested.
 
 ## Suggested team verification
 
@@ -53,6 +53,8 @@ These are suggestions for your team; they were not executed on the completed cod
 - Try overlapping contract dates and an unsupported partial-month contract.
 - Create a salary formula using an earlier rule, then try an unknown identifier and division by zero.
 - Approve a leave request and confirm the allocation decreases once; insufficient balances should block approval.
+- Approve an unpaid leave request, recompute the payrun and confirm the scheduled-day deduction appears on the payslip.
+- Change a schedule's working days and confirm leave duration, attendance lateness and newly computed payroll use the revised schedule.
 - Check that Continue/Back/Cancel in the wizard create no records.
 - Confirm finalized payslips do not change when rules are edited for future payroll.
 - Open employee records from cards and lists and verify smart-button filters.

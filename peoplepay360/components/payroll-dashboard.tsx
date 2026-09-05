@@ -1,5 +1,3 @@
-'use client';
-
 import React, { useState } from 'react';
 import {
   Users,
@@ -18,6 +16,10 @@ import {
   UserCircle2,
   BadgeCheck,
   X,
+  Download,
+  FileSpreadsheet,
+  FileDown,
+  ChevronDown,
 } from 'lucide-react';
 import {
   type Workspace,
@@ -26,12 +28,16 @@ import {
   hours,
   allocationBalance,
   monthEnd,
+  employeeSchedule,
+  scheduleRowForDate,
+  workingDaysBetween,
 } from '@/lib/domain';
 import { Picker, DataTable, Badge, niceMonth } from './peoplepay-ui';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription } from '@/components/ui/empty';
+import { exportDashboardCsv, exportDashboardPdf } from '@/lib/export';
 
 function initials(name: string) {
   return name.split(' ').map((n) => n[0]).slice(0, 2).join('').toUpperCase();
@@ -98,6 +104,46 @@ export default function Dashboard({
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [empSearch, setEmpSearch] = useState('');
   const [secondaryTab, setSecondaryTab] = useState<'dept' | 'attendance' | 'leave' | 'payruns'>('dept');
+  const [exportMenuOpen, setExportMenuOpen] = useState(false);
+  const [exporting, setExporting] = useState(false);
+
+  const triggerDownload = (blob: Blob, filename: string) => {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleExportPdf = async () => {
+    setExporting(true);
+    try {
+      const pdfBytes = await exportDashboardPdf(s, period, department, employeeType);
+      const blob = new Blob([pdfBytes as unknown as BlobPart], { type: 'application/pdf' });
+      triggerDownload(blob, `peoplepay-summary-${period}.pdf`);
+    } catch (err) {
+      console.error('Failed to export PDF:', err);
+    } finally {
+      setExporting(false);
+      setExportMenuOpen(false);
+    }
+  };
+
+  const handleExportCsv = (mode: 'summary' | 'detail') => {
+    setExporting(true);
+    try {
+      const blob = exportDashboardCsv(s, period, department, employeeType, mode);
+      triggerDownload(blob, `peoplepay-${mode}-${period}.csv`);
+    } catch (err) {
+      console.error('Failed to export CSV:', err);
+    } finally {
+      setExporting(false);
+      setExportMenuOpen(false);
+    }
+  };
 
   const selectedEmp = selectedId ? s.employees.find((e) => e.id === selectedId) : null;
 
@@ -116,9 +162,8 @@ export default function Dashboard({
   const complete = present.filter((a) => a.checkOut);
   const missing = present.length - complete.length;
   const late = present.filter((a) => {
-    const e = s.employees.find((e) => e.id === a.employeeId);
-    const sc = s.schedules.find((sc) => sc.id === e?.scheduleId);
-    return a.checkIn > (sc?.start || '09:00');
+    const row = scheduleRowForDate(employeeSchedule(s, a.employeeId, a.date), a.date);
+    return a.checkIn > (row?.start || '09:00');
   }).length;
   const health = attendance.length
     ? Math.round((complete.length / attendance.length) * 100)
@@ -342,46 +387,125 @@ export default function Dashboard({
           CENTER — Primary Visual Focus (KPIs + Key Chart + Tabs)
       ═════════════════════════════════════════════════════════ */}
       <main className="dash-center-focused">
-        {/* ─── Level 1: Primary KPI Row ─── */}
+        {/* Top Report Export Bar */}
+        <div className="flex items-center justify-between bg-white border border-[#e5ded4] rounded-2xl px-5 py-3 shadow-xs mb-1">
+          <div className="flex items-center gap-2 text-xs text-[#5a5047]">
+            <span className="font-semibold text-[#1a1a1a]">Filtered View:</span>
+            <span className="px-2 py-0.5 rounded-full bg-[#f0ebe3] font-medium text-[11px] text-[#5a5047]">
+              {niceMonth(period)}
+            </span>
+            <span className="px-2 py-0.5 rounded-full bg-[#f0ebe3] font-medium text-[11px] text-[#5a5047]">
+              {department}
+            </span>
+            <span className="px-2 py-0.5 rounded-full bg-[#f0ebe3] font-medium text-[11px] text-[#5a5047]">
+              {employeeType}
+            </span>
+          </div>
+
+          <div className="relative">
+            <button
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#e5ded4] bg-[#faf7f3] hover:bg-[#ede7de] text-xs font-semibold text-[#1a1a1a] transition-colors cursor-pointer"
+              onClick={() => setExportMenuOpen(!exportMenuOpen)}
+              disabled={exporting}
+            >
+              <Download className="size-3.5 text-[#5a5047]" />
+              {exporting ? 'Exporting…' : 'Export Reports'}
+              <ChevronDown className="size-3 text-[#9c8f85]" />
+            </button>
+
+            {exportMenuOpen && (
+              <div className="absolute right-0 mt-2 w-56 bg-white border border-[#e5ded4] rounded-2xl shadow-xl z-30 p-1.5 text-xs animate-in fade-in-50 zoom-in-95">
+                <button
+                  className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-left font-medium text-[#1a1a1a] hover:bg-[#faf7f3] transition-colors cursor-pointer"
+                  onClick={handleExportPdf}
+                >
+                  <FileDown className="size-4 text-[#c99a2e]" />
+                  <div>
+                    <div className="font-semibold">Summary PDF Report</div>
+                    <div className="text-[10px] text-[#9c8f85]">Formatted overview & KPIs</div>
+                  </div>
+                </button>
+                <button
+                  className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-left font-medium text-[#1a1a1a] hover:bg-[#faf7f3] transition-colors cursor-pointer"
+                  onClick={() => handleExportCsv('detail')}
+                >
+                  <FileSpreadsheet className="size-4 text-[#22c55e]" />
+                  <div>
+                    <div className="font-semibold">Detailed Payslips CSV</div>
+                    <div className="text-[10px] text-[#9c8f85]">Employee-level breakdown</div>
+                  </div>
+                </button>
+                <button
+                  className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-left font-medium text-[#1a1a1a] hover:bg-[#faf7f3] transition-colors cursor-pointer"
+                  onClick={() => handleExportCsv('summary')}
+                >
+                  <FileText className="size-4 text-[#5a5047]" />
+                  <div>
+                    <div className="font-semibold">Department Summary CSV</div>
+                    <div className="text-[10px] text-[#9c8f85]">Aggregated cost tables</div>
+                  </div>
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* ─── Level 1: Primary KPI Row (With Drill-down Clicks) ─── */}
         <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="kpi-card accent-black">
+          <button
+            className="kpi-card accent-black text-left cursor-pointer hover:opacity-95 transition-opacity"
+            onClick={() => navigate('payslips')}
+            title="Click to open filtered payslips"
+          >
             <span className="kpi-card-label">Total Net Paid</span>
             <span className="kpi-card-value">{money(paid)}</span>
             <p className="kpi-card-sub">
-              {slips.filter((p) => p.status === 'Paid').length} payslips paid
+              {slips.filter((p) => p.status === 'Paid').length} payslips paid · Click to view →
             </p>
             <div className="kpi-card-icon">
               <Wallet className="size-4" />
             </div>
-          </div>
-          <div className="kpi-card">
+          </button>
+          <button
+            className="kpi-card text-left cursor-pointer hover:border-[#1a1a1a] transition-colors"
+            onClick={() => navigate('payruns')}
+            title="Click to view payruns"
+          >
             <span className="kpi-card-label">Generated Slips</span>
             <span className="kpi-card-value">{slips.length}</span>
             <p className="kpi-card-sub">
-              {slips.filter((p) => p.status !== 'Paid').length} pending payment
+              {slips.filter((p) => p.status !== 'Paid').length} pending payment · Open payruns →
             </p>
             <div className="kpi-card-icon">
               <FileText className="size-4" />
             </div>
-          </div>
-          <div className="kpi-card">
+          </button>
+          <button
+            className="kpi-card text-left cursor-pointer hover:border-[#1a1a1a] transition-colors"
+            onClick={() => navigate('payslips')}
+            title="Click to view payslips list"
+          >
             <span className="kpi-card-label">Average Net Pay</span>
             <span className="kpi-card-value">{money(slips.length ? net / slips.length : 0)}</span>
-            <p className="kpi-card-sub">Per generated payslip</p>
+            <p className="kpi-card-sub">Per generated payslip · View slips →</p>
             <div className="kpi-card-icon">
               <Users className="size-4" />
             </div>
-          </div>
-          <div className="kpi-card">
+          </button>
+          <button
+            className="kpi-card text-left cursor-pointer hover:border-[#1a1a1a] transition-colors"
+            onClick={() => navigate('attendance')}
+            title="Click to view attendance records"
+          >
             <span className="kpi-card-label">Attendance Health</span>
             <span className="kpi-card-value">{health}%</span>
             <p className="kpi-card-sub">
-              {complete.length}/{attendance.length} shifts complete
+              {complete.length}/{attendance.length} shifts complete · Open attendance →
             </p>
             <div className="kpi-card-icon">
               <Activity className="size-4" />
             </div>
-          </div>
+          </button>
         </section>
 
         {/* ─── Level 2: Key Focal Point (Chart + Quiet Needs Attention) ─── */}
@@ -396,10 +520,16 @@ export default function Dashboard({
                     Monthly Net Salary Trend
                   </CardTitle>
                   <CardDescription className="text-xs mt-1 text-[#9c8f85]">
-                    Six months trend · {department === 'All' ? 'All departments' : department}
+                    Six months trend · Click a bar to select period, or open payruns
                   </CardDescription>
                 </div>
-                <StatusBadge value="Paid" size="sm" />
+                <button
+                  className="text-xs font-semibold text-[#5a5047] hover:text-[#1a1a1a] inline-flex items-center gap-1 cursor-pointer"
+                  onClick={() => navigate('payruns')}
+                  title="Open payruns for active period"
+                >
+                  Open Payruns <ArrowUpRight className="size-3" />
+                </button>
               </div>
             </CardHeader>
             <CardContent className="p-6 pt-4">
@@ -415,8 +545,14 @@ export default function Dashboard({
                     <div
                       key={t.period}
                       className="flex flex-col items-center flex-1 h-full justify-end group cursor-pointer"
-                      onClick={() => setPeriod(t.period)}
-                      title={`${niceMonth(t.period)}: ${money(t.amount)}`}
+                      onClick={() => {
+                        setPeriod(t.period);
+                      }}
+                      onDoubleClick={() => {
+                        setPeriod(t.period);
+                        navigate('payruns');
+                      }}
+                      title={`Click to set period ${niceMonth(t.period)} (${money(t.amount)}). Double-click to open payruns.`}
                     >
                       <span className="text-[10px] font-semibold mb-1.5 opacity-0 group-hover:opacity-100 transition-opacity text-[#5a5047]">
                         {money(t.amount)}
@@ -444,7 +580,7 @@ export default function Dashboard({
               <div className="mt-4 pt-3 border-t border-[#f0ebe3] flex items-center justify-between text-xs text-[#9c8f85]">
                 <span className="flex items-center gap-2">
                   <span className="size-2 rounded-full inline-block bg-[#e9b84a]" />
-                  Active period ({niceMonth(period)})
+                  Active period ({niceMonth(period)}) · Click bar to change
                 </span>
                 <span>Values in INR (₹)</span>
               </div>
@@ -605,31 +741,37 @@ export default function Dashboard({
 
             {/* Tab Body */}
             <div className="p-6">
-              {/* Tab 1: Department Breakdown */}
+              {/* Tab 1: Department Breakdown (Clickable Drill-down) */}
               {secondaryTab === 'dept' && (
                 <div className="space-y-4">
                   {deptRows.length > 0 && slips.length > 0 ? (
                     deptRows.map((d) => (
-                      <div key={d.id} className="space-y-1.5">
+                      <button
+                        key={d.id}
+                        className="w-full space-y-1.5 text-left p-2 rounded-xl hover:bg-[#faf7f3] transition-colors cursor-pointer group"
+                        onClick={() => navigate('payslips', 'dept:' + d.name)}
+                        title={`Click to view payslips for ${d.name}`}
+                      >
                         <div className="flex items-center justify-between text-xs">
-                          <span className="font-semibold text-[#1a1a1a] flex items-center gap-2">
+                          <span className="font-semibold text-[#1a1a1a] flex items-center gap-2 group-hover:text-[#c99a2e] transition-colors">
                             {d.name}
                             <span className="text-[11px] font-normal text-[#9c8f85]">
                               ({d.count} active staff)
                             </span>
+                            <ArrowUpRight className="size-3 opacity-0 group-hover:opacity-100 transition-opacity" />
                           </span>
                           <span className="font-semibold text-[#1a1a1a]">{money(d.amount)}</span>
                         </div>
                         <div className="emp-bar-track">
                           <div
-                            className="emp-bar-fill"
+                            className="emp-bar-fill transition-all"
                             style={{
                               width: `${(d.amount / maxDept) * 100}%`,
                               background: '#5a5047',
                             }}
                           />
                         </div>
-                      </div>
+                      </button>
                     ))
                   ) : (
                     <Empty className="py-6">
@@ -646,34 +788,41 @@ export default function Dashboard({
                 </div>
               )}
 
-              {/* Tab 2: Attendance Shift Overview */}
+              {/* Tab 2: Attendance Shift Overview (Clickable Drill-down) */}
               {secondaryTab === 'attendance' && (
                 <div className="space-y-5">
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                     {[
-                      { label: 'Present', val: present.length, color: '#22c55e' },
-                      { label: 'Late check-in', val: late, color: '#e9b84a' },
+                      { key: 'present', label: 'Present', val: present.length, color: '#22c55e' },
+                      { key: 'late', label: 'Late check-in', val: late, color: '#e9b84a' },
                       {
+                        key: 'absent',
                         label: 'Absent',
                         val: Math.max(attendance.length - present.length, 0),
                         color: '#f87171',
                       },
                       {
+                        key: 'over9',
                         label: 'Over 9 hours',
                         val: attendance.filter((a) => hours(a) > 9).length,
                         color: '#60a5fa',
                       },
                     ].map((stat) => (
-                      <div
+                      <button
                         key={stat.label}
-                        className="p-3 rounded-xl border border-[#e5ded4] bg-[#faf7f3] text-center"
+                        className="p-3 rounded-xl border border-[#e5ded4] bg-[#faf7f3] hover:bg-white hover:shadow-xs transition-all text-center cursor-pointer group"
                         style={{ borderBottom: `3px solid ${stat.color}` }}
+                        onClick={() => navigate('attendance', 'stat:' + stat.key)}
+                        title={`Click to view ${stat.label.toLowerCase()} shift records`}
                       >
-                        <div className="text-xl font-bold text-[#1a1a1a]">{stat.val}</div>
-                        <div className="text-[11px] font-medium mt-1 text-[#9c8f85]">
-                          {stat.label}
+                        <div className="text-xl font-bold text-[#1a1a1a] group-hover:scale-105 transition-transform">
+                          {stat.val}
                         </div>
-                      </div>
+                        <div className="text-[11px] font-medium mt-1 text-[#9c8f85] flex items-center justify-center gap-1">
+                          {stat.label}
+                          <ArrowUpRight className="size-2.5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                        </div>
+                      </button>
                     ))}
                   </div>
                   <div className="p-3 rounded-xl border border-[#e5ded4] bg-[#faf7f3] flex items-center justify-between text-xs text-[#9c8f85]">
@@ -708,11 +857,12 @@ export default function Dashboard({
                               n +
                               (t.unit === 'Hours'
                                 ? r.duration
-                                : Math.round(
-                                    (Date.parse(r.end < monthEnd(period) ? r.end : monthEnd(period)) -
-                                      Date.parse(r.start > period + '-01' ? r.start : period + '-01')) /
-                                      86400000
-                                  ) + 1),
+                                : workingDaysBetween(
+                                    s,
+                                    r.employeeId,
+                                    r.start > period + '-01' ? r.start : period + '-01',
+                                    r.end < monthEnd(period) ? r.end : monthEnd(period)
+                                  )),
                             0
                           ) +
                         ' ' +

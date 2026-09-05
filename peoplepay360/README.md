@@ -18,7 +18,9 @@ npm run dev
 Open the local URL printed by the development server (normally http://localhost:3000).
 
 `npm.cmd` avoids PowerShell's script-execution restriction on `npm.ps1`. On macOS/Linux, use `npm` instead. Dependencies are already installed in this checkout; installation is needed for another machine or a fresh clone.
-The application runs directly against your local PostgreSQL database configured via `DATABASE_URL` in `.env.local` without any Cloudflare or Wrangler dependencies.
+The application runs directly against your local PostgreSQL database configured via `DATABASE_URL` in `.env.local` without any Cloudflare or Wrangler dependencies. Set a random `JWT_SECRET` containing at least 32 characters.
+
+For bulk payslip email, configure `SMTP_HOST`, `SMTP_PORT`, `SMTP_FROM`, and optional `SMTP_USER`, `SMTP_PASS`, and `SMTP_SECURE`. A local MailHog server normally uses port `1025` without authentication.
 
 Create a local PostgreSQL database named `peoplepay360` and set `DATABASE_URL` in `.env.local` before running `db:setup`. The setup command creates the relational schema. The first API read inserts the fictional OXP sample company only when the employee tables are empty. Reopening the app does not reset existing records.
 
@@ -42,7 +44,7 @@ The completed implementation has **not been built or tested**, per your request.
 4. Open **Payroll → Payruns**, then **September 2026**.
 5. Review the generated payslips; use **Compute** to recompute if desired.
 6. **Validate**, then **Mark paid**. The dashboard's paid totals now reflect that transition.
-7. Open a payslip and use **Print / Save PDF**. Choose your browser's Save as PDF destination.
+7. Open a payslip and use **Download PDF**, or use **Send Payslips** on a validated/paid payrun to email all generated PDFs.
 
 “Mark paid” records a status. It never initiates a bank transfer.
 
@@ -85,7 +87,8 @@ Changing contracts, attendance, salary rules, or structures invalidates unfinali
 - `app/api/workspace/route.ts`: load and mutate API.
 - `db/store.ts`: persistence with optimistic revision checks.
 - `db/schema.ts`: Drizzle schema definition.
-- `db/setup-postgres.sql` and `db/relational-migration.sql`: local PostgreSQL schema initialization.
+- `db/setup-postgres.sql` and `db/relational-migration.sql`: local PostgreSQL baseline initialization.
+- `db/migrations/`: ordered, one-time relational upgrades tracked in `schema_migrations`.
 - `REQUIREMENTS.md`: source requirements, implemented scope and remaining work.
 
 Employees, contracts, attendance, leave, salary structures, payruns and payslips are stored in normalized PostgreSQL tables. The `workspace` row keeps the revision used to reject concurrent lost updates. API reads reconstruct the workspace from the relational tables, so committed changes made through pgAdmin appear after a reload.
@@ -94,11 +97,12 @@ If two sessions edit concurrently, the later stale request returns a conflict. R
 
 ## Current boundaries
 
-- Opens as a clearly labeled **demo administrator**. User creation, passwords and server-enforced roles are not implemented. Use fictional data; do not expose this version as a real multi-user HR service.
-- Payslips use browser printing/Save as PDF. No email is sent. Bulk payroll exports are CSV, not email delivery.
+- Provides local password authentication, admin-managed user accounts and server-enforced role and employee record scopes. The seeded accounts and data are for demonstration and should be replaced before real use.
+- Payslips are generated as PDF files. Bulk delivery requires an SMTP server configured through the environment variables above.
 - Sample salary components are demonstration rules, not statutory tax or contribution logic.
 - Full-month contracts only; no partial-period wage proration.
-- Leave uses inclusive calendar days. Hourly requests must be on one day. Weekend/holiday exclusion, approval chains and payroll-linked unpaid leave remain to implement.
+- Day-based leave counts the employee's scheduled working days. Hourly requests must be on one scheduled working day. Leave types support automatic, manager and HR approval policies plus paid, unpaid and no-payroll-impact treatments. Approved unpaid leave creates a prorated payslip deduction.
+- Public-holiday calendars and role-specific multi-stage approval chains remain to implement.
 - Attendance is one same-day record per employee/date. No overnight shifts or multiple daily sessions. The quick widget represents the demo administrator, Nisha Rao.
 - Attendance is displayed on payslips but does not automatically alter monthly salary. Formula inputs currently include WAGE and earlier salary rule codes.
 - Department and employee-type reporting joins the current employee record; historical department snapshots are a follow-up.

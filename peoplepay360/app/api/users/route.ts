@@ -1,25 +1,10 @@
 import { getPgPool } from '@/db/index';
-import { verifyJwt } from '@/lib/jwt';
-
-function getAuthUser(request: Request) {
-  const authHeader = request.headers.get('authorization');
-  let token = '';
-  if (authHeader && authHeader.startsWith('Bearer ')) {
-    token = authHeader.substring(7);
-  } else {
-    const cookie = request.headers.get('cookie');
-    if (cookie) {
-      const match = cookie.match(/pp360_token=([^;]+)/);
-      if (match) token = match[1];
-    }
-  }
-  if (!token) return null;
-  return verifyJwt(token);
-}
+import { getActiveAuthUser } from '@/lib/auth';
+import { hashPassword } from '@/lib/password';
 
 export async function GET(request: Request) {
   try {
-    const user = getAuthUser(request);
+    const user = await getActiveAuthUser(request);
     if (!user || user.role !== 'Admin') {
       return Response.json({ error: 'Unauthorized: Admin access required.' }, { status: 403 });
     }
@@ -49,7 +34,7 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
-    const user = getAuthUser(request);
+    const user = await getActiveAuthUser(request);
     if (!user || user.role !== 'Admin') {
       return Response.json({ error: 'Unauthorized: Admin access required.' }, { status: 403 });
     }
@@ -69,6 +54,9 @@ export async function POST(request: Request) {
     if (!name || !email || !roleId) {
       return Response.json({ error: 'Name, email, and role are required.' }, { status: 400 });
     }
+    if ((!id && !password?.trim()) || (password?.trim() && password.trim().length < 8)) {
+      return Response.json({ error: 'New passwords must contain at least 8 characters.' }, { status: 400 });
+    }
 
     const pool = getPgPool();
 
@@ -78,7 +66,7 @@ export async function POST(request: Request) {
           `UPDATE users
            SET name = $1, email = $2, role_id = $3, employee_id = $4, active = $5, password = $6
            WHERE id = $7`,
-          [name.trim(), email.trim().toLowerCase(), roleId, employeeId || null, active, password, id]
+          [name.trim(), email.trim().toLowerCase(), roleId, employeeId || null, active, hashPassword(password), id]
         );
       } else {
         await pool.query(
@@ -90,11 +78,11 @@ export async function POST(request: Request) {
       }
     } else {
       const newId = `u_${Date.now()}`;
-      const defaultPassword = password && password.trim() ? password.trim() : 'welcome123';
+      const initialPassword = hashPassword(password!.trim());
       await pool.query(
         `INSERT INTO users (id, name, email, role_id, employee_id, password, active)
          VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-        [newId, name.trim(), email.trim().toLowerCase(), roleId, employeeId || null, defaultPassword, active]
+        [newId, name.trim(), email.trim().toLowerCase(), roleId, employeeId || null, initialPassword, active]
       );
     }
 

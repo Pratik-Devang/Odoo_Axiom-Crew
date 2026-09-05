@@ -1,4 +1,4 @@
-import { pgTable, text, integer, numeric, date, boolean, jsonb, timestamp, primaryKey } from 'drizzle-orm/pg-core';
+import { pgTable, text, integer, numeric, date, boolean, jsonb, timestamp, primaryKey, uniqueIndex } from 'drizzle-orm/pg-core';
 
 // 1. Roles (RBAC)
 export const roles = pgTable('roles', {
@@ -13,10 +13,13 @@ export const roles = pgTable('roles', {
 export const schedules = pgTable('schedules', {
   id: text('id').primaryKey(),
   name: text('name').notNull(),
+  type: text('schedule_type').notNull().default('Fixed'),
   days: jsonb('days').notNull(),
+  workRows: jsonb('work_rows').notNull().default([]),
   startTime: text('start_time').notNull().default('09:00'),
   endTime: text('end_time').notNull().default('18:00'),
   breakHours: numeric('break_hours').notNull().default('1.0'),
+  weeklyHours: numeric('weekly_hours').notNull().default('0'),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
 });
 
@@ -114,6 +117,11 @@ export const leaveTypes = pgTable('leave_types', {
   name: text('name').notNull(),
   unit: text('unit').notNull().default('Days'),
   requiresAllocation: boolean('requires_allocation').notNull().default(true),
+  approvalWorkflow: text('approval_workflow').notNull().default('HR Approval'),
+  payrollImpact: text('payroll_impact').notNull().default('Paid'),
+  payrollWorkEntry: text('payroll_work_entry'),
+  displayColor: text('display_color').notNull().default('Blue'),
+  active: boolean('active').notNull().default(true),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
 });
 
@@ -126,6 +134,7 @@ export const leaveAllocations = pgTable('leave_allocations', {
   startDate: date('start_date').notNull(),
   endDate: date('end_date').notNull(),
   status: text('status').notNull().default('Approved'),
+  approver: text('approver'),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
 });
 
@@ -140,6 +149,7 @@ export const leaveRequests = pgTable('leave_requests', {
   reason: text('reason'),
   status: text('status').notNull().default('Pending'),
   approver: text('approver'),
+  allocationId: text('allocation_id').references(() => leaveAllocations.id),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
 });
 
@@ -150,6 +160,7 @@ export const payruns = pgTable('payruns', {
   period: text('period').notNull(),
   structureId: text('structure_id').references(() => salaryStructures.id),
   status: text('status').notNull().default('Draft'),
+  paidAt: timestamp('paid_at', { withTimezone: true }),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
 });
 
@@ -159,9 +170,11 @@ export const payrunEmployees = pgTable(
   {
     payrunId: text('payrun_id').notNull().references(() => payruns.id),
     employeeId: text('employee_id').notNull().references(() => employees.id),
+    period: text('period').notNull(),
   },
   (table) => [
     primaryKey({ columns: [table.payrunId, table.employeeId] }),
+    uniqueIndex('uq_payrun_employee_period').on(table.employeeId, table.period),
   ]
 );
 
@@ -178,9 +191,15 @@ export const payslips = pgTable('payslips', {
   deductions: numeric('deductions').notNull().default('0'),
   net: numeric('net').notNull().default('0'),
   workedDays: integer('worked_days').notNull().default(0),
+  scheduledDays: numeric('scheduled_days').notNull().default('0'),
+  unpaidLeaveDays: numeric('unpaid_leave_days').notNull().default('0'),
+  payableDays: numeric('payable_days').notNull().default('0'),
   lines: jsonb('lines').notNull().default([]),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
-});
+}, (table) => [
+  uniqueIndex('uq_payslip_payrun_employee').on(table.payrunId, table.employeeId),
+  uniqueIndex('uq_payslip_employee_period').on(table.employeeId, table.period),
+]);
 
 // 16. Audit Logs
 export const auditLogs = pgTable('audit_logs', {

@@ -1,14 +1,7 @@
 import { getPgPool } from '@/db/index';
+import { roleName } from '@/lib/auth';
 import { signJwt } from '@/lib/jwt';
-
-const ROLE_NAME_MAP: Record<string, string> = {
-  admin: 'Admin',
-  payroll_manager: 'HR Payroll Manager',
-  finance_manager: 'HR Payroll Manager',
-  payroll_user: 'HR Payroll User',
-  hr_manager: 'HR Manager',
-  employee: 'Employee',
-};
+import { hashPassword, passwordNeedsUpgrade, verifyPassword } from '@/lib/password';
 
 export async function POST(request: Request) {
   try {
@@ -29,7 +22,7 @@ export async function POST(request: Request) {
     );
 
     const user = res.rows[0];
-    if (!user || user.password !== password) {
+    if (!user || !verifyPassword(password, user.password)) {
       return Response.json({ error: 'Invalid work email or password.' }, { status: 401 });
     }
 
@@ -37,7 +30,11 @@ export async function POST(request: Request) {
       return Response.json({ error: 'Account is deactivated. Contact Administrator.' }, { status: 403 });
     }
 
-    const normalizedRole = ROLE_NAME_MAP[user.role_id] || user.role_title || user.role_id;
+    if (passwordNeedsUpgrade(user.password)) {
+      await pool.query('UPDATE users SET password = $1 WHERE id = $2', [hashPassword(password), user.id]);
+    }
+
+    const normalizedRole = roleName(user.role_id, user.role_title);
 
     const tokenPayload = {
       id: user.id,
@@ -57,7 +54,11 @@ export async function POST(request: Request) {
       },
       {
         headers: {
-          'Set-Cookie': `pp360_token=${token}; Path=/; SameSite=Lax; Max-Age=86400`,
+          'Set-Cookie': `pp360_token=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=86400${
+            request.headers.get('x-forwarded-proto') === 'https' || process.env.NODE_ENV === 'production'
+              ? '; Secure'
+              : ''
+          }`,
         },
       }
     );

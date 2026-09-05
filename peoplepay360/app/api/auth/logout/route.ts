@@ -1,9 +1,13 @@
-export async function POST() {
+export async function POST(request: Request) {
   return Response.json(
     { success: true },
     {
       headers: {
-        'Set-Cookie': 'pp360_token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT',
+        'Set-Cookie': `pp360_token=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0${
+          request.headers.get('x-forwarded-proto') === 'https' || process.env.NODE_ENV === 'production'
+            ? '; Secure'
+            : ''
+        }`,
       },
     }
   );

@@ -20,48 +20,70 @@ if (!connectionString) {
 
 const pool = new pg.Pool({ connectionString });
 
-async function run() {
-  console.log('Connecting to PostgreSQL to run relational migration...');
-  const setupSql = fs.readFileSync(path.resolve(__dirname, 'setup-postgres.sql'), 'utf8');
-  const migrationSql = fs.readFileSync(path.resolve(__dirname, 'relational-migration.sql'), 'utf8');
+async function applyOnce(client, name, sql) {
+  const applied = await client.query('SELECT 1 FROM schema_migrations WHERE name = $1', [name]);
+  if (applied.rowCount) {
+    console.log(`Skipping ${name} (already applied).`);
+    return;
+  }
 
+  console.log(`Applying ${name}...`);
+  await client.query('BEGIN');
   try {
-    const client = await pool.connect();
-    console.log('Connected! Creating the workspace table...');
-    await client.query(setupSql);
-    console.log('Executing relational-migration.sql...');
-    await client.query(migrationSql);
-    console.log('Migration successfully executed!');
-    
-    // Check table counts
-    const res = await client.query(`
-      SELECT table_name 
-      FROM information_schema.tables 
-      WHERE table_schema = 'public' 
-      ORDER BY table_name;
-    `);
-    console.log('\nTables created in PostgreSQL:');
-    res.rows.forEach(r => console.log(' - ' + r.table_name));
-
-    // Check employee count
-    const empRes = await client.query('SELECT count(*) FROM employees;');
-    console.log(`\nMigrated ${empRes.rows[0].count} employee records into relational table.`);
-
-    const contractRes = await client.query('SELECT count(*) FROM contracts;');
-    console.log(`Migrated ${contractRes.rows[0].count} contract records into relational table.`);
-
-    const payrunRes = await client.query('SELECT count(*) FROM payruns;');
-    console.log(`Migrated ${payrunRes.rows[0].count} payrun records into relational table.`);
-
-    const slipRes = await client.query('SELECT count(*) FROM payslips;');
-    console.log(`Migrated ${slipRes.rows[0].count} payslip records into relational table.`);
-
-    client.release();
-  } catch (err) {
-    console.error('Migration failed:', err);
-  } finally {
-    await pool.end();
+    await client.query(sql);
+    await client.query('INSERT INTO schema_migrations (name) VALUES ($1)', [name]);
+    await client.query('COMMIT');
+  } catch (error) {
+    await client.query('ROLLBACK');
+    throw error;
   }
 }
 
-void run();
+async function run() {
+  console.log('Connecting to PostgreSQL...');
+  const client = await pool.connect();
+  try {
+    const setupSql = fs.readFileSync(path.resolve(__dirname, 'setup-postgres.sql'), 'utf8');
+    await client.query(setupSql);
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS schema_migrations (
+        name TEXT PRIMARY KEY,
+        applied_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    const baselineSql = fs.readFileSync(path.resolve(__dirname, 'relational-migration.sql'), 'utf8')
+      .replace(/\bBEGIN;\s*/i, '')
+      .replace(/\bCOMMIT;\s*$/i, '');
+    await applyOnce(client, '000_relational_baseline', baselineSql);
+
+    const migrationsDir = path.resolve(__dirname, 'migrations');
+    const migrationFiles = fs.existsSync(migrationsDir)
+      ? fs.readdirSync(migrationsDir).filter((file) => file.endsWith('.sql')).sort()
+      : [];
+
+    for (const file of migrationFiles) {
+      await applyOnce(client, file, fs.readFileSync(path.join(migrationsDir, file), 'utf8'));
+    }
+
+    const counts = await client.query(`
+      SELECT
+        (SELECT count(*)::int FROM employees) AS employees,
+        (SELECT count(*)::int FROM contracts) AS contracts,
+        (SELECT count(*)::int FROM payruns) AS payruns,
+        (SELECT count(*)::int FROM payslips) AS payslips
+    `);
+    console.log('Database is current:', counts.rows[0]);
+  } finally {
+    client.release();
+  }
+}
+
+run()
+  .catch((error) => {
+    console.error('Migration failed:', error);
+    process.exitCode = 1;
+  })
+  .finally(async () => {
+    await pool.end();
+  });
