@@ -150,9 +150,9 @@ export default function Dashboard({
             title: `${drafts.length} payrun${drafts.length > 1 ? 's' : ''} awaiting completion`,
             detail: `${niceMonth(period)} · Review and process payroll`,
             view: 'payruns',
-            priority: 'HIGH',
-            color: 'border-amber-200 bg-amber-50/40 text-amber-900',
-            badgeBg: 'bg-amber-100 text-amber-800',
+            priority: 'ACTION',
+            color: 'border-slate-200 bg-white text-slate-800',
+            badgeBg: 'bg-slate-900 text-white',
           },
         ]
       : []),
@@ -164,8 +164,8 @@ export default function Dashboard({
             detail: 'Review leave approvals to keep operations smooth',
             view: 'requests',
             priority: 'REVIEW',
-            color: 'border-blue-200 bg-blue-50/40 text-blue-900',
-            badgeBg: 'bg-blue-100 text-blue-800',
+            color: 'border-slate-200 bg-white text-slate-800',
+            badgeBg: 'bg-slate-100 text-slate-700 border border-slate-200',
           },
         ]
       : []),
@@ -178,8 +178,8 @@ export default function Dashboard({
             view: 'employees',
             employeeId: bankMissing[0].id,
             priority: 'ACTION',
-            color: 'border-rose-200 bg-rose-50/40 text-rose-900',
-            badgeBg: 'bg-rose-100 text-rose-800',
+            color: 'border-slate-200 bg-white text-slate-800',
+            badgeBg: 'bg-slate-100 text-slate-700 border border-slate-200',
           },
         ]
       : []),
@@ -191,8 +191,8 @@ export default function Dashboard({
             detail: 'Review upcoming employment term changes',
             view: 'contracts',
             priority: 'NOTICE',
-            color: 'border-slate-200 bg-slate-50/60 text-slate-800',
-            badgeBg: 'bg-slate-100 text-slate-700',
+            color: 'border-slate-200 bg-white text-slate-800',
+            badgeBg: 'bg-slate-100 text-slate-700 border border-slate-200',
           },
         ]
       : []),
@@ -211,8 +211,8 @@ export default function Dashboard({
       sub: `${slips.filter((p) => p.status === 'Paid').length} paid this period`,
       Icon: Wallet,
       accent: true,
-      highlight: 'text-emerald-700',
-      iconBg: 'bg-emerald-100 text-emerald-700',
+      highlight: 'text-white',
+      iconBg: 'bg-slate-800 text-white',
     },
     {
       name: 'Generated Slips',
@@ -221,7 +221,7 @@ export default function Dashboard({
       Icon: FileText,
       accent: false,
       highlight: 'text-slate-900',
-      iconBg: 'bg-blue-50 text-blue-600',
+      iconBg: 'bg-slate-100 text-slate-700',
     },
     {
       name: 'Average Net Pay',
@@ -230,7 +230,7 @@ export default function Dashboard({
       Icon: Users,
       accent: false,
       highlight: 'text-slate-900',
-      iconBg: 'bg-indigo-50 text-indigo-600',
+      iconBg: 'bg-slate-100 text-slate-700',
     },
     {
       name: 'Approved Time Off',
@@ -239,7 +239,7 @@ export default function Dashboard({
       Icon: CalendarDays,
       accent: false,
       highlight: 'text-slate-900',
-      iconBg: 'bg-purple-50 text-purple-600',
+      iconBg: 'bg-slate-100 text-slate-700',
     },
     {
       name: 'Attendance Health',
@@ -247,65 +247,30 @@ export default function Dashboard({
       sub: `${complete.length} / ${attendance.length} completed`,
       Icon: Activity,
       accent: false,
-      highlight: health > 80 ? 'text-emerald-700' : 'text-amber-700',
-      iconBg: 'bg-teal-50 text-teal-600',
+      highlight: 'text-slate-900',
+      iconBg: 'bg-slate-100 text-slate-700',
     },
   ];
 
   return (
-    <div className="space-y-6">
-      {/* Top Filter Strip */}
-      <div className="flex flex-wrap items-center justify-between gap-3 p-3 bg-white border border-slate-200/80 rounded-xl shadow-xs">
-        <div className="flex flex-wrap items-center gap-2.5">
-          <Picker
-            label="Period"
-            value={period}
-            onChange={setPeriod}
-            options={months.map((p) => ({ value: p, label: niceMonth(p) }))}
-          />
-          <Picker
-            label="Department"
-            value={department}
-            onChange={setDepartment}
-            options={[{ value: 'All', label: 'All departments' }, ...departments]}
-          />
-          <Picker
-            label="Employee type"
-            value={employeeType}
-            onChange={setEmployeeType}
-            options={[
-              { value: 'All', label: 'All employee types' },
-              'Full-time',
-              'Contract',
-              'Intern',
-            ]}
-          />
-        </div>
-        <div className="flex items-center gap-2 px-3 py-1 bg-slate-50 border border-slate-100 rounded-lg text-xs text-slate-500 font-medium">
-          <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
-          <span>OXP Pvt Ltd</span>
-          <span className="text-slate-300">|</span>
-          <span>Live Workspace</span>
-        </div>
-      </div>
-
+    <div className="space-y-4">
       {/* KPI Cards Row */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
         {metrics.map((m) => (
           <Card
             key={m.name}
-            className={`transition-all duration-200 hover:shadow-md border ${
+            className={`transition-all duration-200 hover:shadow-md border rounded-2xl ${
               m.accent
-                ? 'bg-emerald-50/30 border-emerald-200 shadow-xs'
+                ? 'bg-slate-900 text-white border-slate-900 shadow-sm'
                 : 'bg-white border-slate-200/80 shadow-xs'
             }`}
           >
             <CardContent className="p-5 flex flex-col justify-between h-full space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+                <span className={`text-[11px] font-bold uppercase tracking-wider ${m.accent ? 'text-slate-400' : 'text-slate-500'}`}>
                   {m.name}
                 </span>
-                <div className={`p-2 rounded-lg ${m.iconBg}`}>
+                <div className={`p-2 rounded-xl ${m.iconBg}`}>
                   <m.Icon className="size-4" />
                 </div>
               </div>
@@ -313,7 +278,7 @@ export default function Dashboard({
                 <div className={`text-2xl font-bold tracking-tight ${m.highlight}`}>
                   {m.value}
                 </div>
-                <p className="text-xs text-slate-500 mt-1 flex items-center gap-1">
+                <p className={`text-xs mt-1 flex items-center gap-1 ${m.accent ? 'text-slate-400' : 'text-slate-500'}`}>
                   {m.sub}
                 </p>
               </div>
@@ -323,14 +288,14 @@ export default function Dashboard({
       </div>
 
       {/* Analytics & Attention Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
         {/* Trend Chart (7 cols) */}
-        <Card className="lg:col-span-7 bg-white border-slate-200/80 shadow-xs">
+        <Card className="lg:col-span-7 bg-white border-slate-200/80 rounded-2xl shadow-xs">
           <CardHeader className="pb-2 border-b border-slate-100">
             <div className="flex items-center justify-between">
               <div>
                 <CardTitle className="text-base font-semibold text-slate-900 flex items-center gap-2">
-                  <TrendingUp className="size-4 text-emerald-600" />
+                  <TrendingUp className="size-4 text-slate-900" />
                   Monthly Net Salary Trend
                 </CardTitle>
                 <CardDescription className="text-xs text-slate-500 mt-0.5">
@@ -348,7 +313,7 @@ export default function Dashboard({
                 .map((t) => `${niceMonth(t.period)}: ${money(t.amount)}`)
                 .join('; ')}
             >
-              {trend.map((t, idx) => {
+              {trend.map((t) => {
                 const heightPct = Math.max(4, Math.round((t.amount / max) * 100));
                 const isCurrent = t.period === period;
                 return (
@@ -360,19 +325,19 @@ export default function Dashboard({
                     <span className="text-[10px] font-medium text-slate-500 mb-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
                       {money(t.amount)}
                     </span>
-                    <div className="w-full max-w-[42px] bg-slate-100 rounded-t-md relative flex items-end h-36 overflow-hidden">
+                    <div className="w-full max-w-[42px] bg-slate-100 rounded-t-lg relative flex items-end h-36 overflow-hidden">
                       <div
-                        className={`w-full rounded-t-md transition-all duration-300 ${
+                        className={`w-full rounded-t-lg transition-all duration-300 ${
                           isCurrent
-                            ? 'bg-emerald-600 group-hover:bg-emerald-700'
-                            : 'bg-emerald-300 group-hover:bg-emerald-400'
+                            ? 'bg-slate-900 group-hover:bg-slate-800'
+                            : 'bg-slate-300 group-hover:bg-slate-400'
                         }`}
                         style={{ height: `${heightPct}%` }}
                       />
                     </div>
                     <span
                       className={`text-xs mt-2 font-medium transition-colors ${
-                        isCurrent ? 'text-emerald-700 font-bold' : 'text-slate-500'
+                        isCurrent ? 'text-slate-900 font-bold' : 'text-slate-500'
                       }`}
                     >
                       {niceMonth(t.period).split(' ')[0].slice(0, 3)}
@@ -383,7 +348,7 @@ export default function Dashboard({
             </div>
             <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400">
               <span className="flex items-center gap-1.5">
-                <span className="size-2 rounded-full bg-emerald-600" />
+                <span className="size-2 rounded-full bg-slate-900" />
                 Selected period highlighted
               </span>
               <span>Values in INR (₹)</span>
@@ -392,14 +357,14 @@ export default function Dashboard({
         </Card>
 
         {/* Needs Your Attention (5 cols) */}
-        <Card className="lg:col-span-5 bg-white border-slate-200/80 shadow-xs flex flex-col justify-between">
+        <Card className="lg:col-span-5 bg-white border-slate-200/80 rounded-2xl shadow-xs flex flex-col justify-between">
           <CardHeader className="pb-3 border-b border-slate-100">
             <div className="flex items-center justify-between">
               <CardTitle className="text-base font-semibold text-slate-900 flex items-center gap-2">
-                <AlertCircle className="size-4 text-amber-600" />
+                <AlertCircle className="size-4 text-slate-700" />
                 Needs Your Attention
               </CardTitle>
-              <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-800">
+              <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200">
                 {alerts.length} Pending
               </span>
             </div>
@@ -413,32 +378,30 @@ export default function Dashboard({
                 {alerts.map((a) => (
                   <div
                     key={a.id}
-                    className={`p-3 rounded-xl border transition-all hover:shadow-xs flex items-start justify-between gap-3 ${a.color}`}
+                    className="p-3 rounded-xl border border-slate-200/80 bg-white hover:border-slate-300 transition-all flex items-start justify-between gap-3 shadow-2xs"
                   >
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
-                        <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${a.badgeBg}`}>
+                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${a.badgeBg}`}>
                           {a.priority}
                         </span>
-                        <h4 className="text-xs font-semibold">{a.title}</h4>
+                        <h4 className="text-xs font-semibold text-slate-900">{a.title}</h4>
                       </div>
-                      <p className="text-xs opacity-85 line-clamp-1">{a.detail}</p>
+                      <p className="text-xs text-slate-500 line-clamp-1">{a.detail}</p>
                     </div>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      className="shrink-0 h-7 text-xs px-2 hover:bg-white/60 font-medium"
+                    <button
+                      className="shrink-0 h-7 text-xs px-2.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 font-medium text-slate-700 inline-flex items-center gap-1 transition-colors shadow-2xs"
                       onClick={() => navigate(a.view, a.employeeId)}
                     >
-                      Resolve <ChevronRight className="size-3.5 ml-1" />
-                    </Button>
+                      Resolve <ChevronRight className="size-3.5" />
+                    </button>
                   </div>
                 ))}
               </div>
             ) : (
               <Empty className="py-8">
-                <EmptyMedia variant="icon" className="bg-emerald-50 text-emerald-600">
-                  <CheckCircle2 className="size-5 text-emerald-600" />
+                <EmptyMedia variant="icon" className="bg-slate-100 text-slate-500">
+                  <CheckCircle2 className="size-5 text-slate-700" />
                 </EmptyMedia>
                 <EmptyHeader>
                   <EmptyTitle className="text-sm font-semibold text-slate-800">
@@ -484,7 +447,7 @@ export default function Dashboard({
                   </div>
                   <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-emerald-500 rounded-full transition-all duration-300"
+                      className="h-full bg-slate-900 rounded-full transition-all duration-300"
                       style={{ width: `${(d.amount / maxDept) * 100}%` }}
                     />
                   </div>
@@ -518,37 +481,35 @@ export default function Dashboard({
                   Recorded shifts and punctuality for {niceMonth(period)}
                 </CardDescription>
               </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-xs text-emerald-700 hover:text-emerald-800"
+              <button
+                className="text-xs font-semibold text-slate-700 hover:text-slate-900 inline-flex items-center gap-1 transition-colors"
                 onClick={() => navigate('attendance')}
               >
-                View logs <ArrowUpRight className="size-3.5 ml-1" />
-              </Button>
+                View logs <ArrowUpRight className="size-3.5" />
+              </button>
             </div>
           </CardHeader>
           <CardContent className="p-5 space-y-4">
             <div className="grid grid-cols-4 gap-2.5">
               {[
-                { label: 'Present', val: present.length, color: 'text-emerald-700 bg-emerald-50 border-emerald-100' },
-                { label: 'Late', val: late, color: 'text-amber-700 bg-amber-50 border-amber-100' },
-                { label: 'Absent', val: attendance.length - present.length, color: 'text-rose-700 bg-rose-50 border-rose-100' },
-                { label: 'Over 9h', val: attendance.filter((a) => hours(a) > 9).length, color: 'text-indigo-700 bg-indigo-50 border-indigo-100' },
+                { label: 'Present', val: present.length },
+                { label: 'Late', val: late },
+                { label: 'Absent', val: attendance.length - present.length },
+                { label: 'Over 9h', val: attendance.filter((a) => hours(a) > 9).length },
               ].map((stat) => (
                 <div
                   key={stat.label}
-                  className={`p-3 rounded-xl border text-center ${stat.color}`}
+                  className="p-3 rounded-xl border border-slate-200/80 bg-slate-50/70 text-center"
                 >
-                  <div className="text-xl font-bold tracking-tight">{stat.val}</div>
-                  <div className="text-[11px] font-medium opacity-80 mt-0.5">{stat.label}</div>
+                  <div className="text-xl font-bold tracking-tight text-slate-900">{stat.val}</div>
+                  <div className="text-[11px] font-medium text-slate-500 mt-0.5">{stat.label}</div>
                 </div>
               ))}
             </div>
 
             <div className="p-3 bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-between text-xs text-slate-500">
               <span className="flex items-center gap-1.5">
-                <span className="size-1.5 rounded-full bg-amber-500" />
+                <span className="size-1.5 rounded-full bg-slate-400" />
                 {missing} missing check-outs
               </span>
               <span className="flex items-center gap-1.5">
@@ -570,17 +531,15 @@ export default function Dashboard({
           <CardHeader className="pb-3 border-b border-slate-100">
             <div className="flex items-center justify-between">
               <CardTitle className="text-base font-semibold text-slate-900 flex items-center gap-2">
-                <CalendarDays className="size-4 text-purple-600" />
+                <CalendarDays className="size-4 text-slate-600" />
                 Time Off Policies & Balances
               </CardTitle>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-xs text-emerald-700 hover:text-emerald-800"
+              <button
+                className="text-xs font-semibold text-slate-700 hover:text-slate-900 inline-flex items-center gap-1 transition-colors"
                 onClick={() => navigate('requests')}
               >
-                Requests <ArrowUpRight className="size-3.5 ml-1" />
-              </Button>
+                Requests <ArrowUpRight className="size-3.5" />
+              </button>
             </div>
           </CardHeader>
           <div className="p-0">
@@ -613,7 +572,7 @@ export default function Dashboard({
                   render: (t) => {
                     const count = requests.filter((r) => r.typeId === t.id && r.status === 'Pending').length;
                     return count > 0 ? (
-                      <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200">
+                      <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200">
                         {count} pending
                       </span>
                     ) : (
@@ -648,10 +607,10 @@ export default function Dashboard({
           <CardHeader className="pb-3 border-b border-slate-100">
             <div className="flex items-center justify-between">
               <CardTitle className="text-base font-semibold text-slate-900 flex items-center gap-2">
-                <Users className="size-4 text-indigo-600" />
+                <Users className="size-4 text-slate-600" />
                 Department Headcount & Cost
               </CardTitle>
-              <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+              <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200">
                 {employees.filter((e) => e.status === 'Active').length} Active Staff
               </span>
             </div>
@@ -680,29 +639,30 @@ export default function Dashboard({
         </Card>
       </div>
 
-      {/* Payrun Summary Card */}
-      <Card className="bg-white border-slate-200/80 shadow-xs overflow-hidden">
-        <CardHeader className="pb-3 border-b border-slate-100">
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="text-base font-semibold text-slate-900 flex items-center gap-2">
-                <FileText className="size-4 text-emerald-600" />
-                Recent Payruns for {niceMonth(period)}
-              </CardTitle>
-              <CardDescription className="text-xs text-slate-500 mt-0.5">
-                Current payrun status and disbursement totals
-              </CardDescription>
-            </div>
-            <Button
-              variant="outline"
-              size="sm"
-              className="text-xs font-medium"
-              onClick={() => navigate('payruns')}
-            >
-              All payruns <ArrowUpRight className="size-3.5 ml-1" />
-            </Button>
+      {/* Payrun Summary Card styled as Workora Execution Logs */}
+      <Card className="bg-white border-slate-200/80 rounded-2xl shadow-xs overflow-hidden">
+        <div className="flex items-center justify-between px-6 pt-4 pb-0 border-b border-slate-100">
+          <div className="flex items-center gap-6">
+            <button className="pb-3 text-sm font-semibold text-slate-900 border-b-2 border-slate-900 flex items-center gap-2">
+              <FileText className="size-4 text-slate-700" />
+              Execution Logs ({niceMonth(period)})
+            </button>
+            <button className="pb-3 text-sm font-medium text-slate-400 hover:text-slate-600">
+              Data Preview
+            </button>
+            <button className="pb-3 text-sm font-medium text-slate-400 hover:text-slate-600">
+              Variables
+            </button>
           </div>
-        </CardHeader>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-xs font-medium text-slate-600 hover:text-slate-900 rounded-full h-8"
+            onClick={() => navigate('payruns')}
+          >
+            All payruns <ArrowUpRight className="size-3.5 ml-1" />
+          </Button>
+        </div>
         <div className="p-0">
           <DataTable
             rows={s.payruns
@@ -717,7 +677,7 @@ export default function Dashboard({
                 title: 'Payrun Name',
                 render: (r) => (
                   <button
-                    className="font-medium text-emerald-700 hover:text-emerald-800 hover:underline flex items-center gap-1.5"
+                    className="font-medium text-slate-900 hover:text-orange-600 hover:underline flex items-center gap-1.5"
                     onClick={() => navigate('run', r.id)}
                   >
                     {r.name}
