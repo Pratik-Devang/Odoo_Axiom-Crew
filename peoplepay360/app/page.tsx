@@ -2802,17 +2802,41 @@ export default function Home() {
               </Field>
 
               <Field label="System Role">
-                <select
-                  className="h-9 w-full rounded-xl border border-slate-200 px-3 text-xs bg-white outline-none"
-                  value={userFormData.roleId}
-                  onChange={(e) => setUserFormData({ ...userFormData, roleId: e.target.value })}
-                >
-                  <option value="admin">Admin</option>
-                  <option value="payroll_manager">HR Payroll Manager</option>
-                  <option value="payroll_user">HR Payroll User</option>
-                  <option value="hr_manager">HR Manager</option>
-                  <option value="employee">Employee</option>
-                </select>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+                  {[
+                    { id: 'admin', label: 'Admin', desc: 'Universal control' },
+                    { id: 'payroll_manager', label: 'HR Payroll Manager', desc: 'Full payroll & rules governance' },
+                    { id: 'payroll_user', label: 'HR Payroll User', desc: 'Compute payruns & contracts' },
+                    { id: 'hr_manager', label: 'HR Manager', desc: 'Employees, attendance & time-off' },
+                    { id: 'employee', label: 'Employee', desc: 'Self-service portal access' },
+                  ].map((roleOption) => {
+                    const isSelected = userFormData.roleId === roleOption.id;
+                    return (
+                      <label
+                        key={roleOption.id}
+                        onClick={() => setUserFormData({ ...userFormData, roleId: roleOption.id })}
+                        className={`flex items-start gap-2.5 p-2.5 rounded-xl border cursor-pointer transition-all ${
+                          isSelected
+                            ? 'bg-amber-50/80 border-[#c99a2e] text-slate-900 shadow-2xs'
+                            : 'bg-slate-50/50 border-slate-200 hover:bg-slate-50 text-slate-700'
+                        }`}
+                      >
+                        <input
+                          type="radio"
+                          name="userRoleId"
+                          value={roleOption.id}
+                          checked={isSelected}
+                          onChange={() => setUserFormData({ ...userFormData, roleId: roleOption.id })}
+                          className="mt-0.5 accent-[#c99a2e] cursor-pointer"
+                        />
+                        <div className="flex flex-col text-left">
+                          <span className="font-bold text-xs leading-tight">{roleOption.label}</span>
+                          <span className="text-[10px] text-slate-400 leading-tight mt-0.5">{roleOption.desc}</span>
+                        </div>
+                      </label>
+                    );
+                  })}
+                </div>
               </Field>
 
               <div className="grid grid-cols-2 gap-3">
