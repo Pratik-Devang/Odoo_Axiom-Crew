@@ -1,0 +1,1339 @@
+
+=======================================================
+### Flow 0: Login & User Access Flow (Total items: 65)
+=======================================================
+[495,-1055 | sz:22pt] 0) Login & User Access Flow
+[529,-1055 | sz:12pt] Administrators create user accounts and assign access. Employees use Login to enter the HR and Payroll application.
+[597,-1030 | sz:18pt] HR Portal
+[598,-254 | sz:18pt] User Management
+[605,-84 | sz:10pt] ADMIN ONLY
+[659,-1029 | sz:24pt] Welcome back
+[675,-298 | sz:13pt] +  New User
+[676,-142 | sz:12pt] Search users, employees or email…
+[676,288 | sz:12pt] Role Filter
+[684,437 | sz:16pt] Open on New User
+[693,-1029 | sz:12pt] Sign in to continue to your workspace.
+[736,-286 | sz:11pt] User
+[736,-154 | sz:11pt] Employee
+[736,-22 | sz:11pt] Work Email
+[736,155 | sz:11pt] Role
+[736,302 | sz:11pt] Status
+[740,446 | sz:16pt] Create / Edit User
+[741,-1029 | sz:11pt] Work Email
+[771,444 | sz:10pt] Employee *
+[772,993 | sz:15pt] LOGIN / USER ACCESS NOTE
+[774,-1015 | sz:12pt] name@company.com
+[784,-286 | sz:10pt] Aarav Mehta
+[784,-154 | sz:10pt] Aarav Mehta
+[784,-22 | sz:10pt] aarav@company.com
+[784,155 | sz:10pt] Payroll User
+[786,302 | sz:10pt] Active
+[799,456 | sz:10pt] Select employee
+[808,984 | sz:16pt] • In the ERP flow. User accounts are created by an Admin.
+• When creating a user, link the account to the relevant employee and assign one or more roles.
+• Roles control which modules, records and actions become available after login.
+• Users must not be able to assign or elevate their own roles.
+• Password reset, invitations, SSO, etc. can be added as enhancements.
+[816,-1029 | sz:11pt] Password
+[836,444 | sz:10pt] Work Email *
+[842,-286 | sz:10pt] Maya Shah
+[842,-154 | sz:10pt] Maya Shah
+[842,-22 | sz:10pt] maya@company.com
+[842,155 | sz:10pt] Time Off Admin
+[844,302 | sz:10pt] Active
+[849,-1015 | sz:12pt] ••••••••••
+[853,-424 | sz:10pt] User can
+now log in
+[864,456 | sz:10pt] employee@company.com
+[884,-575 | sz:11pt] Forgot password?
+[900,-286 | sz:10pt] Rohan Patel
+[900,-154 | sz:10pt] Rohan Patel
+[900,-22 | sz:10pt] rohan@company.com
+[900,155 | sz:10pt] Time Off User
+[901,444 | sz:10pt] Roles *
+[902,302 | sz:10pt] Active
+[924,468 | sz:10pt] Employee
+[931,-1029 | sz:13pt] Sign In
+[954,468 | sz:10pt] Hr Manager
+[958,-286 | sz:10pt] Nisha Rao
+[958,-154 | sz:10pt] Nisha Rao
+[958,-22 | sz:10pt] nisha@company.com
+[958,155 | sz:10pt] Payroll Admin
+[960,302 | sz:10pt] Active
+[984,468 | sz:10pt] Hr Payroll User
+[1007,471 | sz:10pt] Hr Payroll Admin
+[1012,-298 | sz:10pt] Select a user to edit access, or create a new user.
+[1016,-1029 | sz:12pt] Accounts are created by an administrator.
+[1026,471 | sz:10pt] Admin
+[1050,444 | sz:10pt] Account Status
+[1051,600 | sz:10pt] Active
+[1082,-1029 | sz:11pt] After sign-in, show only the modules and actions allowed by the user’s assigned role.
+[1099,444 | sz:12pt] Create User / Save Access
+[1142,-298 | sz:10pt] User accounts are separate from Employee records, but should be linked to an employee for access and ownership.
+[1222,-735 | sz:11pt] Successful sign in
+[1339,-1029 | sz:30pt] Odoo HR Payroll Hackathon — Functional Screen Flow
+
+=======================================================
+### Flow 1: Employee & Contract Flow (Total items: 6)
+=======================================================
+[1443,-1029 | sz:20pt] 1) Employee & Contract Flow
+[1483,-1028 | sz:12pt] Use arrows as navigation flow: user reaches Employee screens, opens a record, then accesses related Contract records.
+[1568,-920 | sz:13pt] Menus under Employees
+[1612,-887 | sz:11pt] Employees
+[1647,-890 | sz:14pt] contracts
+[1683,-896 | sz:14pt] departments
+
+=======================================================
+### Flow 1.1: Working Schedule (Total items: 265)
+=======================================================
+[1717,-908 | sz:13pt] Working Schedule
+[1831,2853 | sz:26pt] Working Schedule — List & Form Views
+[1857,-1023 | sz:13pt] Employees ▼
+[1857,-915 | sz:13pt] Contracts ▼
+[1857,-807 | sz:13pt] Attendance
+[1857,-707 | sz:13pt] Time Off ▼
+[1857,-607 | sz:13pt] Payroll
+[1857,-249 | sz:13pt] Employees ▼
+[1857,-141 | sz:13pt] Contracts ▼
+[1857,-33 | sz:13pt] Attendance
+[1857,67 | sz:13pt] Time Off ▼
+[1857,167 | sz:13pt] Payroll
+[1857,525 | sz:13pt] Employees ▼
+[1857,633 | sz:13pt] Contracts ▼
+[1857,741 | sz:13pt] Attendance
+[1857,841 | sz:13pt] Time Off ▼
+[1857,941 | sz:13pt] Payroll
+[1859,-1059 | sz:12pt] HR
+[1859,-285 | sz:12pt] HR
+[1859,489 | sz:12pt] HR
+[1884,3836 | sz:20pt] 40 Hours / Week
+[1885,2994 | sz:20pt] Working Schedules
+[1886,2870 | sz:12pt] +  New Schedule
+[1887,3710 | sz:12pt] ←  Back to list
+[1902,-1055 | sz:22pt] Employees
+[1902,-281 | sz:22pt] Employees
+[1902,493 | sz:22pt] Employee / Aarav Mehta
+[1934,-1055 | sz:12pt] Default view: Kanban
+[1934,-281 | sz:12pt] List view for sort, filter and bulk scanning
+[1934,493 | sz:12pt] Main employee form with related HR actions
+[1944,2863 | sz:13pt] List
+[1944,2932 | sz:13pt] Calendar
+[1953,1357 | sz:28pt] Employee & Contract
+
+- Employees should be viewable in both Kanban and List views.
+- Opening an employee should show their HR details and related records such as Contracts,
+Attendance, Time Off, and Allocations.
+- An employee can have multiple contracts over time.
+- Payroll should use the contract applicable to the selected payroll period.
+
+Working Schedule
+- Working Schedules need List and Form views. Clicking a row should open that schedule.
+- List should surface name, calendar type, days/week, hours/week, company and status.
+- Form defines the weekly pattern: day, start/end time, optional break and hours. Weekly
+hours should be derived from the schedule.
+- A schedule can be assigned to an Employee/Contract and used by Attendance and Payroll.
+Shift, flexible-time and other rules are open to the participant.
+[1956,3714 | sz:11pt] Schedule Name
+[1956,4106 | sz:11pt] Company
+[1970,845 | sz:11pt] Time Off 3
+[1971,953 | sz:11pt] Contracts 2
+[1971,1061 | sz:11pt] Attendance 14
+[1975,-1034 | sz:11pt] NEW
+[1975,-973 | sz:11pt] Search employees…
+[1975,-511 | sz:11pt] Kanban
+[1975,-420 | sz:11pt] List
+[1975,-260 | sz:11pt] NEW
+[1975,-199 | sz:11pt] Search employees…
+[1975,265 | sz:11pt] Kanban
+[1975,353 | sz:11pt] List
+[1975,510 | sz:11pt] EDIT
+[1986,3726 | sz:12pt] 40 Hours / Week
+[1986,4118 | sz:12pt] My Company
+[1998,2877 | sz:12pt] Search schedules…
+[1998,3339 | sz:12pt] Filter
+[1998,3437 | sz:12pt] Columns
+[2028,581 | sz:20pt] Aarav Mehta
+[2030,-273 | sz:10pt] Employee
+[2030,-108 | sz:10pt] Work Email
+[2030,62 | sz:10pt] Job Position
+[2030,197 | sz:10pt] Department
+[2030,312 | sz:10pt] Status
+[2036,-985 | sz:14pt] Aarav Mehta
+[2036,-643 | sz:14pt] Sara Khan
+[2040,3714 | sz:11pt] Days per Week
+[2040,3906 | sz:11pt] Hours per Week
+[2040,4106 | sz:11pt] Timezone
+[2045,-1033 | sz:13pt] AM
+[2045,-691 | sz:13pt] SK
+[2052,515 | sz:16pt] AM
+[2058,-985 | sz:11pt] Payroll Specialist
+[2058,-643 | sz:11pt] HR Officer
+[2060,581 | sz:12pt] Payroll Specialist • Finance
+[2067,-273 | sz:10pt] Aarav Mehta
+[2067,-108 | sz:10pt] aarav@oxp.com
+[2067,62 | sz:10pt] Payroll Specialist
+[2067,197 | sz:10pt] Finance
+[2067,312 | sz:10pt] Active
+[2067,2882 | sz:11pt] Schedule Name
+[2067,3187 | sz:11pt] Days / Week
+[2067,3281 | sz:11pt] Hours / Week
+[2067,3382 | sz:11pt] Company
+[2067,3522 | sz:11pt] Status
+[2070,3726 | sz:12pt] 5
+[2070,3918 | sz:12pt] 40h
+[2070,4118 | sz:12pt] Company timezone
+[2082,581 | sz:11pt] aarav@oxp.com | +91 98765 43210
+[2092,-1041 | sz:11pt] Finance
+[2092,-699 | sz:11pt] HR
+[2109,-273 | sz:10pt] Sara Khan
+[2109,-108 | sz:10pt] sara@oxp.com
+[2109,62 | sz:10pt] HR Officer
+[2109,197 | sz:10pt] HR
+[2109,312 | sz:10pt] Active
+[2110,-1041 | sz:11pt] ● Active
+[2110,-699 | sz:11pt] ● Active
+[2122,493 | sz:11pt] Work Information
+[2122,663 | sz:11pt] Private Information
+[2125,2882 | sz:12pt] 40 Hours / Week
+[2125,3197 | sz:12pt] 5
+[2125,3291 | sz:12pt] 40h
+[2125,3382 | sz:12pt] My Company
+[2126,3531 | sz:11pt] Active
+[2128,3714 | sz:17pt] Weekly Schedule
+[2128,4688 | sz:12pt] +  Add Day
+[2151,-273 | sz:10pt] John Dsouza
+[2151,-108 | sz:10pt] john@oxp.com
+[2151,62 | sz:10pt] Developer
+[2151,197 | sz:10pt] Engineering
+[2151,312 | sz:10pt] Active
+[2168,493 | sz:10pt] Department
+[2168,829 | sz:10pt] Job Position
+[2172,617 | sz:10pt] Finance
+[2172,953 | sz:10pt] Payroll Specialist
+[2184,3764 | sz:11pt] Day
+[2184,3964 | sz:11pt] Start Time
+[2184,4124 | sz:11pt] End Time
+[2184,4284 | sz:11pt] Break
+[2184,4434 | sz:11pt] Hours
+[2191,3607 | sz:12pt] Open schedule
+[2192,-985 | sz:14pt] John Dsouza
+[2192,-643 | sz:14pt] Neha Patel
+[2193,-273 | sz:10pt] Neha Patel
+[2193,-108 | sz:10pt] neha@oxp.com
+[2193,62 | sz:10pt] Recruiter
+[2193,197 | sz:10pt] HR
+[2193,312 | sz:10pt] Active
+[2197,2882 | sz:12pt] Night Shift
+[2197,3197 | sz:12pt] 5
+[2197,3291 | sz:12pt] 40h
+[2197,3382 | sz:12pt] My Company
+[2198,3531 | sz:11pt] Active
+[2201,-1033 | sz:13pt] JD
+[2201,-691 | sz:13pt] NP
+[2208,493 | sz:10pt] Manager
+[2208,829 | sz:10pt] Work Location
+[2212,617 | sz:10pt] Sara Khan
+[2212,953 | sz:10pt] Mumbai
+[2214,-985 | sz:11pt] Developer
+[2214,-643 | sz:11pt] Recruiter
+[2225,2743 | sz:12pt] Working Schedule
+[2229,4669 | sz:15pt] ×
+[2230,3764 | sz:12pt] Monday
+[2230,4439 | sz:12pt] 8h
+[2232,3958 | sz:11pt] 9:00 AM
+[2232,4118 | sz:11pt] 6:00 PM
+[2232,4278 | sz:11pt] 1h
+[2248,-1041 | sz:11pt] Engineering
+[2248,-699 | sz:11pt] HR
+[2248,493 | sz:10pt] Working Schedule
+[2248,829 | sz:10pt] Status
+[2252,617 | sz:10pt] 40 Hours / Week
+[2252,953 | sz:10pt] Active
+[2266,-1041 | sz:11pt] ● Active
+[2266,-699 | sz:11pt] ● Active
+[2269,2882 | sz:12pt] Retail Weekend
+[2269,3197 | sz:12pt] 5
+[2269,3291 | sz:12pt] 40h
+[2269,3382 | sz:12pt] My Company
+[2270,3531 | sz:11pt] Active
+[2283,4669 | sz:15pt] ×
+[2284,3764 | sz:12pt] Tuesday
+[2284,4439 | sz:12pt] 8h
+[2286,3958 | sz:11pt] 9:00 AM
+[2286,4118 | sz:11pt] 6:00 PM
+[2286,4278 | sz:11pt] 1h
+[2288,493 | sz:10pt] Company
+[2288,829 | sz:10pt] Work Email
+[2292,617 | sz:10pt] OXP Pvt Ltd
+[2292,953 | sz:10pt] aarav@oxp.com
+[2337,4669 | sz:15pt] ×
+[2338,3764 | sz:12pt] Wednesday
+[2338,4439 | sz:12pt] 8h
+[2340,3958 | sz:11pt] 9:00 AM
+[2340,4118 | sz:11pt] 6:00 PM
+[2340,4278 | sz:11pt] 1h
+[2341,2882 | sz:12pt] Flexible Hybrid
+[2341,3197 | sz:12pt] 5
+[2341,3291 | sz:12pt] 37.5h
+[2341,3382 | sz:12pt] My Company
+[2342,3531 | sz:11pt] Active
+[2360,-1055 | sz:12pt] Useful note: Kanban is good for browsing; clicking a card should open the same Employee Form used everywhere else.
+[2360,-281 | sz:12pt] Useful note: the list view is the main entry point for opening a specific employee record quickly.
+[2368,476 | sz:12pt] Useful note: smart buttons should open related Contracts, Attendance and Time Off records filtered for the current employee.
+[2391,4669 | sz:15pt] ×
+[2392,3764 | sz:12pt] Thursday
+[2392,4439 | sz:12pt] 8h
+[2394,3958 | sz:11pt] 9:00 AM
+[2394,4118 | sz:11pt] 6:00 PM
+[2394,4278 | sz:11pt] 1h
+[2413,2882 | sz:12pt] Part-time 20h
+[2413,3197 | sz:12pt] 4
+[2413,3291 | sz:12pt] 20h
+[2413,3382 | sz:12pt] My Company
+[2414,3531 | sz:11pt] Inactive
+[2445,4669 | sz:15pt] ×
+[2446,3764 | sz:12pt] Friday
+[2446,4439 | sz:12pt] 8h
+[2448,3958 | sz:11pt] 9:00 AM
+[2448,4118 | sz:11pt] 6:00 PM
+[2448,4278 | sz:11pt] 1h
+[2450,-55 | sz:11pt] Open related contracts
+[2493,-249 | sz:13pt] Employees ▼
+[2493,-141 | sz:13pt] Contracts ▼
+[2493,-33 | sz:13pt] Attendance
+[2493,67 | sz:13pt] Time Off ▼
+[2493,167 | sz:13pt] Payroll
+[2493,525 | sz:13pt] Employees ▼
+[2493,633 | sz:13pt] Contracts ▼
+[2493,741 | sz:13pt] Attendance
+[2493,841 | sz:13pt] Time Off ▼
+[2493,941 | sz:13pt] Payroll
+[2495,-285 | sz:12pt] HR
+[2495,489 | sz:12pt] HR
+[2504,4434 | sz:12pt] Total Weekly Hours:
+[2504,4629 | sz:13pt] 40h
+[2538,-281 | sz:22pt] Contracts
+[2538,493 | sz:22pt] Contract / CON/2026/0042
+[2570,-281 | sz:12pt] List view of employee contracts
+[2570,493 | sz:12pt] Form view of one contract
+[2584,3714 | sz:11pt] Use this schedule as the employee/contract working pattern.
+[2584,2867 | sz:11pt] Select a schedule to open its Form view
+[2611,-260 | sz:11pt] NEW
+[2612,-195 | sz:11pt] Search contracts…
+[2648,493 | sz:10pt] Employee
+[2648,829 | sz:10pt] Department
+[2652,617 | sz:10pt] Aarav Mehta
+[2652,953 | sz:10pt] Finance
+[2666,-273 | sz:10pt] Contract
+[2666,-143 | sz:10pt] Employee
+[2666,2 | sz:10pt] Start
+[2666,87 | sz:10pt] End
+[2666,172 | sz:10pt] Wage / Month
+[2666,284 | sz:10pt] Status
+[2670,2867 | sz:15pt] WORKING SCHEDULE NOTE
+• Required views: List and Form. The List is for finding/opening schedules; the Form defines one schedule.
+• A schedule should capture the weekly working pattern (days, working time and total weekly hours). Breaks or variable shifts can be handled in your own way.
+• Employee/Contract can reference a Working Schedule. Attendance and Payroll may use it as the expected working time.
+[2688,493 | sz:10pt] Start Date
+[2688,829 | sz:10pt] Job Position
+[2692,617 | sz:10pt] 01-Jan-2026
+[2692,953 | sz:10pt] Payroll Specialist
+[2706,-273 | sz:10pt] CON/2026/0042
+[2706,-143 | sz:10pt] Aarav Mehta
+[2706,2 | sz:10pt] 01-Jan-26
+[2706,87 | sz:10pt] —
+[2706,172 | sz:10pt] ₹85,000
+[2706,284 | sz:10pt] Running
+[2728,493 | sz:10pt] End Date
+[2728,829 | sz:10pt] Wage / Month
+[2732,617 | sz:10pt] —
+[2732,953 | sz:10pt] ₹85,000
+[2754,-273 | sz:10pt] CON/2025/0018
+[2754,-143 | sz:10pt] Aarav Mehta
+[2754,2 | sz:10pt] 01-Jul-25
+[2754,87 | sz:10pt] 31-Dec-25
+[2754,172 | sz:10pt] ₹78,000
+[2754,284 | sz:10pt] Expired
+[2768,493 | sz:10pt] Status
+[2768,829 | sz:10pt] Working Schedule
+[2772,617 | sz:10pt] Running
+[2772,953 | sz:10pt] 40 Hours / Week
+[2802,-273 | sz:10pt] CON/2026/0031
+[2802,-143 | sz:10pt] Sara Khan
+[2802,2 | sz:10pt] 01-Jan-26
+[2802,87 | sz:10pt] —
+[2802,172 | sz:10pt] ₹95,000
+[2802,284 | sz:10pt] Running
+[2836,505 | sz:11pt] Salary Structure / Notes
+[2862,505 | sz:11pt] Structure Type: Employee Salary
+This running contract is the source for payroll calculation in the active period.
+[2948,-281 | sz:12pt] Useful note: retain contract history, but make the active Running contract obvious because payroll depends on it.
+[2948,493 | sz:12pt] Useful note: for the problem statement, one employee should not have multiple Running contracts for the same period.
+
+=======================================================
+### Flow 2: Attendance Flow (Total items: 85)
+=======================================================
+[3323,-782 | sz:20pt] 2) Attendance Flow
+[3345,-782 | sz:12pt] Attendance records can be opened from the Attendance menu or from the Employee Form smart button.
+[3417,1299 | sz:18pt] Attendance Widget
+[3421,1777 | sz:14pt] ⏱
+[3426,-732 | sz:13pt] Employees ▼
+[3426,-624 | sz:13pt] Contracts ▼
+[3426,-516 | sz:13pt] Attendance
+[3426,-416 | sz:13pt] Time Off ▼
+[3426,-316 | sz:13pt] Payroll
+[3426,202 | sz:13pt] Employees ▼
+[3426,310 | sz:13pt] Contracts ▼
+[3426,418 | sz:13pt] Attendance
+[3426,518 | sz:13pt] Time Off ▼
+[3426,618 | sz:13pt] Payroll
+[3428,-768 | sz:12pt] HR
+[3428,166 | sz:12pt] HR
+[3471,-764 | sz:22pt] Attendance
+[3471,170 | sz:22pt] Attendance / Aarav Mehta / 02-Sep-2026
+[3477,1309 | sz:14pt] Welcome back
+[3503,-764 | sz:12pt] List view of employee attendance records
+[3503,170 | sz:12pt] Form view of one attendance record
+[3511,1309 | sz:24pt] User Name!
+[3541,1898 | sz:16pt] i
+[3544,-743 | sz:11pt] NEW
+[3544,-682 | sz:11pt] Search attendance…
+[3544,-388 | sz:11pt] Today
+[3544,-296 | sz:11pt] Employee: Aarav
+[3544,187 | sz:11pt] EDIT
+[3546,1902 | sz:16pt] Clicking the attendance icon
+opens the Check In / Check Out
+popup.
+[3578,2365 | sz:28pt] Attendances: 
+
+- Attendance can be accessed globally or from an individual employee.
+- Store check-in, check-out, worked hours, and attendance status.
+- When opened from an employee, only that employee’s attendance should be shown.
+- Attendance data should be usable later for reporting/dashboard insights.
+[3581,170 | sz:10pt] Employee
+[3581,566 | sz:10pt] Department
+[3585,294 | sz:10pt] Aarav Mehta
+[3585,690 | sz:10pt] Finance
+[3593,1309 | sz:18pt] 9:48 AM
+[3593,1443 | sz:18pt] —  Now
+[3593,1713 | sz:18pt] 6h56
+[3599,-756 | sz:10pt] Employee
+[3599,-576 | sz:10pt] Check In
+[3599,-416 | sz:10pt] Check Out
+[3599,-256 | sz:10pt] Worked Hours
+[3599,-136 | sz:10pt] Status
+[3621,170 | sz:10pt] Check In
+[3621,566 | sz:10pt] Manager
+[3625,294 | sz:10pt] 02-Sep-2026 09:05
+[3625,690 | sz:10pt] Sara Khan
+[3637,-756 | sz:10pt] Aarav Mehta
+[3637,-576 | sz:10pt] 09:05
+[3637,-416 | sz:10pt] 18:10
+[3637,-256 | sz:10pt] 9.08
+[3637,-136 | sz:10pt] Present
+[3655,1309 | sz:18pt] Today
+[3655,1713 | sz:18pt] 6h56
+[3661,170 | sz:10pt] Check Out
+[3661,566 | sz:10pt] Status
+[3665,294 | sz:10pt] 02-Sep-2026 18:10
+[3665,690 | sz:10pt] Present
+[3681,-756 | sz:10pt] Sara Khan
+[3681,-576 | sz:10pt] 09:15
+[3681,-416 | sz:10pt] 18:02
+[3681,-256 | sz:10pt] 8.78
+[3681,-136 | sz:10pt] Present
+[3683,144 | sz:11pt] Open selected attendance record
+[3701,170 | sz:10pt] Worked Hours
+[3701,566 | sz:10pt] Overtime
+[3705,294 | sz:10pt] 9.08
+[3705,690 | sz:10pt] 0.50 hrs
+[3717,1487 | sz:20pt] Check Out
+[3725,-756 | sz:10pt] John Dsouza
+[3725,-576 | sz:10pt] 09:32
+[3725,-416 | sz:10pt] 17:58
+[3725,-256 | sz:10pt] 8.43
+[3725,-136 | sz:10pt] Present
+[3767,1309 | sz:12pt] Employees can mark attendance from the quick widget and review records from the Attendance module.
+[3769,-756 | sz:10pt] Neha Patel
+[3769,-576 | sz:10pt] —
+[3769,-416 | sz:10pt] —
+[3769,-256 | sz:10pt] 0.00
+[3769,-136 | sz:10pt] Absent
+[3773,182 | sz:11pt] Notes
+[3797,182 | sz:11pt] System-generated from check in/out or manually corrected by an authorized user.
+[3836,1319 | sz:14pt] ATTENDANCE QUICK ACTION NOTE
+[3867,-764 | sz:12pt] Useful note: list view should help users review raw check-in / check-out data and identify missing punches quickly.
+[3867,170 | sz:12pt] Useful note: worked hours and overtime should be easy to read because they may later influence payroll or reporting.
+[3870,1319 | sz:13pt] • Clicking the red attendance icon should open a popup.
+• If there is no active session, show Check In.
+• If the user is already checked in, show Check Out.
+• The popup should display elapsed time till now.
+• After successful Check In, the status indicator changes to green.
+
+=======================================================
+### Flow 3: Time Off Flow (Requests, Allocations, Types) (Total items: 205)
+=======================================================
+[4095,-785 | sz:20pt] 3) Time Off Flow
+[4117,-785 | sz:12pt] Requests, Allocations and Time Off Types must be reached from Time Off ▼ in the navbar. Do not add separate page buttons for them.
+[4174,227 | sz:28pt] Time Off:
+
+- Requests should support a simple approval flow.
+- For leave types that require allocation, approved leave should reduce the
+employee’s available balance.
+- Time Off Types should define how each leave type behaves. The exact
+policies and validations are open to interpretation.
+[4192,-646 | sz:17pt] Menus under Time Off
+[4250,-602 | sz:15pt] Dashboard
+[4294,-597 | sz:15pt] Time offs
+[4334,-622 | sz:16pt] Time off Types
+[4377,-601 | sz:16pt] Allocations
+[4561,664 | sz:13pt] Employees ▼
+[4561,772 | sz:13pt] Contracts ▼
+[4561,880 | sz:13pt] Attendance
+[4561,980 | sz:13pt] Time Off ▼
+[4561,1080 | sz:13pt] Payroll
+[4563,628 | sz:12pt] HR
+[4567,-127 | sz:13pt] Employees ▼
+[4567,-19 | sz:13pt] Contracts ▼
+[4567,89 | sz:13pt] Attendance
+[4567,189 | sz:13pt] Time Off ▼
+[4567,289 | sz:13pt] Payroll
+[4569,-163 | sz:12pt] HR
+[4576,-961 | sz:13pt] Employees ▼
+[4576,-856 | sz:13pt] Contracts ▼
+[4576,-751 | sz:13pt] Attendance
+[4576,-654 | sz:13pt] Time Off ▼
+[4576,-557 | sz:13pt] Payroll
+[4576,1476 | sz:13pt] Employees ▼
+[4576,1584 | sz:13pt] Contracts ▼
+[4576,1692 | sz:13pt] Attendance
+[4576,1792 | sz:13pt] Time Off ▼
+[4576,1892 | sz:13pt] Payroll
+[4578,-996 | sz:12pt] HR
+[4578,1440 | sz:12pt] HR
+[4606,632 | sz:22pt] Allocations
+[4612,-159 | sz:22pt] Time Off Request / Aarav Mehta
+[4619,-992 | sz:21pt] Time Off Requests
+[4621,1444 | sz:22pt] Allocation / Aarav Mehta
+[4638,632 | sz:12pt] List view opened from Time Off ▼ → Allocations
+[4644,-159 | sz:12pt] Form view of one request
+[4651,-992 | sz:12pt] List view opened from Time Off ▼ → Requests
+[4653,1444 | sz:12pt] Form view of one allocation record
+[4679,653 | sz:11pt] NEW
+[4679,714 | sz:11pt] Search allocations…
+[4681,-143 | sz:11pt] Approve
+[4682,-78 | sz:11pt] Refuse
+[4690,-972 | sz:11pt] NEW
+[4690,-913 | sz:11pt] Search requests…
+[4690,-689 | sz:11pt] My Team
+[4694,1457 | sz:11pt] Approve
+[4694,1461 | sz:11pt] EDIT
+[4695,1525 | sz:11pt] Refuse
+[4722,-159 | sz:10pt] Employee
+[4722,147 | sz:10pt] Duration
+[4726,-35 | sz:10pt] Aarav Mehta
+[4726,271 | sz:10pt] 3 Days
+[4731,1444 | sz:10pt] Employee
+[4731,1750 | sz:10pt] Taken
+[4734,640 | sz:10pt] Employee
+[4734,790 | sz:10pt] Type
+[4734,910 | sz:10pt] Allocated
+[4734,1000 | sz:10pt] Taken
+[4734,1080 | sz:10pt] Remaining
+[4734,1170 | sz:10pt] Status
+[4735,1568 | sz:10pt] Aarav Mehta
+[4735,1874 | sz:10pt] 8 Days
+[4744,-985 | sz:10pt] Employee
+[4744,-849 | sz:10pt] Type
+[4744,-742 | sz:10pt] Start
+[4744,-658 | sz:10pt] End
+[4744,-574 | sz:10pt] Duration
+[4744,-487 | sz:10pt] Status
+[4762,-159 | sz:10pt] Time Off Type
+[4762,147 | sz:10pt] Status
+[4766,-35 | sz:10pt] Paid Time Off
+[4766,271 | sz:10pt] Approved
+[4767,1288 | sz:16pt] open allocation
+[4771,1444 | sz:10pt] Time Off Type
+[4771,1750 | sz:10pt] Remaining
+[4772,640 | sz:10pt] Aarav Mehta
+[4772,790 | sz:10pt] Paid Time Off
+[4772,910 | sz:10pt] 20 days
+[4772,1000 | sz:10pt] 8 days
+[4772,1080 | sz:10pt] 12 days
+[4772,1170 | sz:10pt] Approved
+[4775,1568 | sz:10pt] Paid Time Off
+[4775,1874 | sz:10pt] 12 Days
+[4781,-985 | sz:10pt] Aarav Mehta
+[4781,-849 | sz:10pt] Paid Time Off
+[4781,-742 | sz:10pt] 12-Sep
+[4781,-658 | sz:10pt] 14-Sep
+[4781,-574 | sz:10pt] 3 Days
+[4781,-487 | sz:10pt] Approved
+[4783,-406 | sz:6pt] Approve
+[4784,-372 | sz:6pt] Refuse
+[4802,-159 | sz:10pt] Start Date
+[4802,147 | sz:10pt] Approver
+[4806,-35 | sz:10pt] 12-Sep-2026
+[4806,271 | sz:10pt] Sara Khan
+[4811,1444 | sz:10pt] Allocated
+[4811,1750 | sz:10pt] Approver
+[4815,1568 | sz:10pt] 20 Days
+[4815,1874 | sz:10pt] Sara Khan
+[4816,640 | sz:10pt] Sara Khan
+[4816,790 | sz:10pt] Paid Time Off
+[4816,910 | sz:10pt] 18 days
+[4816,1000 | sz:10pt] 4 days
+[4816,1080 | sz:10pt] 14 days
+[4816,1170 | sz:10pt] Approved
+[4824,-985 | sz:10pt] Sara Khan
+[4824,-849 | sz:10pt] Sick Leave
+[4824,-742 | sz:10pt] 18-Sep
+[4824,-658 | sz:10pt] 18-Sep
+[4824,-574 | sz:10pt] 1 Day
+[4824,-487 | sz:10pt] Approved
+[4825,-406 | sz:6pt] Approve
+[4825,-370 | sz:6pt] Refuse
+[4842,-159 | sz:10pt] End Date
+[4842,147 | sz:10pt] Allocation Used
+[4843,-298 | sz:16pt] Open time off
+[4846,-35 | sz:10pt] 14-Sep-2026
+[4846,271 | sz:10pt] Paid Time Off 2026
+[4851,1444 | sz:10pt] Status
+[4851,1750 | sz:10pt] Validity
+[4855,1568 | sz:10pt] Approved
+[4855,1874 | sz:10pt] 2026 Annual Balance
+[4860,640 | sz:10pt] Neha Patel
+[4860,790 | sz:10pt] Comp Off
+[4860,910 | sz:10pt] 2 days
+[4860,1000 | sz:10pt] 1 day
+[4860,1080 | sz:10pt] 1 day
+[4860,1170 | sz:10pt] To Approve
+[4866,-985 | sz:10pt] John Dsouza
+[4866,-849 | sz:10pt] Comp Off
+[4866,-742 | sz:10pt] 27-Sep
+[4866,-658 | sz:10pt] 27-Sep
+[4866,-574 | sz:10pt] 1 Day
+[4866,-487 | sz:10pt] To Approve
+[4868,-403 | sz:6pt] Approve
+[4869,-367 | sz:6pt] Refuse
+[4912,-147 | sz:11pt] Reason
+[4921,1456 | sz:11pt] Description
+[4938,-147 | sz:11pt] Family vacation
+[4947,1456 | sz:11pt] Annual leave balance granted at start of policy year.
+[4966,632 | sz:12pt] Useful note: the list should expose the balance math at a glance — Allocated, Taken and Remaining.
+[4969,-992 | sz:11pt] Useful note: request status should show the approval lifecycle clearly.
+[4987,-159 | sz:9pt] Useful note: if the selected type requires allocation, the request should clearly show which balance was consumed.
+[4988,1444 | sz:12pt] Useful note: approved allocation is what creates available leave balance for the employee.
+[5018,853 | sz:11pt] Open selected allocation
+[5141,31 | sz:13pt] Employees ▼
+[5141,139 | sz:13pt] Contracts ▼
+[5141,247 | sz:13pt] Attendance
+[5141,347 | sz:13pt] Time Off ▼
+[5141,447 | sz:13pt] Payroll
+[5143,-5 | sz:12pt] HR
+[5149,770 | sz:13pt] Employees ▼
+[5149,878 | sz:13pt] Contracts ▼
+[5149,986 | sz:13pt] Attendance
+[5149,1086 | sz:13pt] Time Off ▼
+[5149,1186 | sz:13pt] Payroll
+[5151,734 | sz:12pt] HR
+[5186,-1 | sz:22pt] Time Off Types
+[5194,738 | sz:22pt] Time Off Type / Paid Time Off
+[5218,-1 | sz:12pt] List view opened from Time Off ▼ → Time Off Types
+[5226,738 | sz:12pt] Form view of one time off type
+[5259,20 | sz:11pt] NEW
+[5259,81 | sz:11pt] Search time off types…
+[5267,755 | sz:11pt] EDIT
+[5304,738 | sz:10pt] Type Name
+[5304,1044 | sz:10pt] Approval
+[5308,862 | sz:10pt] Paid Time Off
+[5308,1168 | sz:10pt] Manager
+[5314,7 | sz:10pt] Type
+[5314,177 | sz:10pt] Unit
+[5314,267 | sz:10pt] Allocation
+[5314,377 | sz:10pt] Approval
+[5314,487 | sz:10pt] Status
+[5344,738 | sz:10pt] Unit
+[5344,1044 | sz:10pt] Payroll / Work Entry
+[5348,862 | sz:10pt] Days
+[5348,1168 | sz:10pt] Leave Work Entry
+[5348,609 | sz:9pt] Open selected type
+[5352,7 | sz:10pt] Paid Time Off
+[5352,177 | sz:10pt] Days
+[5352,267 | sz:10pt] Required
+[5352,377 | sz:10pt] Manager
+[5352,487 | sz:10pt] Active
+[5384,738 | sz:10pt] Requires Allocation
+[5384,1044 | sz:10pt] Display Color
+[5388,862 | sz:10pt] Yes
+[5388,1168 | sz:10pt] Blue
+[5396,7 | sz:10pt] Sick Leave
+[5396,177 | sz:10pt] Days
+[5396,267 | sz:10pt] No
+[5396,377 | sz:10pt] Manager
+[5396,487 | sz:10pt] Active
+[5424,738 | sz:10pt] Active
+[5428,862 | sz:10pt] True
+[5440,7 | sz:10pt] Comp Off
+[5440,177 | sz:10pt] Hours
+[5440,267 | sz:10pt] Required
+[5440,377 | sz:10pt] Officer
+[5440,487 | sz:10pt] Active
+[5494,750 | sz:11pt] Configuration Notes
+[5520,750 | sz:11pt] Standard annual leave. Balance comes from approved allocations.
+[5546,-1 | sz:12pt] Useful note: this list defines policy rules, not employee transactions.
+[5554,738 | sz:12pt] Useful note: Time Off Type drives approval behavior and whether a request needs an allocation.
+
+=======================================================
+### Flow 4: Payroll (Payrun & Payslips, 2-Step Wizard) (Total items: 255)
+=======================================================
+[5722,-763 | sz:36pt] 4) Payroll — Payrun & Payslips
+[5903,-313 | sz:24pt] Menus under Payroll
+[5940,2615 | sz:28pt] Payrun Creation:
+
+Creating a Payrun happens in two steps:
+
+- Select the payroll scope, such as employee type, salary structure, and period.
+- Select the employees to include.
+- Continue only moves to employee selection. A Payrun is created only after clicking “Create
+Payrun”.
+Only the selected employees should be included in that Payrun.
+
+
+Payruns & Payslips:
+
+A Payrun represents payroll processing for a particular period.
+Each selected employee should have a Payslip linked to the Payrun.
+Computing payroll should use the employee’s applicable contract and selected salary structure.
+Payslips should show understandable components such as Basic, Allowances, Deductions, Gross,
+and Net Salary.
+Payroll issues, such as missing required information or duplicate payslips, should be visible to the
+user.
+
+
+Payroll Workflow:
+
+The intended flow is broadly:
+
+Draft → Compute → Validate → Mark Paid
+
+Paid/finalised payroll should remain available as historical data.
+
+
+Salary Structures & Salary Rules:
+
+A Salary Structure contains the rules used to calculate salary.
+Salary Rules can represent Basic Salary, Allowances, Deductions, Gross, Net, etc.
+Rules should be processed according to their sequence.
+Different calculation methods may be supported, such as fixed amounts, percentages, or formulas.
+
+Participants are free to design the calculation engine as long as salary rules actually drive Payslip
+calculations.
+
+
+Payslip PDF:
+
+Users should be able to generate/print a Payslip showing the employee’s payroll calculation for
+that period.
+Sending Payslips can also be supported from the Payrun.
+
+
+Payroll Dashboard:
+
+The dashboard should use actual data created through the HR and Payroll flows rather than
+hardcoded values.
+
+It should provide useful payroll/HR insights such as:
+
+Salary totals
+Payslip status
+Salary by department
+Salary trends
+Attendance overview
+Time Off overview
+Payroll warnings or items requiring attention
+
+Filters such as Period, Department, Employee Type, or Company should affect the relevant
+dashboard data.
+[5986,-251 | sz:21pt] Dashboard
+[6048,-244 | sz:21pt] Payruns
+[6103,-248 | sz:21pt] Payslips
+[6169,-253 | sz:21pt] Structures
+[6230,-247 | sz:21pt] Rules
+[6311,770 | sz:24pt] The Payrun is created only after employee selection.
+[6368,1545 | sz:26pt] ×
+[6370,430 | sz:24pt] Select Employee Records
+[6434,822 | sz:16pt] Search employees...
+[6436,1362 | sz:16pt] 1–22 / 22
+[6464,-640 | sz:24pt] New Pay Run
+[6471,9 | sz:26pt] ×
+[6489,440 | sz:16pt] ✓
+[6489,490 | sz:16pt] Employee
+[6489,750 | sz:16pt] Working Hours
+[6489,970 | sz:16pt] Start Date
+[6489,1160 | sz:16pt] Wage
+[6528,-629 | sz:16pt] Pay Structure
+[6529,440 | sz:16pt] ☐
+[6529,490 | sz:16pt] Anita Oliver
+[6529,750 | sz:16pt] 40 hours/week
+[6529,970 | sz:16pt] Jan 1
+[6529,1160 | sz:16pt] $ 4,500.00
+[6532,-487 | sz:16pt] United States: Regular Pay
+[6557,-323 | sz:20pt] →
+[6559,-485 | sz:16pt] Sep 1
+[6559,-269 | sz:16pt] Sep 30
+[6563,187 | sz:16pt] on continue
+[6571,440 | sz:16pt] ☐
+[6571,490 | sz:16pt] Audrey Peterson
+[6571,750 | sz:16pt] 40 hours/week
+[6571,970 | sz:16pt] Jan 1
+[6571,1160 | sz:16pt] $ 4,000.00
+[6590,-629 | sz:16pt] Period
+[6613,440 | sz:16pt] ☐
+[6613,490 | sz:16pt] Billy Kyle
+[6613,750 | sz:16pt] 40 hours/week
+[6613,970 | sz:16pt] Sep 2
+[6613,1160 | sz:16pt] $ 3,100.00
+[6655,440 | sz:16pt] ☐
+[6655,490 | sz:16pt] Eli Lambert
+[6655,750 | sz:16pt] 40 hours/week
+[6655,970 | sz:16pt] Jan 1
+[6655,1160 | sz:16pt] $ 4,350.00
+[6655,-615 | sz:16pt] Continue
+[6657,-493 | sz:16pt] Discard
+[6697,440 | sz:16pt] ☐
+[6697,490 | sz:16pt] Paul Williams
+[6697,750 | sz:16pt] 40 hours/week
+[6697,970 | sz:16pt] Jul 1
+[6697,1160 | sz:16pt] $ 3,950.00
+[6714,431 | sz:16pt] Create Payrun
+[6750,450 | sz:16pt] Create payrun
+[6753,610 | sz:16pt] Back
+[6754,-698 | sz:16pt] Participant note: this popup collects the payrun scope only. Continue should not create the Payrun yet.
+[6813,542 | sz:16pt] Participant note: user selects one or more eligible employees, then clicks Create Payrun. The created Payrun should contain only the selected employees.
+[6888,-1192 | sz:13pt] Employees ▼
+[6888,-1088 | sz:13pt] Contracts ▼
+[6888,-984 | sz:13pt] Attendance
+[6888,-888 | sz:13pt] Time Off ▼
+[6888,-792 | sz:13pt] Payroll
+[6890,-1228 | sz:12pt] HR
+[6896,-188 | sz:13pt] Employees ▼
+[6896,-84 | sz:13pt] Contracts ▼
+[6896,20 | sz:13pt] Attendance
+[6896,116 | sz:13pt] Time Off ▼
+[6896,212 | sz:13pt] Payroll
+[6898,-224 | sz:12pt] HR
+[6912,1743 | sz:13pt] Employees ▼
+[6912,1847 | sz:13pt] Contracts ▼
+[6912,1951 | sz:13pt] Attendance
+[6912,2047 | sz:13pt] Time Off ▼
+[6912,2143 | sz:13pt] Payroll
+[6914,1707 | sz:12pt] HR
+[6915,742 | sz:13pt] Employees ▼
+[6915,846 | sz:13pt] Contracts ▼
+[6915,950 | sz:13pt] Attendance
+[6915,1046 | sz:13pt] Time Off ▼
+[6915,1142 | sz:13pt] Payroll
+[6917,706 | sz:12pt] HR
+[6933,-1224 | sz:22pt] Payruns
+[6941,-220 | sz:22pt] Payrun / February 2026
+[6957,1711 | sz:22pt] Payslip / Aarav Mehta / February 2026
+[6960,710 | sz:22pt] Payslips
+[6965,-1224 | sz:12pt] Payrun view for payroll periods
+[6973,-220 | sz:12pt] Open one Payrun to compute and manage its payslips
+[6989,1711 | sz:12pt] Detailed salary computation for one employee
+[6992,710 | sz:12pt] List view of employee payslips
+[7006,-1203 | sz:11pt] NEW
+[7006,-1142 | sz:11pt] Search payruns…
+[7006,-890 | sz:11pt] 2026
+[7014,-78 | sz:11pt] VALIDATE
+[7014,31 | sz:11pt] MARK PAID
+[7014,308 | sz:11pt] SEND PAYSLIPS
+[7015,-193 | sz:11pt] COMPUTE
+[7030,1738 | sz:11pt] COMPUTE
+[7030,1836 | sz:11pt] MARK PAID
+[7031,1936 | sz:11pt] PRINT PAYSLIP
+[7033,731 | sz:11pt] NEW
+[7033,792 | sz:11pt] Search payslips…
+[7033,1044 | sz:11pt] Period: Feb 2026
+[7055,-220 | sz:10pt] Name
+[7059,-96 | sz:10pt] February 2026
+[7065,-1208 | sz:15pt] January 2026
+[7066,-918 | sz:11pt] 42 employees
+[7066,-728 | sz:11pt] Paid
+[7071,1711 | sz:10pt] Employee
+[7071,2047 | sz:10pt] Period
+[7075,1835 | sz:10pt] Aarav Mehta
+[7075,2171 | sz:10pt] 01-Feb — 28-Feb
+[7087,716 | sz:10pt] Employee
+[7087,841 | sz:10pt] Warning
+[7087,951 | sz:10pt] Period
+[7087,1061 | sz:10pt] Basic
+[7087,1136 | sz:10pt] Gross
+[7087,1211 | sz:10pt] Net
+[7087,1286 | sz:10pt] Structure
+[7087,1391 | sz:10pt] Status
+[7087,-574 | sz:14pt] ↗
+[7089,-1208 | sz:10pt] 01-Jan-2026 — 31-Jan-2026
+[7091,-728 | sz:10pt] 1 warning
+[7095,-220 | sz:10pt] Salary Structure
+[7099,-96 | sz:10pt] Regular Salary
+[7111,1711 | sz:10pt] Salary Structure
+[7111,2047 | sz:10pt] Status
+[7115,1835 | sz:10pt] Regular Salary
+[7115,2171 | sz:10pt] Done
+[7124,716 | sz:9pt] Aarav Mehta
+[7124,841 | sz:9pt] —
+[7124,951 | sz:9pt] 01-Feb — 28-Feb
+[7124,1061 | sz:9pt] ₹50k
+[7124,1136 | sz:9pt] ₹80k
+[7124,1211 | sz:9pt] ₹75k
+[7124,1286 | sz:9pt] Regular
+[7124,1391 | sz:9pt] Done
+[7135,-220 | sz:10pt] Period
+[7139,-96 | sz:10pt] 01-Feb — 28-Feb
+[7151,1711 | sz:10pt] Pay Run
+[7151,2047 | sz:10pt] Worked Days
+[7155,1835 | sz:10pt] February 2026
+[7155,2171 | sz:10pt] 22
+[7166,716 | sz:9pt] Sara Khan
+[7166,841 | sz:9pt] A/C missing
+[7166,951 | sz:9pt] 01-Feb — 28-Feb
+[7166,1061 | sz:9pt] ₹60k
+[7166,1136 | sz:9pt] ₹96k
+[7166,1211 | sz:9pt] ₹88k
+[7166,1286 | sz:9pt] Regular
+[7166,1391 | sz:9pt] Done
+[7167,-1208 | sz:15pt] February 2026
+[7168,-918 | sz:11pt] 42 employees
+[7168,-728 | sz:11pt] Validated
+[7175,-220 | sz:10pt] Status
+[7179,-96 | sz:10pt] Validated
+[7189,-574 | sz:14pt] ↗
+[7191,-1208 | sz:10pt] 01-Feb-2026 — 28-Feb-2026
+[7193,-728 | sz:10pt] 2 warnings
+[7208,-421 | sz:16pt] Open Payrun
+[7208,716 | sz:9pt] John Dsouza
+[7208,841 | sz:9pt] Duplicate
+[7208,951 | sz:9pt] 01-Feb — 28-Feb
+[7208,1061 | sz:9pt] ₹45k
+[7208,1136 | sz:9pt] ₹72k
+[7208,1211 | sz:9pt] ₹66k
+[7208,1286 | sz:9pt] Regular
+[7208,1391 | sz:9pt] Draft
+[7213,1711 | sz:12pt] Salary Computation
+[7223,-220 | sz:12pt] Payslips in this Payrun
+[7224,1506 | sz:16pt] Open payslip
+[7250,716 | sz:9pt] Neha Patel
+[7250,841 | sz:9pt] —
+[7250,951 | sz:9pt] 01-Feb — 28-Feb
+[7250,1061 | sz:9pt] ₹40k
+[7250,1136 | sz:9pt] ₹64k
+[7250,1211 | sz:9pt] ₹59k
+[7250,1286 | sz:9pt] Regular
+[7250,1391 | sz:9pt] Done
+[7250,1719 | sz:10pt] Rule
+[7250,1979 | sz:10pt] Category
+[7250,2109 | sz:10pt] Amount
+[7250,2229 | sz:10pt] Code
+[7260,-214 | sz:10pt] Employee
+[7260,-84 | sz:10pt] Warning
+[7260,36 | sz:10pt] Worked
+[7260,106 | sz:10pt] Basic
+[7260,186 | sz:10pt] Gross
+[7260,266 | sz:10pt] Net
+[7260,346 | sz:10pt] Status
+[7260,426 | sz:10pt] PDF
+[7269,-1208 | sz:15pt] March 2026
+[7270,-918 | sz:11pt] 42 employees
+[7270,-728 | sz:11pt] Draft
+[7280,1719 | sz:9pt] Basic Salary
+[7280,1979 | sz:9pt] Basic
+[7280,2109 | sz:9pt] ₹50,000
+[7280,2229 | sz:9pt] BASIC
+[7291,-574 | sz:14pt] ↗
+[7293,-1208 | sz:10pt] 01-Mar-2026 — 31-Mar-2026
+[7295,-214 | sz:10pt] Aarav Mehta
+[7295,-84 | sz:10pt] —
+[7295,36 | sz:10pt] 22
+[7295,106 | sz:10pt] ₹50k
+[7295,186 | sz:10pt] ₹80k
+[7295,266 | sz:10pt] ₹75k
+[7295,346 | sz:10pt] Done
+[7295,426 | sz:10pt] PDF
+[7295,-728 | sz:10pt] No warnings
+[7298,1360 | sz:10pt] Open selected payslip
+[7304,1719 | sz:9pt] House Rent Allowance
+[7304,1979 | sz:9pt] Allowance
+[7304,2109 | sz:9pt] ₹20,000
+[7304,2229 | sz:9pt] HRA
+[7328,1719 | sz:9pt] Standard Allowance
+[7328,1979 | sz:9pt] Allowance
+[7328,2109 | sz:9pt] ₹10,000
+[7328,2229 | sz:9pt] STD
+[7333,-214 | sz:10pt] Sara Khan
+[7333,-84 | sz:10pt] A/C missing
+[7333,36 | sz:10pt] 22
+[7333,106 | sz:10pt] ₹60k
+[7333,186 | sz:10pt] ₹96k
+[7333,266 | sz:10pt] ₹88k
+[7333,346 | sz:10pt] Done
+[7333,426 | sz:10pt] PDF
+[7352,1719 | sz:9pt] Gross Salary
+[7352,1979 | sz:9pt] Gross
+[7352,2109 | sz:9pt] ₹80,000
+[7352,2229 | sz:9pt] GROSS
+[7371,-214 | sz:10pt] John Dsouza
+[7371,-84 | sz:10pt] Duplicate
+[7371,36 | sz:10pt] 20
+[7371,106 | sz:10pt] ₹45k
+[7371,186 | sz:10pt] ₹72k
+[7371,266 | sz:10pt] ₹66k
+[7371,346 | sz:10pt] Draft
+[7371,426 | sz:10pt] PDF
+[7376,1719 | sz:9pt] Provident Fund
+[7376,1979 | sz:9pt] Deduction
+[7376,2109 | sz:9pt] -₹3,000
+[7376,2229 | sz:9pt] PF
+[7389,-1224 | sz:12pt] Useful note: each Payrun represents one payroll period and groups the payslips generated for that period.
+[7400,1719 | sz:9pt] Professional Tax
+[7400,1979 | sz:9pt] Deduction
+[7400,2109 | sz:9pt] -₹2,000
+[7400,2229 | sz:9pt] PT
+[7416,710 | sz:12pt] Useful note: selecting any payslip opens the detailed salary computation and PDF action for that employee.
+[7416,-235 | sz:11pt] Useful note: warnings such as missing account data or duplicate payslips should be visible before payroll is finalized.
+[7424,1719 | sz:9pt] Net Salary
+[7424,1979 | sz:9pt] Net
+[7424,2109 | sz:9pt] ₹75,000
+[7424,2229 | sz:9pt] NET
+[7447,1711 | sz:12pt] Useful note: the Print action generates the employee payslip as PDF; that PDF can be sent from the parent Payrun.
+
+=======================================================
+### Flow 5: Payroll Configuration (Salary Structures & Rules) (Total items: 183)
+=======================================================
+[7475,-1248 | sz:20pt] 5) Payroll Configuration — Salary Structures & Rules
+[7513,146 | sz:10pt] Configured structure is selected when a Payrun is created
+[7546,-1192 | sz:13pt] Employees ▼
+[7546,-1088 | sz:13pt] Contracts ▼
+[7546,-984 | sz:13pt] Attendance
+[7546,-888 | sz:13pt] Time Off ▼
+[7546,-792 | sz:13pt] Payroll
+[7548,-1228 | sz:12pt] HR
+[7554,-188 | sz:13pt] Employees ▼
+[7554,-84 | sz:13pt] Contracts ▼
+[7554,20 | sz:13pt] Attendance
+[7554,116 | sz:13pt] Time Off ▼
+[7554,212 | sz:13pt] Payroll
+[7556,-224 | sz:12pt] HR
+[7570,1743 | sz:13pt] Employees ▼
+[7570,1847 | sz:13pt] Contracts ▼
+[7570,1951 | sz:13pt] Attendance
+[7570,2047 | sz:13pt] Time Off ▼
+[7570,2143 | sz:13pt] Payroll
+[7572,1707 | sz:12pt] HR
+[7573,742 | sz:13pt] Employees ▼
+[7573,846 | sz:13pt] Contracts ▼
+[7573,950 | sz:13pt] Attendance
+[7573,1046 | sz:13pt] Time Off ▼
+[7573,1142 | sz:13pt] Payroll
+[7575,706 | sz:12pt] HR
+[7591,-1224 | sz:22pt] Salary Structures
+[7599,-220 | sz:22pt] Salary Structure / Regular Salary
+[7615,1711 | sz:22pt] Salary Rule / Basic Salary
+[7618,710 | sz:22pt] Salary Rules
+[7623,-1224 | sz:12pt] List view
+[7631,-220 | sz:12pt] Form view with its salary rules
+[7647,1711 | sz:12pt] Form view
+[7650,710 | sz:12pt] List view
+[7664,-1203 | sz:11pt] NEW
+[7664,-1142 | sz:11pt] Search structures…
+[7688,1728 | sz:11pt] EDIT
+[7691,731 | sz:11pt] NEW
+[7691,792 | sz:11pt] Search salary rules…
+[7691,1054 | sz:11pt] Regular Salary
+[7713,-220 | sz:10pt] Structure Name
+[7713,156 | sz:10pt] Active
+[7717,-96 | sz:10pt] Regular Salary
+[7717,280 | sz:10pt] True
+[7719,-1216 | sz:10pt] Structure Name
+[7719,-956 | sz:10pt] Rules
+[7719,-856 | sz:10pt] Employees
+[7719,-736 | sz:10pt] Active
+[7729,1711 | sz:10pt] Rule Name
+[7729,2057 | sz:10pt] Salary Structure
+[7733,1835 | sz:10pt] Basic Salary
+[7733,2181 | sz:10pt] Regular Salary
+[7746,718 | sz:10pt] Rule Name
+[7746,938 | sz:10pt] Code
+[7746,1028 | sz:10pt] Category
+[7746,1158 | sz:10pt] Structure
+[7746,1298 | sz:10pt] Sequence
+[7758,-1216 | sz:10pt] Regular Salary
+[7758,-956 | sz:10pt] 12 rules
+[7758,-856 | sz:10pt] 42 employees
+[7758,-736 | sz:10pt] Active
+[7765,-220 | sz:12pt] Salary Rules
+[7769,1711 | sz:10pt] Code
+[7769,2057 | sz:10pt] Computation
+[7773,1835 | sz:10pt] BASIC
+[7773,2181 | sz:10pt] Percentage of Wage
+[7783,718 | sz:10pt] Basic Salary
+[7783,938 | sz:10pt] BASIC
+[7783,1028 | sz:10pt] Basic
+[7783,1158 | sz:10pt] Regular Salary
+[7783,1298 | sz:10pt] 1
+[7802,-212 | sz:10pt] Rule Name
+[7802,68 | sz:10pt] Code
+[7802,168 | sz:10pt] Category
+[7802,298 | sz:10pt] Sequence
+[7804,-1216 | sz:10pt] Intern Salary
+[7804,-956 | sz:10pt] 8 rules
+[7804,-856 | sz:10pt] 6 employees
+[7804,-736 | sz:10pt] Active
+[7809,1711 | sz:10pt] Category
+[7809,2057 | sz:10pt] Percentage
+[7813,1835 | sz:10pt] Basic
+[7813,2181 | sz:10pt] 50%
+[7823,718 | sz:10pt] House Rent Allowance
+[7823,938 | sz:10pt] HRA
+[7823,1028 | sz:10pt] Allowance
+[7823,1158 | sz:10pt] Regular Salary
+[7823,1298 | sz:10pt] 10
+[7830,-213 | sz:9pt] Basic Salary
+[7830,67 | sz:9pt] BASIC
+[7830,167 | sz:9pt] Basic
+[7830,297 | sz:9pt] 1
+[7849,-430 | sz:16pt] open structure
+[7849,-213 | sz:9pt] House Rent Allowance
+[7849,67 | sz:9pt] HRA
+[7849,167 | sz:9pt] Allowance
+[7849,297 | sz:9pt] 10
+[7849,1711 | sz:10pt] Sequence
+[7849,2057 | sz:10pt] Quantity
+[7850,-1216 | sz:10pt] Contractor
+[7850,-956 | sz:10pt] 6 rules
+[7850,-856 | sz:10pt] 9 employees
+[7850,-736 | sz:10pt] Active
+[7853,1835 | sz:10pt] 1
+[7853,2181 | sz:10pt] 1
+[7863,718 | sz:10pt] Standard Allowance
+[7863,938 | sz:10pt] STD
+[7863,1028 | sz:10pt] Allowance
+[7863,1158 | sz:10pt] Regular Salary
+[7863,1298 | sz:10pt] 20
+[7868,-213 | sz:9pt] Standard Allowance
+[7868,67 | sz:9pt] STD
+[7868,167 | sz:9pt] Allowance
+[7868,297 | sz:9pt] 20
+[7869,1492 | sz:16pt] Open salary rule
+[7887,-213 | sz:9pt] Performance Bonus
+[7887,67 | sz:9pt] BONUS
+[7887,167 | sz:9pt] Allowance
+[7887,297 | sz:9pt] 30
+[7903,718 | sz:10pt] Performance Bonus
+[7903,938 | sz:10pt] BONUS
+[7903,1028 | sz:10pt] Allowance
+[7903,1158 | sz:10pt] Regular Salary
+[7903,1298 | sz:10pt] 30
+[7905,1711 | sz:12pt] Computation options from the source
+[7906,-213 | sz:9pt] Leave Travel Allowance
+[7906,67 | sz:9pt] LTA
+[7906,167 | sz:9pt] Allowance
+[7906,297 | sz:9pt] 40
+[7925,-213 | sz:9pt] Fixed Allowance
+[7925,67 | sz:9pt] FIX
+[7925,167 | sz:9pt] Allowance
+[7925,297 | sz:9pt] 50
+[7943,718 | sz:10pt] Leave Travel Allowance
+[7943,938 | sz:10pt] LTA
+[7943,1028 | sz:10pt] Allowance
+[7943,1158 | sz:10pt] Regular Salary
+[7943,1298 | sz:10pt] 40
+[7944,-213 | sz:9pt] Gross Salary
+[7944,67 | sz:9pt] GROSS
+[7944,167 | sz:9pt] Gross
+[7944,297 | sz:9pt] 60
+[7947,1727 | sz:11pt] Fixed Amount
+[7947,1907 | sz:11pt] Percentage of Wage
+[7947,2117 | sz:11pt] Python Code
+[7963,-213 | sz:9pt] LWF fund
+[7963,67 | sz:9pt] LWF
+[7963,167 | sz:9pt] Deduction
+[7963,297 | sz:9pt] 70
+[7982,-213 | sz:9pt] Provident Fund
+[7982,67 | sz:9pt] PF
+[7982,167 | sz:9pt] Deduction
+[7982,297 | sz:9pt] 80
+[7983,718 | sz:10pt] Fixed Allowance
+[7983,938 | sz:10pt] FIX
+[7983,1028 | sz:10pt] Allowance
+[7983,1158 | sz:10pt] Regular Salary
+[7983,1298 | sz:10pt] 50
+[7989,1727 | sz:10pt] Example expression: result = categories['BASIC']
+[8001,-213 | sz:9pt] ESIC
+[8001,67 | sz:9pt] ESIC
+[8001,167 | sz:9pt] Deduction
+[8001,297 | sz:9pt] 90
+[8015,-1224 | sz:12pt] Structures group salary rules; rules define the ordered salary computation used by a payslip. Both require List and Form views.
+[8020,-213 | sz:9pt] Professional Tax
+[8020,67 | sz:9pt] PT
+[8020,167 | sz:9pt] Deduction
+[8020,297 | sz:9pt] 100
+[8023,718 | sz:10pt] Gross Salary
+[8023,938 | sz:10pt] GROSS
+[8023,1028 | sz:10pt] Gross
+[8023,1158 | sz:10pt] Regular Salary
+[8023,1298 | sz:10pt] 60
+[8039,-213 | sz:9pt] Net Salary
+[8039,67 | sz:9pt] NET
+[8039,167 | sz:9pt] Net
+[8039,297 | sz:9pt] 110
+[8049,-1227 | sz:11pt] Useful note: the Salary Structure selected on a Payrun determines which set of salary rules will calculate each payslip.
+[8069,-220 | sz:12pt] Useful note: rule order matters. Keep sequence visible so participants understand the calculation order.
+Rules created here is just for reference
+[8074,710 | sz:12pt] Useful note: List view should expose name, code, category, structure and sequence — the fields needed to understand 
+a payroll rule quickly.
+[8085,1711 | sz:12pt] Useful note: a Salary Rule needs a clear computation method and category because these drive the lines displayed 
+hon the final payslip.
+[8164,-450 | sz:16pt] Continue into dashboard view
+[8169,1597 | sz:20pt] Computation Note:
+ - Fixed Amount: uses the exact value entered in the rule, e.g. Meal Allowance = 2,000.
+ - Percentage: calculates the rule as a percentage of a selected base such as Contract Wage,
+Basic Salary, or Gross Salary, e.g. HRA = 20% × Basic Salary.
+ - Python Code / Formula: is used for advanced calculations where fixed or percentage methods
+are not sufficient, such as attendance-based salary, overtime, unpaid leave deductions, or
+calculations using multiple salary-rule values.
+
+=======================================================
+### Flow 6: Payroll Dashboard (Charts, KPIs, Alerts, Headcount, Cost) (Total items: 123)
+=======================================================
+[8223,-1242 | sz:28pt] 6) Payroll Dashboard
+[8255,-1242 | sz:18pt] Dashboard challenge: combine Payroll with HR data from multiple models and present useful insights with cards, charts, and summaries.
+[8296,-1156 | sz:18pt] Employees
+[8296,-1016 | sz:18pt] Attendance
+[8296,-872 | sz:18pt] Time Off
+[8296,-732 | sz:18pt] Payroll
+[8297,-1214 | sz:18pt] HR
+[8355,-1218 | sz:26pt] Payroll Dashboard
+[8389,-1218 | sz:16pt] Dashboard should help payroll/HR users understand payments, staffing impact, leave patterns, and attendance quality for the selected period.
+[8475,-1218 | sz:15pt] Period
+[8475,-958 | sz:15pt] Department
+[8475,-698 | sz:15pt] Employee Type
+[8475,-438 | sz:15pt] Company
+[8503,-1208 | sz:15pt] Sep 2026
+[8503,-948 | sz:15pt] All Departments
+[8503,-688 | sz:15pt] All Types
+[8503,-428 | sz:15pt] OXP Pvt Ltd
+[8571,-1200 | sz:16pt] Total Net Salary Paid
+[8571,-682 | sz:16pt] Payslips Generated
+[8571,-164 | sz:16pt] Avg Salary / Employee
+[8571,354 | sz:16pt] Approved Time Off Days
+[8571,872 | sz:16pt] Attendance Health
+[8599,-1200 | sz:28pt] ₹ 18.4L
+[8599,-682 | sz:28pt] 148
+[8599,-164 | sz:28pt] ₹ 12,432
+[8599,354 | sz:28pt] 34 Days
+[8599,872 | sz:28pt] 94%
+[8639,-1200 | sz:14pt] +8.5% vs previous month
+[8639,-682 | sz:14pt] 142 paid, 6 pending
+[8639,-164 | sz:14pt] Based on current payrun
+[8639,354 | sz:14pt] Across selected period
+[8639,872 | sz:14pt] Present / reviewed records
+[8721,-1200 | sz:20pt] Salary Cost by Department
+[8721,-252 | sz:20pt] Monthly Net Salary Trend
+[8721,536 | sz:20pt] Payslip Status & Payroll Alerts
+[8749,-1200 | sz:14pt] Source: Payslips + Employee Department
+[8749,-252 | sz:14pt] Source: historical Payslips / Payruns
+[8749,536 | sz:14pt] Source: Payrun + Payslip validation
+[8765,-528 | sz:13pt] ₹ 170k
+[8785,-942 | sz:13pt] ₹ 150k
+[8793,542 | sz:16pt] Status split
+[8793,1102 | sz:16pt] Current alerts
+[8805,-666 | sz:13pt] ₹ 130k
+[8825,-1080 | sz:13pt] ₹ 110k
+[8825,1102 | sz:15pt] • 2 employees missing bank account
+[8845,-804 | sz:13pt] ₹ 90k
+[8857,1102 | sz:15pt] • 1 duplicate payslip warning
+[8883,140 | sz:13pt] 15.0L
+[8884,570 | sz:15pt] Paid
+[8889,1102 | sz:15pt] • 4 drafts still not validated
+[8912,570 | sz:15pt] Done
+[8921,1102 | sz:15pt] • 3 contracts expiring this month
+[8940,570 | sz:15pt] Pending
+[8967,-1076 | sz:14pt] HR
+[8967,-938 | sz:14pt] Sales
+[8967,-800 | sz:14pt] Support
+[8967,-662 | sz:14pt] Finance
+[8967,-524 | sz:14pt] IT
+[8968,570 | sz:15pt] Warning
+[8969,-178 | sz:13pt] Apr
+[8969,-68 | sz:13pt] May
+[8969,42 | sz:13pt] Jun
+[8969,152 | sz:13pt] Jul
+[8969,262 | sz:13pt] Aug
+[8969,372 | sz:13pt] Sep
+[9039,-78 | sz:13pt] 15.2L
+[9047,-1200 | sz:20pt] Attendance Overview
+[9047,-552 | sz:20pt] Time Off Overview
+[9047,196 | sz:20pt] Department Overview
+[9047,844 | sz:20pt] Models to Aggregate
+[9049,-188 | sz:13pt] 14.8L
+[9069,32 | sz:13pt] 14.3L
+[9075,-1200 | sz:14pt] Source: Attendance
+[9075,-552 | sz:14pt] Source: Time Off Requests + Allocations
+[9075,196 | sz:14pt] Source: Employee + Contract + Payslip totals
+[9075,844 | sz:14pt] This is the actual challenge behind the dashboard.
+[9079,362 | sz:13pt] 18.4L
+[9089,252 | sz:13pt] 17.1L
+[9097,-1168 | sz:13pt] 94
+[9103,208 | sz:13pt] Department
+[9103,399 | sz:13pt] Headcount
+[9103,504 | sz:13pt] Monthly Salary
+[9111,844 | sz:15pt] • Employees / Departments → headcount, ownership, grouping
+[9117,-542 | sz:15pt] Type
+[9117,-362 | sz:15pt] Approved Days
+[9117,-212 | sz:15pt] Pending
+[9117,-92 | sz:15pt] Remaining Balance
+[9121,-778 | sz:13pt] 22
+[9127,-798 | sz:15pt] Missing check-outs: 5
+Manual attendance edits: 7
+Attendance coverage: 94%
+[9133,208 | sz:13pt] IT
+[9133,399 | sz:13pt] 18
+[9133,504 | sz:13pt] ₹ 4.2L
+[9137,844 | sz:15pt] • Contracts → wage, schedule, active employees
+[9151,-542 | sz:15pt] Paid Time Off
+[9151,-362 | sz:15pt] 24
+[9151,-212 | sz:15pt] 3
+[9151,-92 | sz:15pt] 118 Days
+[9160,208 | sz:13pt] Sales
+[9160,399 | sz:13pt] 22
+[9160,504 | sz:13pt] ₹ 5.7L
+[9163,844 | sz:15pt] • Payruns / Payslips → salary totals, paid vs pending, trend data
+[9173,-1038 | sz:13pt] 18
+[9182,-908 | sz:13pt] 9
+[9185,-542 | sz:15pt] Sick Leave
+[9185,-362 | sz:15pt] 6
+[9185,-212 | sz:15pt] 1
+[9185,-92 | sz:15pt] N/A
+[9188,208 | sz:13pt] HR
+[9188,399 | sz:13pt] 8
+[9188,504 | sz:13pt] ₹ 1.9L
+[9189,844 | sz:15pt] • Attendance → presence, absences, late entries, overtime
+[9215,844 | sz:15pt] • Time Off Requests / Allocations → leave taken and leave balances
+[9216,208 | sz:13pt] Support
+[9216,399 | sz:13pt] 14
+[9216,504 | sz:13pt] ₹ 3.1L
+[9219,-1174 | sz:13pt] Present
+[9219,-1044 | sz:13pt] Late
+[9219,-914 | sz:13pt] Absent
+[9219,-784 | sz:13pt] Overtime
+[9219,-542 | sz:15pt] Comp Off
+[9219,-362 | sz:15pt] 4
+[9219,-212 | sz:15pt] 2
+[9219,-92 | sz:15pt] 11 Days
+
+=======================================================
+### Flow Other / General (Total items: 0)
+=======================================================

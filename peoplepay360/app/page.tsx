@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { useCallback, useEffect, useState } from 'react';
 import {
   Plus,
@@ -17,17 +18,9 @@ import {
   CheckCircle2,
   XCircle,
   CalendarDays,
-  Sparkles,
-  Shield,
   ShieldAlert,
-  Lock,
-  LogOut,
-  UserCheck,
   AlertCircle,
   Users,
-  Briefcase,
-  Wallet,
-  Eye,
   Key,
   Mail,
   ChevronRight,
@@ -40,7 +33,6 @@ import {
   type Workspace,
   type Row,
   type AppUser,
-  type UserRole,
   canView,
   money,
   hours,
@@ -85,7 +77,7 @@ type Modal = {
   record?: Row;
 };
 
-async function readApiResponse(response: Response): Promise<any> {
+async function readApiResponse(response: Response): Promise<ApiBody> {
   const text = await response.text();
   if (!text) return {};
 
@@ -100,6 +92,32 @@ async function readApiResponse(response: Response): Promise<any> {
       .slice(0, 240);
     throw new Error(message || `The server returned an invalid response (${response.status}).`);
   }
+}
+
+type ApiBody = Record<string, unknown>;
+
+type SystemUser = {
+  id: string;
+  name: string;
+  email: string;
+  roleId: string;
+  roleName?: string;
+  employeeId?: string;
+  active?: boolean;
+};
+
+type PayrunCreatePayload = {
+  period: string;
+  structureId: string;
+  employeeIds: string[];
+};
+
+function errorMessage(error: unknown, fallback: string) {
+  return error instanceof Error ? error.message : fallback;
+}
+
+function responseError(body: ApiBody, fallback: string) {
+  return typeof body.error === 'string' ? body.error : fallback;
 }
 
 
@@ -261,8 +279,7 @@ export default function Home() {
       const r = await fetch('/api/users', { cache: 'no-store' });
       if (r.ok) {
         const body = await r.json();
-        setSystemUsers(body.users || []);
-        setSystemRoles(body.roles || []);
+        setSystemUsers(Array.isArray(body.users) ? body.users : []);
       }
     } catch (e) {
       console.error('Failed to load users:', e);
@@ -286,19 +303,20 @@ export default function Home() {
       });
       const data = await readApiResponse(r);
       if (!r.ok) {
-        throw new Error(data.error || 'Authentication failed.');
+        throw new Error(responseError(data, 'Authentication failed.'));
       }
-      setCurrentUser(data.user);
+      const user = data.user as AppUser;
+      setCurrentUser(user);
       setLoginEmail('');
       setLoginPassword('');
       await load();
-      if (data.user.role === 'Admin') {
+      if (user.role === 'Admin') {
         await loadUsers();
       }
-      const defRoute = defaultRouteForRole(data.user.role);
+      const defRoute = defaultRouteForRole(user.role);
       navigate(defRoute);
-    } catch (err: any) {
-      setLoginError(err.message || 'Login failed.');
+    } catch (err: unknown) {
+      setLoginError(errorMessage(err, 'Login failed.'));
     } finally {
       setLoginBusy(false);
     }
@@ -317,7 +335,7 @@ export default function Home() {
     window.location.hash = '';
   }
 
-  async function handleSaveUser(e: React.FormEvent) {
+  async function handleSaveUser(e: React.SyntheticEvent<HTMLFormElement>) {
     e.preventDefault();
     setBusy(true);
     setError('');
@@ -328,12 +346,12 @@ export default function Home() {
         body: JSON.stringify(userFormData),
       });
       const body = await readApiResponse(r);
-      if (!r.ok) throw new Error(body.error || 'Failed to save user.');
+      if (!r.ok) throw new Error(responseError(body, 'Failed to save user.'));
       await loadUsers();
       setMessage(userFormData.id ? 'User updated successfully.' : 'New user provisioned.');
       setModal(null);
-    } catch (err: any) {
-      setError(err.message || 'Unable to save user.');
+    } catch (err: unknown) {
+      setError(errorMessage(err, 'Unable to save user.'));
     } finally {
       setBusy(false);
     }
@@ -348,9 +366,9 @@ export default function Home() {
         setCurrentUser(null);
         setS(null);
       }
-      if (!r.ok) throw new Error(body.error || 'Unable to load the workspace.');
-      setS(body.data);
-      setRevision(body.revision);
+      if (!r.ok) throw new Error(responseError(body, 'Unable to load the workspace.'));
+      setS(body.data as Workspace);
+      setRevision(Number(body.revision || 0));
     } catch (e) {
       setError((e as Error).message);
     }
@@ -398,7 +416,7 @@ export default function Home() {
   }, [currentUser]);
 
   function navigate(v: string, id?: string) {
-    let resolvedView = (v === 'employees' || v === 'employee' || v === 'admin/employees') && currentUser?.role === 'Admin' ? 'users' : v;
+    let resolvedView = v;
     let resolvedId = id || '';
     let newQuery = '';
 
@@ -434,7 +452,7 @@ export default function Home() {
 
   async function act(
     action: string,
-    payload: Record<string, any> = {},
+    payload: Record<string, unknown> = {},
     success = 'Changes saved'
   ): Promise<Workspace | null> {
     if (busy) return null;
@@ -452,11 +470,12 @@ export default function Home() {
         setCurrentUser(null);
         setS(null);
       }
-      if (!r.ok) throw new Error(b.error || 'Unable to save.');
-      setS(b.data);
-      setRevision(b.revision);
+      if (!r.ok) throw new Error(responseError(b, 'Unable to save.'));
+      const nextWorkspace = b.data as Workspace;
+      setS(nextWorkspace);
+      setRevision(Number(b.revision || 0));
       setMessage(success);
-      return b.data;
+      return nextWorkspace;
     } catch (e) {
       setError((e as Error).message);
       return null;
@@ -504,8 +523,10 @@ export default function Home() {
     try {
       const response = await fetch(`/api/payruns/${encodeURIComponent(runId)}/send`, { method: 'POST' });
       const body = await readApiResponse(response);
-      if (!response.ok && response.status !== 207) throw new Error(body.error || 'Unable to send payslips.');
-      setMessage(`${body.sent} payslip${body.sent === 1 ? '' : 's'} sent${body.failed ? `; ${body.failed} failed` : ''}.`);
+      if (!response.ok && response.status !== 207) throw new Error(responseError(body, 'Unable to send payslips.'));
+      const sent = Number(body.sent || 0);
+      const failed = Number(body.failed || 0);
+      setMessage(`${sent} payslip${sent === 1 ? '' : 's'} sent${failed ? `; ${failed} failed` : ''}.`);
     } catch (error) {
       setError((error as Error).message);
     } finally {
@@ -619,14 +640,14 @@ export default function Home() {
 
   const departments = s ? [...new Set(s.employees.map((e) => e.department))] : [];
 
-  /* ─────────────────────────────────────────────────────────
+  /* ---------------------------------------------------------
      LOGIN SCREEN (Crextio Design System)
-     ───────────────────────────────────────────────────────── */
+     --------------------------------------------------------- */
   if (authLoading) {
     return (
       <div className="min-h-screen bg-[#fcfbf9] flex flex-col items-center justify-center p-6 text-center">
         <RefreshCw className="size-8 text-slate-400 animate-spin mb-3" />
-        <h2 className="text-sm font-semibold text-slate-800">Verifying secure session…</h2>
+        <h2 className="text-sm font-semibold text-slate-800">Verifying secure session...</h2>
         <p className="text-xs text-slate-500 mt-1">Connecting to PeoplePay360 database</p>
       </div>
     );
@@ -638,7 +659,7 @@ export default function Home() {
         <div className="w-full max-w-md bg-white rounded-3xl border border-[#e5ded4] shadow-sm p-8 space-y-6">
           <div className="text-center space-y-2">
             <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-amber-50 border border-amber-200/60 shadow-2xs mb-1">
-              <img src="/favicon.png" alt="PeoplePay360" className="w-10 h-10 rounded-xl object-contain" />
+              <Image src="/favicon.png" alt="PeoplePay360" width={40} height={40} className="rounded-xl object-contain" />
             </div>
             <h1 className="text-xl font-extrabold tracking-tight text-slate-900">
               peoplepay<span className="text-[#e6a817]">360</span>
@@ -653,7 +674,7 @@ export default function Home() {
             </div>
           )}
 
-          {/* ── Employee Quick-Login Picker ─────────────────────── */}
+          {/* -- Employee Quick-Login Picker ----------------------- */}
           <div className="relative">
             <button
               type="button"
@@ -693,11 +714,10 @@ export default function Home() {
                   <div className="flex items-center gap-2 px-3 py-2 border-b border-[#f0ece5] bg-[#faf8f5]">
                     <Search size={12} className="text-slate-400 shrink-0" />
                     <input
-                      autoFocus
                       type="text"
                       value={loginSearch}
                       onChange={e => setLoginSearch(e.target.value)}
-                      placeholder="Search name, position or department…"
+                      placeholder="Search name, position or department..."
                       className="w-full text-xs outline-none bg-transparent text-slate-700 placeholder:text-slate-400"
                     />
                     {loginSearch && (
@@ -738,7 +758,7 @@ export default function Home() {
                                   <div className="text-[10px] text-slate-400 truncate">{emp.position}</div>
                                 </div>
                               </div>
-                              <span className="text-[10px] text-[#c99a2e] font-semibold shrink-0 ml-2 opacity-0 group-hover:opacity-100 transition-opacity">Fill →</span>
+                              <span className="text-[10px] text-[#c99a2e] font-semibold shrink-0 ml-2 opacity-0 group-hover:opacity-100 transition-opacity">Fill -&gt;</span>
                             </button>
                           ))}
                         </div>
@@ -748,7 +768,7 @@ export default function Home() {
 
                   {/* Footer hint */}
                   <div className="px-3 py-1.5 border-t border-[#f0ece5] bg-[#faf8f5] text-[9px] text-slate-400 text-center">
-                    All employees · password: <span className="font-mono font-semibold text-slate-500">welcome123</span>
+                    All employees - password: <span className="font-mono font-semibold text-slate-500">welcome123</span>
                   </div>
                 </div>
               );
@@ -763,9 +783,10 @@ export default function Home() {
             className="space-y-4"
           >
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1.5">Work Email</label>
+              <label htmlFor="login-email" className="block text-xs font-semibold text-slate-700 mb-1.5">Work Email</label>
               <div className="pill-search !py-2 w-full bg-slate-50 border border-slate-200 focus-within:border-slate-400 focus-within:bg-white transition-all">
                 <input
+                  id="login-email"
                   type="email"
                   name="email"
                   autoComplete="username"
@@ -779,16 +800,17 @@ export default function Home() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1.5">Password</label>
+              <label htmlFor="login-password" className="block text-xs font-semibold text-slate-700 mb-1.5">Password</label>
               <div className="pill-search !py-2 w-full bg-slate-50 border border-slate-200 focus-within:border-slate-400 focus-within:bg-white transition-all">
                 <input
+                  id="login-password"
                   type="password"
                   name="password"
                   autoComplete="current-password"
                   required
                   value={loginPassword}
                   onChange={(e) => setLoginPassword(e.target.value)}
-                  placeholder="••••••••"
+                  placeholder="********"
                   className="w-full text-xs outline-none bg-transparent"
                 />
               </div>
@@ -799,7 +821,7 @@ export default function Home() {
               disabled={loginBusy}
               className="w-full pill-btn pill-btn-black !py-2.5 justify-center text-xs font-semibold cursor-pointer disabled:opacity-50"
             >
-              {loginBusy ? 'Signing In…' : 'Sign In'}
+              {loginBusy ? 'Signing In...' : 'Sign In'}
             </button>
           </form>
 
@@ -831,7 +853,7 @@ export default function Home() {
                     </div>
                   </div>
                   <span className="text-[11px] text-[#c99a2e] font-semibold group-hover:underline">
-                    Sign In →
+                    Sign In -&gt;
                   </span>
                 </button>
               ))}
@@ -842,9 +864,9 @@ export default function Home() {
     );
   }
 
-  /* ─────────────────────────────────────────────────────────
+  /* ---------------------------------------------------------
      SLOT GENERATORS FOR EACH VIEW (Crextio 3-Column Template)
-     ───────────────────────────────────────────────────────── */
+     --------------------------------------------------------- */
 
   let pageTitle = 'People & Operations Workflow';
   let headerActions: React.ReactNode = null;
@@ -861,7 +883,7 @@ export default function Home() {
       <div className="workora-card text-center py-16">
         <RefreshCw className="size-8 text-slate-400 mx-auto animate-spin mb-3" />
         <h2 className="text-base font-semibold text-slate-900">
-          {error ? 'Workspace connection unavailable' : 'Opening your workspace…'}
+          {error ? 'Workspace connection unavailable' : 'Opening your workspace...'}
         </h2>
         <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
           {error
@@ -1000,7 +1022,7 @@ export default function Home() {
         count={filteredEmployees.length}
         search={query}
         onSearchChange={setQuery}
-        searchPlaceholder="Search employee…"
+        searchPlaceholder="Search employee..."
         filters={
           <div className="grid grid-cols-2 gap-2 w-full">
             <Picker label="Dept" value={department} onChange={setDepartment} options={['All', ...departments]} />
@@ -1023,7 +1045,7 @@ export default function Home() {
               key={e.id}
               avatar={initials(e.name)}
               title={e.name}
-              subtitle={`${e.department} · ${e.type}`}
+              subtitle={`${e.department} - ${e.type}`}
               badge={e.status}
               active={isSel}
               onClick={() => setActiveId(e.id)}
@@ -1134,7 +1156,7 @@ export default function Home() {
         <DetailPanel
           avatar={initials(activeEmp.name)}
           title={activeEmp.name}
-          subtitle={`${activeEmp.position} · ${activeEmp.department}`}
+          subtitle={`${activeEmp.position} - ${activeEmp.department}`}
           badge={activeEmp.status}
         >
           <DetailSection title="BASIC INFORMATION">
@@ -1162,7 +1184,7 @@ export default function Home() {
             )}
             <DocChip
               name={`${sched?.name || 'Standard Shift'} Policy`}
-              meta={`${sched?.start || '09:00'} – ${sched?.end || '18:00'}`}
+              meta={`${sched?.start || '09:00'} - ${sched?.end || '18:00'}`}
               onClick={() => navigate('schedules')}
             />
           </DetailSection>
@@ -1248,7 +1270,43 @@ export default function Home() {
     const filteredContracts = filtered(s.contracts);
     const activeContractRecord = s.contracts.find((c) => c.id === activeId) || filteredContracts[0];
 
-
+    leftSlot = (
+      <MasterList
+        title="Contracts"
+        count={filteredContracts.length}
+        search={query}
+        onSearchChange={setQuery}
+        searchPlaceholder="Search contracts…"
+        isEmpty={filteredContracts.length === 0}
+      >
+        {filteredContracts.map((c) => {
+          const emp = employee(c.employeeId);
+          const isSel = c.id === activeContractRecord?.id;
+          const isRunning = !c.end || c.end >= todayIso;
+          return (
+            <MasterCard
+              key={c.id}
+              avatar={initials(emp?.name || 'CT')}
+              title={emp?.name || 'Contract'}
+              subtitle={
+                c.id.startsWith('c') && c.id.length < 5
+                  ? `CON/2026/${String(+c.id.slice(1) + 1).padStart(4, '0')}`
+                  : c.id.slice(0, 8).toUpperCase()
+              }
+              badge={isRunning ? 'Running' : 'Expired'}
+              active={isSel}
+              onClick={() => setActiveId(c.id)}
+              progress={{
+                label: 'Monthly Wage',
+                value: 100,
+                displayValue: money(c.wage),
+                variant: 'gold',
+              }}
+            />
+          );
+        })}
+      </MasterList>
+    );
 
     centerContent = (
       <div className="workora-table-container">
@@ -1310,7 +1368,7 @@ export default function Home() {
               },
               { title: 'Type', render: (r) => r.type || 'Fixed' },
               { title: 'Working days', render: (r) => scheduleRows(r).filter((row) => row.working).map((row) => row.day.slice(0, 3)).join(', ') },
-              { title: 'Daily hours', render: (r) => scheduleRows(r).filter((row) => row.working).map((row) => `${row.day.slice(0, 3)} ${row.start}–${row.end}`).join(', ') },
+              { title: 'Daily hours', render: (r) => scheduleRows(r).filter((row) => row.working).map((row) => `${row.day.slice(0, 3)} ${row.start}-${row.end}`).join(', ') },
               { title: 'Weekly hours', render: (r) => scheduleWeeklyHours(r).toFixed(1) },
             ]}
           />
@@ -1333,7 +1391,7 @@ export default function Home() {
             <DetailRow label="Salary Structure" value={structure(activeContractRecord.structureId)} />
             <DetailRow label="Start Date" value={activeContractRecord.start} />
             <DetailRow label="End Date" value={activeContractRecord.end || 'Open-ended contract'} />
-            <DetailRow label="Employee Department" value={emp?.department || '—'} />
+            <DetailRow label="Employee Department" value={emp?.department || '-'} />
           </DetailSection>
 
           <DetailSection title="DOCUMENTS">
@@ -1423,7 +1481,39 @@ export default function Home() {
       })
       .sort((a, b) => b.date.localeCompare(a.date));
 
-
+    leftSlot = (
+      <MasterList
+        title={currentUser.role === 'Employee' ? 'My Profile' : 'Staff Attendance'}
+        count={employeePool.length}
+        search={query}
+        onSearchChange={setQuery}
+        searchPlaceholder="Filter team…"
+      >
+        {employeePool.map((e) => {
+          const att = s.attendance.filter((a) => a.employeeId === e.id && a.date.startsWith(period));
+          const presentCount = att.filter((a) => a.checkIn).length;
+          const rate = att.length ? Math.round((presentCount / att.length) * 100) : 0;
+          const isSel = e.id === activeEmp?.id;
+          return (
+            <MasterCard
+              key={e.id}
+              avatar={initials(e.name)}
+              title={e.name}
+              subtitle={e.department}
+              badge={rate >= 80 ? 'Present' : rate > 0 ? 'Late' : 'Absent'}
+              active={isSel}
+              onClick={() => setActiveId(e.id)}
+              progress={{
+                label: 'Attendance Rate',
+                value: rate,
+                displayValue: `${rate}%`,
+                variant: rate >= 80 ? 'gold' : 'dark',
+              }}
+            />
+          );
+        })}
+      </MasterList>
+    );
 
     centerContent = (
       <div className="workora-table-container">
@@ -1447,8 +1537,8 @@ export default function Home() {
                 </button>
               ),
             },
-            { title: 'Check-in', render: (a) => a.checkIn || '—' },
-            { title: 'Check-out', render: (a) => a.checkOut || '—' },
+            { title: 'Check-in', render: (a) => a.checkIn || '-' },
+            { title: 'Check-out', render: (a) => a.checkOut || '-' },
             { title: 'Worked hours', render: (a) => hours(a).toFixed(2) },
             { title: 'Status', render: (a) => <Badge value={attendanceStatus(a)} /> },
             { title: 'Source', render: (a) => (a.edited ? 'Manually edited' : 'Shift entry') },
@@ -1566,7 +1656,38 @@ export default function Home() {
     const filteredRequests = filtered(baseRequests);
     const activeReq = baseRequests.find((r) => r.id === activeId) || filteredRequests[0];
 
-
+    leftSlot = (
+      <MasterList
+        title={currentUser.role === 'Employee' ? 'My Requests' : 'Leave Requests'}
+        count={filteredRequests.length}
+        search={query}
+        onSearchChange={setQuery}
+        searchPlaceholder="Filter requests…"
+        isEmpty={filteredRequests.length === 0}
+      >
+        {filteredRequests.map((r) => {
+          const emp = employee(r.employeeId);
+          const isSel = r.id === activeReq?.id;
+          return (
+            <MasterCard
+              key={r.id}
+              avatar={initials(emp?.name || 'TO')}
+              title={emp?.name || 'Employee'}
+              subtitle={`${leaveType(r.typeId)?.name} · ${r.duration} ${leaveType(r.typeId)?.unit?.toLowerCase() || 'days'}`}
+              badge={r.status}
+              active={isSel}
+              onClick={() => setActiveId(r.id)}
+              progress={{
+                label: 'Duration',
+                value: Math.min(r.duration * 10, 100),
+                displayValue: `${r.duration} ${leaveType(r.typeId)?.unit?.toLowerCase() || 'days'}`,
+                variant: r.status === 'Approved' ? 'green' : 'gold',
+              }}
+            />
+          );
+        })}
+      </MasterList>
+    );
 
     centerContent = (
       <div className="workora-table-container">
@@ -1592,7 +1713,7 @@ export default function Home() {
                   </button>
                 ),
               },
-              { title: 'Dates', render: (r) => r.start + ' – ' + r.end },
+              { title: 'Dates', render: (r) => r.start + ' - ' + r.end },
               { title: 'Duration', render: (r) => r.duration + ' ' + leaveType(r.typeId)?.unit.toLowerCase() },
               { title: 'Status', render: (r) => <Badge value={r.status} /> },
               {
@@ -1633,7 +1754,7 @@ export default function Home() {
                 render: (r) => (r.status === 'Approved' ? r.amount - allocationBalance(s, r) : 0),
               },
               { title: 'Remaining', render: (r) => allocationBalance(s, r) },
-              { title: 'Validity', render: (r) => r.start + ' – ' + r.end },
+              { title: 'Validity', render: (r) => r.start + ' - ' + r.end },
               { title: 'Status', render: (r) => <Badge value={r.status} /> },
             ]}
           />
@@ -1801,7 +1922,7 @@ export default function Home() {
         count={s.payruns.length}
         search={query}
         onSearchChange={setQuery}
-        searchPlaceholder="Search payruns…"
+        searchPlaceholder="Search payruns..."
       >
         {s.payruns.map((r) => {
           const isSel = r.id === activeRun?.id;
@@ -1811,7 +1932,7 @@ export default function Home() {
               key={r.id}
               avatar="PR"
               title={r.name}
-              subtitle={`${niceMonth(r.period)} · ${r.employeeIds.length} staff`}
+              subtitle={`${niceMonth(r.period)} - ${r.employeeIds.length} staff`}
               badge={r.status}
               active={isSel}
               onClick={() => {
@@ -1845,7 +1966,7 @@ export default function Home() {
                   const isPast = ['Draft', 'Computed', 'Validated', 'Paid'].indexOf(run.status) >= idx;
                   return (
                     <div key={st} className="flex items-center gap-1">
-                      {idx > 0 && <span className="text-[10px] text-slate-300">→</span>}
+                      {idx > 0 && <span className="text-[10px] text-slate-300">-&gt;</span>}
                       <span
                         className={`px-2.5 py-0.5 rounded-lg text-xs font-semibold ${
                           isCurrent
@@ -1867,7 +1988,7 @@ export default function Home() {
               <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
                 <span className="text-[11px] text-slate-400">Period</span>
                 <span className="text-xs font-bold text-slate-900 block mt-0.5">
-                  {run.period + '-01'} — {monthEnd(run.period)}
+                  {run.period + '-01'} - {monthEnd(run.period)}
                 </span>
               </div>
               <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
@@ -1958,7 +2079,7 @@ export default function Home() {
                   disabled={busy || !run.slips.length || !['Validated', 'Paid'].includes(run.status)}
                   onClick={() => void sendPayslips(run.id)}
                 >
-                  <Mail size={13} /> {busy ? 'Sending…' : 'Send Payslips'}
+                  <Mail size={13} /> {busy ? 'Sending...' : 'Send Payslips'}
                 </button>
               )}
               {['Admin', 'HR Payroll Manager', 'HR Payroll User'].includes(currentUser.role) &&
@@ -2012,7 +2133,7 @@ export default function Home() {
                     </button>
                   ),
                 },
-                { title: 'Period', render: (r) => r.period + '-01 – ' + monthEnd(r.period) },
+                { title: 'Period', render: (r) => r.period + '-01 - ' + monthEnd(r.period) },
                 { title: 'Structure', render: (r) => structure(r.structureId) },
                 { title: 'Employees', render: (r) => r.employeeIds.length },
                 { title: 'Net salary', render: (r) => money(r.slips.reduce((n: number, p: Row) => n + p.net, 0)) },
@@ -2362,7 +2483,7 @@ export default function Home() {
         currentView={view}
         onNavigate={navigate}
         title="PeoplePay360"
-        badgeText={error ? 'Offline' : 'Opening…'}
+        badgeText={error ? 'Offline' : 'Opening...'}
         error={error}
         message={message}
         onReload={() => void load()}
@@ -2403,7 +2524,7 @@ export default function Home() {
           ) : (
             <>
               <RefreshCw className="size-8 text-slate-400 mx-auto animate-spin mb-3" />
-              <h2 className="text-base font-semibold text-slate-900">Opening your workspace…</h2>
+              <h2 className="text-base font-semibold text-slate-900">Opening your workspace...</h2>
               <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
                 Loading employees, attendance, and payroll records.
               </p>
@@ -2443,7 +2564,6 @@ export default function Home() {
       >
         {centerContent}
       </PageShell>
-
       {/* ─── Slide-Over Right Drawer Overlay for Users ─── */}
       {selectedUserDrawer && (
         <div className="fixed inset-0 z-50 overflow-hidden">
@@ -2706,9 +2826,9 @@ export default function Home() {
               </DialogTitle>
               <DialogDescription className="text-xs text-slate-400 mt-0.5">
                 {modal?.kind === 'about'
-                  ? 'PeoplePay360 · Crextio Design System'
+                  ? 'PeoplePay360 - Crextio Design System'
                   : modal?.kind === 'clock'
-                  ? 'Nisha Rao · Finance Manager · Live Shift'
+                  ? 'Nisha Rao - Finance Manager - Live Shift'
                   : 'Connected records. One unified workspace.'}
               </DialogDescription>
             </div>
@@ -2991,7 +3111,7 @@ export default function Home() {
                   </span>
                   <h3 className="text-base font-bold text-slate-900">{empName(modal.record.employeeId)}</h3>
                   <p className="text-xs text-slate-500">
-                    {niceMonth(modal.record.period)} · {structure(modal.record.structureId)}
+                    {niceMonth(modal.record.period)} - {structure(modal.record.structureId)}
                   </p>
                 </div>
                 <Badge value={modal.record.status || 'Computed'} />
@@ -2999,8 +3119,8 @@ export default function Home() {
 
               <div className="grid grid-cols-3 gap-2">
                 {[
-                  ['Scheduled days', modal.record.scheduledDays ?? '—'],
-                  ['Payable days', modal.record.payableDays ?? modal.record.scheduledDays ?? '—'],
+                  ['Scheduled days', modal.record.scheduledDays ?? '-'],
+                  ['Payable days', modal.record.payableDays ?? modal.record.scheduledDays ?? '-'],
                   ['Unpaid leave', modal.record.unpaidLeaveDays || 0],
                 ].map(([label, value]) => (
                   <div key={String(label)} className="rounded-xl border border-slate-100 bg-slate-50 p-3">
@@ -3011,7 +3131,7 @@ export default function Home() {
               </div>
 
               <DataTable
-                rows={modal.record.lines?.map((l: any) => ({ ...l, id: l.code })) || []}
+                rows={((modal.record.lines as Row[] | undefined) || []).map((l) => ({ ...l, id: l.code }))}
                 columns={[
                   { title: 'Salary Component', render: (l) => l.name },
                   { title: 'Category', render: (l) => l.category },
@@ -3050,7 +3170,7 @@ export default function Home() {
                   : '10:00 AM'}
               </div>
               <p className="text-xs text-slate-400">
-                Today ·{' '}
+                Today -{' '}
                 {mounted && clockNow
                   ? clockNow.toLocaleDateString('en-IN', {
                       timeZone: 'Asia/Kolkata',
@@ -3058,7 +3178,7 @@ export default function Home() {
                       month: 'long',
                     })
                   : '5 September'}{' '}
-                · Asia/Kolkata
+                - Asia/Kolkata
               </p>
 
               <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-between text-xs">
@@ -3066,7 +3186,7 @@ export default function Home() {
                   {signedIn
                     ? 'Checked in at ' + currentClock?.checkIn
                     : currentClock?.checkOut
-                    ? 'Today’s shift completed'
+                    ? "Today's shift completed"
                     : 'You are not checked in'}
                 </span>
                 <Badge value={signedIn ? 'Present' : currentClock?.checkOut ? 'Completed' : 'Not checked in'} />
@@ -3103,16 +3223,18 @@ export default function Home() {
           {modal?.kind === 'about' && (
             <div className="space-y-4 text-xs text-slate-600">
               <div className="flex flex-col items-center justify-center p-4 bg-amber-50/50 rounded-2xl border border-amber-100/80 text-center">
-                <img
+                <Image
                   src="/favicon.png"
                   alt="PeoplePay360"
-                  className="w-24 h-24 rounded-2xl object-contain shadow-xs border border-amber-200/60 bg-white mb-2"
+                  width={96}
+                  height={96}
+                  className="rounded-2xl object-contain shadow-xs border border-amber-200/60 bg-white mb-2"
                 />
                 <h3 className="font-extrabold text-slate-900 text-base flex items-center">
                   peoplepay<span className="text-[#e6a817]">360</span>
                 </h3>
                 <p className="text-[10px] font-bold tracking-widest text-amber-700/80 uppercase mt-0.5">
-                  People • Payroll • Progress
+                  People * Payroll * Progress
                 </p>
               </div>
               <p className="p-3 rounded-xl bg-slate-50 border border-slate-100 leading-relaxed text-slate-600">
@@ -3140,7 +3262,7 @@ function PayrunWizard({
 }: {
   s: Workspace;
   busy: boolean;
-  onCreate: (p: Record<string, any>) => Promise<void>;
+  onCreate: (p: PayrunCreatePayload) => Promise<void>;
   onCancel: () => void;
 }) {
   const [step, setStep] = useState(1);
@@ -3169,10 +3291,10 @@ function PayrunWizard({
     <div className="space-y-4">
       <div className="flex items-center gap-4 text-xs font-semibold pb-2 border-b border-slate-100">
         <span className={step === 1 ? 'text-slate-900 border-b-2 border-slate-900 pb-1' : 'text-slate-400'}>
-          01 · Scope & Period
+          01 - Scope & Period
         </span>
         <span className={step === 2 ? 'text-slate-900 border-b-2 border-slate-900 pb-1' : 'text-slate-400'}>
-          02 · Select Employees
+          02 - Select Employees
         </span>
       </div>
 
@@ -3209,7 +3331,7 @@ function PayrunWizard({
                 aria-label="Search eligible employees"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search eligible employees…"
+                placeholder="Search eligible employees..."
               />
             </div>
             <span className="px-2.5 py-1 rounded-full bg-slate-100 text-xs font-semibold text-slate-700">
@@ -3236,7 +3358,7 @@ function PayrunWizard({
                   <span className="font-medium">{e.name}</span>
                   <span className="text-[11px] text-slate-400 ml-auto">
                     {e.department}
-                    {!e.bank ? ' · Bank missing' : ''}
+                    {!e.bank ? ' - Bank missing' : ''}
                   </span>
                 </label>
               ))}
@@ -3268,7 +3390,7 @@ function PayrunWizard({
             disabled={busy || !ids.length}
             onClick={() => void onCreate({ period, structureId, employeeIds: ids })}
           >
-            {busy ? 'Creating…' : 'Create payrun'}
+            {busy ? 'Creating...' : 'Create payrun'}
           </button>
         )}
       </div>

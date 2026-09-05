@@ -1,0 +1,211 @@
+[4095,-785 | sz:20pt] 3) Time Off Flow
+[4117,-785 | sz:12pt] Requests, Allocations and Time Off Types must be reached from Time Off ▼ in the navbar. Do not add separate page buttons for them.
+[4174,227 | sz:28pt] Time Off:
+
+- Requests should support a simple approval flow.
+- For leave types that require allocation, approved leave should reduce the
+employee’s available balance.
+- Time Off Types should define how each leave type behaves. The exact
+policies and validations are open to interpretation.
+[4192,-646 | sz:17pt] Menus under Time Off
+[4250,-602 | sz:15pt] Dashboard
+[4294,-597 | sz:15pt] Time offs
+[4334,-622 | sz:16pt] Time off Types
+[4377,-601 | sz:16pt] Allocations
+[4561,664 | sz:13pt] Employees ▼
+[4561,772 | sz:13pt] Contracts ▼
+[4561,880 | sz:13pt] Attendance
+[4561,980 | sz:13pt] Time Off ▼
+[4561,1080 | sz:13pt] Payroll
+[4563,628 | sz:12pt] HR
+[4567,-127 | sz:13pt] Employees ▼
+[4567,-19 | sz:13pt] Contracts ▼
+[4567,89 | sz:13pt] Attendance
+[4567,189 | sz:13pt] Time Off ▼
+[4567,289 | sz:13pt] Payroll
+[4569,-163 | sz:12pt] HR
+[4576,-961 | sz:13pt] Employees ▼
+[4576,-856 | sz:13pt] Contracts ▼
+[4576,-751 | sz:13pt] Attendance
+[4576,-654 | sz:13pt] Time Off ▼
+[4576,-557 | sz:13pt] Payroll
+[4576,1476 | sz:13pt] Employees ▼
+[4576,1584 | sz:13pt] Contracts ▼
+[4576,1692 | sz:13pt] Attendance
+[4576,1792 | sz:13pt] Time Off ▼
+[4576,1892 | sz:13pt] Payroll
+[4578,-996 | sz:12pt] HR
+[4578,1440 | sz:12pt] HR
+[4606,632 | sz:22pt] Allocations
+[4612,-159 | sz:22pt] Time Off Request / Aarav Mehta
+[4619,-992 | sz:21pt] Time Off Requests
+[4621,1444 | sz:22pt] Allocation / Aarav Mehta
+[4638,632 | sz:12pt] List view opened from Time Off ▼ → Allocations
+[4644,-159 | sz:12pt] Form view of one request
+[4651,-992 | sz:12pt] List view opened from Time Off ▼ → Requests
+[4653,1444 | sz:12pt] Form view of one allocation record
+[4679,653 | sz:11pt] NEW
+[4679,714 | sz:11pt] Search allocations…
+[4681,-143 | sz:11pt] Approve
+[4682,-78 | sz:11pt] Refuse
+[4690,-972 | sz:11pt] NEW
+[4690,-913 | sz:11pt] Search requests…
+[4690,-689 | sz:11pt] My Team
+[4694,1457 | sz:11pt] Approve
+[4694,1461 | sz:11pt] EDIT
+[4695,1525 | sz:11pt] Refuse
+[4722,-159 | sz:10pt] Employee
+[4722,147 | sz:10pt] Duration
+[4726,-35 | sz:10pt] Aarav Mehta
+[4726,271 | sz:10pt] 3 Days
+[4731,1444 | sz:10pt] Employee
+[4731,1750 | sz:10pt] Taken
+[4734,640 | sz:10pt] Employee
+[4734,790 | sz:10pt] Type
+[4734,910 | sz:10pt] Allocated
+[4734,1000 | sz:10pt] Taken
+[4734,1080 | sz:10pt] Remaining
+[4734,1170 | sz:10pt] Status
+[4735,1568 | sz:10pt] Aarav Mehta
+[4735,1874 | sz:10pt] 8 Days
+[4744,-985 | sz:10pt] Employee
+[4744,-849 | sz:10pt] Type
+[4744,-742 | sz:10pt] Start
+[4744,-658 | sz:10pt] End
+[4744,-574 | sz:10pt] Duration
+[4744,-487 | sz:10pt] Status
+[4762,-159 | sz:10pt] Time Off Type
+[4762,147 | sz:10pt] Status
+[4766,-35 | sz:10pt] Paid Time Off
+[4766,271 | sz:10pt] Approved
+[4767,1288 | sz:16pt] open allocation
+[4771,1444 | sz:10pt] Time Off Type
+[4771,1750 | sz:10pt] Remaining
+[4772,640 | sz:10pt] Aarav Mehta
+[4772,790 | sz:10pt] Paid Time Off
+[4772,910 | sz:10pt] 20 days
+[4772,1000 | sz:10pt] 8 days
+[4772,1080 | sz:10pt] 12 days
+[4772,1170 | sz:10pt] Approved
+[4775,1568 | sz:10pt] Paid Time Off
+[4775,1874 | sz:10pt] 12 Days
+[4781,-985 | sz:10pt] Aarav Mehta
+[4781,-849 | sz:10pt] Paid Time Off
+[4781,-742 | sz:10pt] 12-Sep
+[4781,-658 | sz:10pt] 14-Sep
+[4781,-574 | sz:10pt] 3 Days
+[4781,-487 | sz:10pt] Approved
+[4783,-406 | sz:6pt] Approve
+[4784,-372 | sz:6pt] Refuse
+[4802,-159 | sz:10pt] Start Date
+[4802,147 | sz:10pt] Approver
+[4806,-35 | sz:10pt] 12-Sep-2026
+[4806,271 | sz:10pt] Sara Khan
+[4811,1444 | sz:10pt] Allocated
+[4811,1750 | sz:10pt] Approver
+[4815,1568 | sz:10pt] 20 Days
+[4815,1874 | sz:10pt] Sara Khan
+[4816,640 | sz:10pt] Sara Khan
+[4816,790 | sz:10pt] Paid Time Off
+[4816,910 | sz:10pt] 18 days
+[4816,1000 | sz:10pt] 4 days
+[4816,1080 | sz:10pt] 14 days
+[4816,1170 | sz:10pt] Approved
+[4824,-985 | sz:10pt] Sara Khan
+[4824,-849 | sz:10pt] Sick Leave
+[4824,-742 | sz:10pt] 18-Sep
+[4824,-658 | sz:10pt] 18-Sep
+[4824,-574 | sz:10pt] 1 Day
+[4824,-487 | sz:10pt] Approved
+[4825,-406 | sz:6pt] Approve
+[4825,-370 | sz:6pt] Refuse
+[4842,-159 | sz:10pt] End Date
+[4842,147 | sz:10pt] Allocation Used
+[4843,-298 | sz:16pt] Open time off
+[4846,-35 | sz:10pt] 14-Sep-2026
+[4846,271 | sz:10pt] Paid Time Off 2026
+[4851,1444 | sz:10pt] Status
+[4851,1750 | sz:10pt] Validity
+[4855,1568 | sz:10pt] Approved
+[4855,1874 | sz:10pt] 2026 Annual Balance
+[4860,640 | sz:10pt] Neha Patel
+[4860,790 | sz:10pt] Comp Off
+[4860,910 | sz:10pt] 2 days
+[4860,1000 | sz:10pt] 1 day
+[4860,1080 | sz:10pt] 1 day
+[4860,1170 | sz:10pt] To Approve
+[4866,-985 | sz:10pt] John Dsouza
+[4866,-849 | sz:10pt] Comp Off
+[4866,-742 | sz:10pt] 27-Sep
+[4866,-658 | sz:10pt] 27-Sep
+[4866,-574 | sz:10pt] 1 Day
+[4866,-487 | sz:10pt] To Approve
+[4868,-403 | sz:6pt] Approve
+[4869,-367 | sz:6pt] Refuse
+[4912,-147 | sz:11pt] Reason
+[4921,1456 | sz:11pt] Description
+[4938,-147 | sz:11pt] Family vacation
+[4947,1456 | sz:11pt] Annual leave balance granted at start of policy year.
+[4966,632 | sz:12pt] Useful note: the list should expose the balance math at a glance — Allocated, Taken and Remaining.
+[4969,-992 | sz:11pt] Useful note: request status should show the approval lifecycle clearly.
+[4987,-159 | sz:9pt] Useful note: if the selected type requires allocation, the request should clearly show which balance was consumed.
+[4988,1444 | sz:12pt] Useful note: approved allocation is what creates available leave balance for the employee.
+[5018,853 | sz:11pt] Open selected allocation
+[5141,31 | sz:13pt] Employees ▼
+[5141,139 | sz:13pt] Contracts ▼
+[5141,247 | sz:13pt] Attendance
+[5141,347 | sz:13pt] Time Off ▼
+[5141,447 | sz:13pt] Payroll
+[5143,-5 | sz:12pt] HR
+[5149,770 | sz:13pt] Employees ▼
+[5149,878 | sz:13pt] Contracts ▼
+[5149,986 | sz:13pt] Attendance
+[5149,1086 | sz:13pt] Time Off ▼
+[5149,1186 | sz:13pt] Payroll
+[5151,734 | sz:12pt] HR
+[5186,-1 | sz:22pt] Time Off Types
+[5194,738 | sz:22pt] Time Off Type / Paid Time Off
+[5218,-1 | sz:12pt] List view opened from Time Off ▼ → Time Off Types
+[5226,738 | sz:12pt] Form view of one time off type
+[5259,20 | sz:11pt] NEW
+[5259,81 | sz:11pt] Search time off types…
+[5267,755 | sz:11pt] EDIT
+[5304,738 | sz:10pt] Type Name
+[5304,1044 | sz:10pt] Approval
+[5308,862 | sz:10pt] Paid Time Off
+[5308,1168 | sz:10pt] Manager
+[5314,7 | sz:10pt] Type
+[5314,177 | sz:10pt] Unit
+[5314,267 | sz:10pt] Allocation
+[5314,377 | sz:10pt] Approval
+[5314,487 | sz:10pt] Status
+[5344,738 | sz:10pt] Unit
+[5344,1044 | sz:10pt] Payroll / Work Entry
+[5348,862 | sz:10pt] Days
+[5348,1168 | sz:10pt] Leave Work Entry
+[5348,609 | sz:9pt] Open selected type
+[5352,7 | sz:10pt] Paid Time Off
+[5352,177 | sz:10pt] Days
+[5352,267 | sz:10pt] Required
+[5352,377 | sz:10pt] Manager
+[5352,487 | sz:10pt] Active
+[5384,738 | sz:10pt] Requires Allocation
+[5384,1044 | sz:10pt] Display Color
+[5388,862 | sz:10pt] Yes
+[5388,1168 | sz:10pt] Blue
+[5396,7 | sz:10pt] Sick Leave
+[5396,177 | sz:10pt] Days
+[5396,267 | sz:10pt] No
+[5396,377 | sz:10pt] Manager
+[5396,487 | sz:10pt] Active
+[5424,738 | sz:10pt] Active
+[5428,862 | sz:10pt] True
+[5440,7 | sz:10pt] Comp Off
+[5440,177 | sz:10pt] Hours
+[5440,267 | sz:10pt] Required
+[5440,377 | sz:10pt] Officer
+[5440,487 | sz:10pt] Active
+[5494,750 | sz:11pt] Configuration Notes
+[5520,750 | sz:11pt] Standard annual leave. Balance comes from approved allocations.
+[5546,-1 | sz:12pt] Useful note: this list defines policy rules, not employee transactions.
+[5554,738 | sz:12pt] Useful note: Time Off Type drives approval behavior and whether a request needs an allocation.

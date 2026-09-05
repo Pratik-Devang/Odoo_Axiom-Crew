@@ -1,0 +1,3677 @@
+--- [y=495, x=-1055, size=22pt] ---
+0) Login & User Access Flow
+
+--- [y=529, x=-1055, size=12pt] ---
+Administrators create user accounts and assign access. Employees use Login to enter the HR and Payroll application.
+
+--- [y=597, x=-1030, size=18pt] ---
+HR Portal
+
+--- [y=598, x=-254, size=18pt] ---
+User Management
+
+--- [y=605, x=-84, size=10pt] ---
+ADMIN ONLY
+
+--- [y=659, x=-1029, size=24pt] ---
+Welcome back
+
+--- [y=675, x=-298, size=13pt] ---
++  New User
+
+--- [y=676, x=-142, size=12pt] ---
+Search users, employees or email…
+
+--- [y=676, x=288, size=12pt] ---
+Role Filter
+
+--- [y=684, x=437, size=16pt] ---
+Open on New User
+
+--- [y=693, x=-1029, size=12pt] ---
+Sign in to continue to your workspace.
+
+--- [y=736, x=-286, size=11pt] ---
+User
+
+--- [y=736, x=-154, size=11pt] ---
+Employee
+
+--- [y=736, x=-22, size=11pt] ---
+Work Email
+
+--- [y=736, x=155, size=11pt] ---
+Role
+
+--- [y=736, x=302, size=11pt] ---
+Status
+
+--- [y=740, x=446, size=16pt] ---
+Create / Edit User
+
+--- [y=741, x=-1029, size=11pt] ---
+Work Email
+
+--- [y=771, x=444, size=10pt] ---
+Employee *
+
+--- [y=772, x=993, size=15pt] ---
+LOGIN / USER ACCESS NOTE
+
+--- [y=774, x=-1015, size=12pt] ---
+name@company.com
+
+--- [y=784, x=-286, size=10pt] ---
+Aarav Mehta
+
+--- [y=784, x=-154, size=10pt] ---
+Aarav Mehta
+
+--- [y=784, x=-22, size=10pt] ---
+aarav@company.com
+
+--- [y=784, x=155, size=10pt] ---
+Payroll User
+
+--- [y=786, x=302, size=10pt] ---
+Active
+
+--- [y=799, x=456, size=10pt] ---
+Select employee
+
+--- [y=808, x=984, size=16pt] ---
+• In the ERP flow. User accounts are created by an Admin.
+• When creating a user, link the account to the relevant employee and assign one or more roles.
+• Roles control which modules, records and actions become available after login.
+• Users must not be able to assign or elevate their own roles.
+• Password reset, invitations, SSO, etc. can be added as enhancements.
+
+--- [y=816, x=-1029, size=11pt] ---
+Password
+
+--- [y=836, x=444, size=10pt] ---
+Work Email *
+
+--- [y=842, x=-286, size=10pt] ---
+Maya Shah
+
+--- [y=842, x=-154, size=10pt] ---
+Maya Shah
+
+--- [y=842, x=-22, size=10pt] ---
+maya@company.com
+
+--- [y=842, x=155, size=10pt] ---
+Time Off Admin
+
+--- [y=844, x=302, size=10pt] ---
+Active
+
+--- [y=849, x=-1015, size=12pt] ---
+••••••••••
+
+--- [y=853, x=-424, size=10pt] ---
+User can
+now log in
+
+--- [y=864, x=456, size=10pt] ---
+employee@company.com
+
+--- [y=884, x=-575, size=11pt] ---
+Forgot password?
+
+--- [y=900, x=-286, size=10pt] ---
+Rohan Patel
+
+--- [y=900, x=-154, size=10pt] ---
+Rohan Patel
+
+--- [y=900, x=-22, size=10pt] ---
+rohan@company.com
+
+--- [y=900, x=155, size=10pt] ---
+Time Off User
+
+--- [y=901, x=444, size=10pt] ---
+Roles *
+
+--- [y=902, x=302, size=10pt] ---
+Active
+
+--- [y=924, x=468, size=10pt] ---
+Employee
+
+--- [y=931, x=-1029, size=13pt] ---
+Sign In
+
+--- [y=954, x=468, size=10pt] ---
+Hr Manager
+
+--- [y=958, x=-286, size=10pt] ---
+Nisha Rao
+
+--- [y=958, x=-154, size=10pt] ---
+Nisha Rao
+
+--- [y=958, x=-22, size=10pt] ---
+nisha@company.com
+
+--- [y=958, x=155, size=10pt] ---
+Payroll Admin
+
+--- [y=960, x=302, size=10pt] ---
+Active
+
+--- [y=984, x=468, size=10pt] ---
+Hr Payroll User
+
+--- [y=1007, x=471, size=10pt] ---
+Hr Payroll Admin
+
+--- [y=1012, x=-298, size=10pt] ---
+Select a user to edit access, or create a new user.
+
+--- [y=1016, x=-1029, size=12pt] ---
+Accounts are created by an administrator.
+
+--- [y=1026, x=471, size=10pt] ---
+Admin
+
+--- [y=1050, x=444, size=10pt] ---
+Account Status
+
+--- [y=1051, x=600, size=10pt] ---
+Active
+
+--- [y=1082, x=-1029, size=11pt] ---
+After sign-in, show only the modules and actions allowed by the user’s assigned role.
+
+--- [y=1099, x=444, size=12pt] ---
+Create User / Save Access
+
+--- [y=1142, x=-298, size=10pt] ---
+User accounts are separate from Employee records, but should be linked to an employee for access and ownership.
+
+--- [y=1222, x=-735, size=11pt] ---
+Successful sign in
+
+--- [y=1339, x=-1029, size=30pt] ---
+Odoo HR Payroll Hackathon — Functional Screen Flow
+
+--- [y=1443, x=-1029, size=20pt] ---
+1) Employee & Contract Flow
+
+--- [y=1483, x=-1028, size=12pt] ---
+Use arrows as navigation flow: user reaches Employee screens, opens a record, then accesses related Contract records.
+
+--- [y=1568, x=-920, size=13pt] ---
+Menus under Employees
+
+--- [y=1612, x=-887, size=11pt] ---
+Employees
+
+--- [y=1647, x=-890, size=14pt] ---
+contracts
+
+--- [y=1683, x=-896, size=14pt] ---
+departments
+
+--- [y=1717, x=-908, size=13pt] ---
+Working Schedule
+
+--- [y=1831, x=2853, size=26pt] ---
+Working Schedule — List & Form Views
+
+--- [y=1857, x=-1023, size=13pt] ---
+Employees ▼
+
+--- [y=1857, x=-915, size=13pt] ---
+Contracts ▼
+
+--- [y=1857, x=-807, size=13pt] ---
+Attendance
+
+--- [y=1857, x=-707, size=13pt] ---
+Time Off ▼
+
+--- [y=1857, x=-607, size=13pt] ---
+Payroll
+
+--- [y=1857, x=-249, size=13pt] ---
+Employees ▼
+
+--- [y=1857, x=-141, size=13pt] ---
+Contracts ▼
+
+--- [y=1857, x=-33, size=13pt] ---
+Attendance
+
+--- [y=1857, x=67, size=13pt] ---
+Time Off ▼
+
+--- [y=1857, x=167, size=13pt] ---
+Payroll
+
+--- [y=1857, x=525, size=13pt] ---
+Employees ▼
+
+--- [y=1857, x=633, size=13pt] ---
+Contracts ▼
+
+--- [y=1857, x=741, size=13pt] ---
+Attendance
+
+--- [y=1857, x=841, size=13pt] ---
+Time Off ▼
+
+--- [y=1857, x=941, size=13pt] ---
+Payroll
+
+--- [y=1859, x=-1059, size=12pt] ---
+HR
+
+--- [y=1859, x=-285, size=12pt] ---
+HR
+
+--- [y=1859, x=489, size=12pt] ---
+HR
+
+--- [y=1884, x=3836, size=20pt] ---
+40 Hours / Week
+
+--- [y=1885, x=2994, size=20pt] ---
+Working Schedules
+
+--- [y=1886, x=2870, size=12pt] ---
++  New Schedule
+
+--- [y=1887, x=3710, size=12pt] ---
+←  Back to list
+
+--- [y=1902, x=-1055, size=22pt] ---
+Employees
+
+--- [y=1902, x=-281, size=22pt] ---
+Employees
+
+--- [y=1902, x=493, size=22pt] ---
+Employee / Aarav Mehta
+
+--- [y=1934, x=-1055, size=12pt] ---
+Default view: Kanban
+
+--- [y=1934, x=-281, size=12pt] ---
+List view for sort, filter and bulk scanning
+
+--- [y=1934, x=493, size=12pt] ---
+Main employee form with related HR actions
+
+--- [y=1944, x=2863, size=13pt] ---
+List
+
+--- [y=1944, x=2932, size=13pt] ---
+Calendar
+
+--- [y=1953, x=1357, size=28pt] ---
+Employee & Contract
+
+- Employees should be viewable in both Kanban and List views.
+- Opening an employee should show their HR details and related records such as Contracts,
+Attendance, Time Off, and Allocations.
+- An employee can have multiple contracts over time.
+- Payroll should use the contract applicable to the selected payroll period.
+
+Working Schedule
+- Working Schedules need List and Form views. Clicking a row should open that schedule.
+- List should surface name, calendar type, days/week, hours/week, company and status.
+- Form defines the weekly pattern: day, start/end time, optional break and hours. Weekly
+hours should be derived from the schedule.
+- A schedule can be assigned to an Employee/Contract and used by Attendance and Payroll.
+Shift, flexible-time and other rules are open to the participant.
+
+--- [y=1956, x=3714, size=11pt] ---
+Schedule Name
+
+--- [y=1956, x=4106, size=11pt] ---
+Company
+
+--- [y=1970, x=845, size=11pt] ---
+Time Off 3
+
+--- [y=1971, x=953, size=11pt] ---
+Contracts 2
+
+--- [y=1971, x=1061, size=11pt] ---
+Attendance 14
+
+--- [y=1975, x=-1034, size=11pt] ---
+NEW
+
+--- [y=1975, x=-973, size=11pt] ---
+Search employees…
+
+--- [y=1975, x=-511, size=11pt] ---
+Kanban
+
+--- [y=1975, x=-420, size=11pt] ---
+List
+
+--- [y=1975, x=-260, size=11pt] ---
+NEW
+
+--- [y=1975, x=-199, size=11pt] ---
+Search employees…
+
+--- [y=1975, x=265, size=11pt] ---
+Kanban
+
+--- [y=1975, x=353, size=11pt] ---
+List
+
+--- [y=1975, x=510, size=11pt] ---
+EDIT
+
+--- [y=1986, x=3726, size=12pt] ---
+40 Hours / Week
+
+--- [y=1986, x=4118, size=12pt] ---
+My Company
+
+--- [y=1998, x=2877, size=12pt] ---
+Search schedules…
+
+--- [y=1998, x=3339, size=12pt] ---
+Filter
+
+--- [y=1998, x=3437, size=12pt] ---
+Columns
+
+--- [y=2028, x=581, size=20pt] ---
+Aarav Mehta
+
+--- [y=2030, x=-273, size=10pt] ---
+Employee
+
+--- [y=2030, x=-108, size=10pt] ---
+Work Email
+
+--- [y=2030, x=62, size=10pt] ---
+Job Position
+
+--- [y=2030, x=197, size=10pt] ---
+Department
+
+--- [y=2030, x=312, size=10pt] ---
+Status
+
+--- [y=2036, x=-985, size=14pt] ---
+Aarav Mehta
+
+--- [y=2036, x=-643, size=14pt] ---
+Sara Khan
+
+--- [y=2040, x=3714, size=11pt] ---
+Days per Week
+
+--- [y=2040, x=3906, size=11pt] ---
+Hours per Week
+
+--- [y=2040, x=4106, size=11pt] ---
+Timezone
+
+--- [y=2045, x=-1033, size=13pt] ---
+AM
+
+--- [y=2045, x=-691, size=13pt] ---
+SK
+
+--- [y=2052, x=515, size=16pt] ---
+AM
+
+--- [y=2058, x=-985, size=11pt] ---
+Payroll Specialist
+
+--- [y=2058, x=-643, size=11pt] ---
+HR Officer
+
+--- [y=2060, x=581, size=12pt] ---
+Payroll Specialist • Finance
+
+--- [y=2067, x=-273, size=10pt] ---
+Aarav Mehta
+
+--- [y=2067, x=-108, size=10pt] ---
+aarav@oxp.com
+
+--- [y=2067, x=62, size=10pt] ---
+Payroll Specialist
+
+--- [y=2067, x=197, size=10pt] ---
+Finance
+
+--- [y=2067, x=312, size=10pt] ---
+Active
+
+--- [y=2067, x=2882, size=11pt] ---
+Schedule Name
+
+--- [y=2067, x=3187, size=11pt] ---
+Days / Week
+
+--- [y=2067, x=3281, size=11pt] ---
+Hours / Week
+
+--- [y=2067, x=3382, size=11pt] ---
+Company
+
+--- [y=2067, x=3522, size=11pt] ---
+Status
+
+--- [y=2070, x=3726, size=12pt] ---
+5
+
+--- [y=2070, x=3918, size=12pt] ---
+40h
+
+--- [y=2070, x=4118, size=12pt] ---
+Company timezone
+
+--- [y=2082, x=581, size=11pt] ---
+aarav@oxp.com | +91 98765 43210
+
+--- [y=2092, x=-1041, size=11pt] ---
+Finance
+
+--- [y=2092, x=-699, size=11pt] ---
+HR
+
+--- [y=2109, x=-273, size=10pt] ---
+Sara Khan
+
+--- [y=2109, x=-108, size=10pt] ---
+sara@oxp.com
+
+--- [y=2109, x=62, size=10pt] ---
+HR Officer
+
+--- [y=2109, x=197, size=10pt] ---
+HR
+
+--- [y=2109, x=312, size=10pt] ---
+Active
+
+--- [y=2110, x=-1041, size=11pt] ---
+● Active
+
+--- [y=2110, x=-699, size=11pt] ---
+● Active
+
+--- [y=2122, x=493, size=11pt] ---
+Work Information
+
+--- [y=2122, x=663, size=11pt] ---
+Private Information
+
+--- [y=2125, x=2882, size=12pt] ---
+40 Hours / Week
+
+--- [y=2125, x=3197, size=12pt] ---
+5
+
+--- [y=2125, x=3291, size=12pt] ---
+40h
+
+--- [y=2125, x=3382, size=12pt] ---
+My Company
+
+--- [y=2126, x=3531, size=11pt] ---
+Active
+
+--- [y=2128, x=3714, size=17pt] ---
+Weekly Schedule
+
+--- [y=2128, x=4688, size=12pt] ---
++  Add Day
+
+--- [y=2151, x=-273, size=10pt] ---
+John Dsouza
+
+--- [y=2151, x=-108, size=10pt] ---
+john@oxp.com
+
+--- [y=2151, x=62, size=10pt] ---
+Developer
+
+--- [y=2151, x=197, size=10pt] ---
+Engineering
+
+--- [y=2151, x=312, size=10pt] ---
+Active
+
+--- [y=2168, x=493, size=10pt] ---
+Department
+
+--- [y=2168, x=829, size=10pt] ---
+Job Position
+
+--- [y=2172, x=617, size=10pt] ---
+Finance
+
+--- [y=2172, x=953, size=10pt] ---
+Payroll Specialist
+
+--- [y=2184, x=3764, size=11pt] ---
+Day
+
+--- [y=2184, x=3964, size=11pt] ---
+Start Time
+
+--- [y=2184, x=4124, size=11pt] ---
+End Time
+
+--- [y=2184, x=4284, size=11pt] ---
+Break
+
+--- [y=2184, x=4434, size=11pt] ---
+Hours
+
+--- [y=2191, x=3607, size=12pt] ---
+Open schedule
+
+--- [y=2192, x=-985, size=14pt] ---
+John Dsouza
+
+--- [y=2192, x=-643, size=14pt] ---
+Neha Patel
+
+--- [y=2193, x=-273, size=10pt] ---
+Neha Patel
+
+--- [y=2193, x=-108, size=10pt] ---
+neha@oxp.com
+
+--- [y=2193, x=62, size=10pt] ---
+Recruiter
+
+--- [y=2193, x=197, size=10pt] ---
+HR
+
+--- [y=2193, x=312, size=10pt] ---
+Active
+
+--- [y=2197, x=2882, size=12pt] ---
+Night Shift
+
+--- [y=2197, x=3197, size=12pt] ---
+5
+
+--- [y=2197, x=3291, size=12pt] ---
+40h
+
+--- [y=2197, x=3382, size=12pt] ---
+My Company
+
+--- [y=2198, x=3531, size=11pt] ---
+Active
+
+--- [y=2201, x=-1033, size=13pt] ---
+JD
+
+--- [y=2201, x=-691, size=13pt] ---
+NP
+
+--- [y=2208, x=493, size=10pt] ---
+Manager
+
+--- [y=2208, x=829, size=10pt] ---
+Work Location
+
+--- [y=2212, x=617, size=10pt] ---
+Sara Khan
+
+--- [y=2212, x=953, size=10pt] ---
+Mumbai
+
+--- [y=2214, x=-985, size=11pt] ---
+Developer
+
+--- [y=2214, x=-643, size=11pt] ---
+Recruiter
+
+--- [y=2225, x=2743, size=12pt] ---
+Working Schedule
+
+--- [y=2229, x=4669, size=15pt] ---
+×
+
+--- [y=2230, x=3764, size=12pt] ---
+Monday
+
+--- [y=2230, x=4439, size=12pt] ---
+8h
+
+--- [y=2232, x=3958, size=11pt] ---
+9:00 AM
+
+--- [y=2232, x=4118, size=11pt] ---
+6:00 PM
+
+--- [y=2232, x=4278, size=11pt] ---
+1h
+
+--- [y=2248, x=-1041, size=11pt] ---
+Engineering
+
+--- [y=2248, x=-699, size=11pt] ---
+HR
+
+--- [y=2248, x=493, size=10pt] ---
+Working Schedule
+
+--- [y=2248, x=829, size=10pt] ---
+Status
+
+--- [y=2252, x=617, size=10pt] ---
+40 Hours / Week
+
+--- [y=2252, x=953, size=10pt] ---
+Active
+
+--- [y=2266, x=-1041, size=11pt] ---
+● Active
+
+--- [y=2266, x=-699, size=11pt] ---
+● Active
+
+--- [y=2269, x=2882, size=12pt] ---
+Retail Weekend
+
+--- [y=2269, x=3197, size=12pt] ---
+5
+
+--- [y=2269, x=3291, size=12pt] ---
+40h
+
+--- [y=2269, x=3382, size=12pt] ---
+My Company
+
+--- [y=2270, x=3531, size=11pt] ---
+Active
+
+--- [y=2283, x=4669, size=15pt] ---
+×
+
+--- [y=2284, x=3764, size=12pt] ---
+Tuesday
+
+--- [y=2284, x=4439, size=12pt] ---
+8h
+
+--- [y=2286, x=3958, size=11pt] ---
+9:00 AM
+
+--- [y=2286, x=4118, size=11pt] ---
+6:00 PM
+
+--- [y=2286, x=4278, size=11pt] ---
+1h
+
+--- [y=2288, x=493, size=10pt] ---
+Company
+
+--- [y=2288, x=829, size=10pt] ---
+Work Email
+
+--- [y=2292, x=617, size=10pt] ---
+OXP Pvt Ltd
+
+--- [y=2292, x=953, size=10pt] ---
+aarav@oxp.com
+
+--- [y=2337, x=4669, size=15pt] ---
+×
+
+--- [y=2338, x=3764, size=12pt] ---
+Wednesday
+
+--- [y=2338, x=4439, size=12pt] ---
+8h
+
+--- [y=2340, x=3958, size=11pt] ---
+9:00 AM
+
+--- [y=2340, x=4118, size=11pt] ---
+6:00 PM
+
+--- [y=2340, x=4278, size=11pt] ---
+1h
+
+--- [y=2341, x=2882, size=12pt] ---
+Flexible Hybrid
+
+--- [y=2341, x=3197, size=12pt] ---
+5
+
+--- [y=2341, x=3291, size=12pt] ---
+37.5h
+
+--- [y=2341, x=3382, size=12pt] ---
+My Company
+
+--- [y=2342, x=3531, size=11pt] ---
+Active
+
+--- [y=2360, x=-1055, size=12pt] ---
+Useful note: Kanban is good for browsing; clicking a card should open the same Employee Form used everywhere else.
+
+--- [y=2360, x=-281, size=12pt] ---
+Useful note: the list view is the main entry point for opening a specific employee record quickly.
+
+--- [y=2368, x=476, size=12pt] ---
+Useful note: smart buttons should open related Contracts, Attendance and Time Off records filtered for the current employee.
+
+--- [y=2391, x=4669, size=15pt] ---
+×
+
+--- [y=2392, x=3764, size=12pt] ---
+Thursday
+
+--- [y=2392, x=4439, size=12pt] ---
+8h
+
+--- [y=2394, x=3958, size=11pt] ---
+9:00 AM
+
+--- [y=2394, x=4118, size=11pt] ---
+6:00 PM
+
+--- [y=2394, x=4278, size=11pt] ---
+1h
+
+--- [y=2413, x=2882, size=12pt] ---
+Part-time 20h
+
+--- [y=2413, x=3197, size=12pt] ---
+4
+
+--- [y=2413, x=3291, size=12pt] ---
+20h
+
+--- [y=2413, x=3382, size=12pt] ---
+My Company
+
+--- [y=2414, x=3531, size=11pt] ---
+Inactive
+
+--- [y=2445, x=4669, size=15pt] ---
+×
+
+--- [y=2446, x=3764, size=12pt] ---
+Friday
+
+--- [y=2446, x=4439, size=12pt] ---
+8h
+
+--- [y=2448, x=3958, size=11pt] ---
+9:00 AM
+
+--- [y=2448, x=4118, size=11pt] ---
+6:00 PM
+
+--- [y=2448, x=4278, size=11pt] ---
+1h
+
+--- [y=2450, x=-55, size=11pt] ---
+Open related contracts
+
+--- [y=2493, x=-249, size=13pt] ---
+Employees ▼
+
+--- [y=2493, x=-141, size=13pt] ---
+Contracts ▼
+
+--- [y=2493, x=-33, size=13pt] ---
+Attendance
+
+--- [y=2493, x=67, size=13pt] ---
+Time Off ▼
+
+--- [y=2493, x=167, size=13pt] ---
+Payroll
+
+--- [y=2493, x=525, size=13pt] ---
+Employees ▼
+
+--- [y=2493, x=633, size=13pt] ---
+Contracts ▼
+
+--- [y=2493, x=741, size=13pt] ---
+Attendance
+
+--- [y=2493, x=841, size=13pt] ---
+Time Off ▼
+
+--- [y=2493, x=941, size=13pt] ---
+Payroll
+
+--- [y=2495, x=-285, size=12pt] ---
+HR
+
+--- [y=2495, x=489, size=12pt] ---
+HR
+
+--- [y=2504, x=4434, size=12pt] ---
+Total Weekly Hours:
+
+--- [y=2504, x=4629, size=13pt] ---
+40h
+
+--- [y=2538, x=-281, size=22pt] ---
+Contracts
+
+--- [y=2538, x=493, size=22pt] ---
+Contract / CON/2026/0042
+
+--- [y=2570, x=-281, size=12pt] ---
+List view of employee contracts
+
+--- [y=2570, x=493, size=12pt] ---
+Form view of one contract
+
+--- [y=2584, x=3714, size=11pt] ---
+Use this schedule as the employee/contract working pattern.
+
+--- [y=2584, x=2867, size=11pt] ---
+Select a schedule to open its Form view
+
+--- [y=2611, x=-260, size=11pt] ---
+NEW
+
+--- [y=2612, x=-195, size=11pt] ---
+Search contracts…
+
+--- [y=2648, x=493, size=10pt] ---
+Employee
+
+--- [y=2648, x=829, size=10pt] ---
+Department
+
+--- [y=2652, x=617, size=10pt] ---
+Aarav Mehta
+
+--- [y=2652, x=953, size=10pt] ---
+Finance
+
+--- [y=2666, x=-273, size=10pt] ---
+Contract
+
+--- [y=2666, x=-143, size=10pt] ---
+Employee
+
+--- [y=2666, x=2, size=10pt] ---
+Start
+
+--- [y=2666, x=87, size=10pt] ---
+End
+
+--- [y=2666, x=172, size=10pt] ---
+Wage / Month
+
+--- [y=2666, x=284, size=10pt] ---
+Status
+
+--- [y=2670, x=2867, size=15pt] ---
+WORKING SCHEDULE NOTE
+• Required views: List and Form. The List is for finding/opening schedules; the Form defines one schedule.
+• A schedule should capture the weekly working pattern (days, working time and total weekly hours). Breaks or variable shifts can be handled in your own way.
+• Employee/Contract can reference a Working Schedule. Attendance and Payroll may use it as the expected working time.
+
+--- [y=2688, x=493, size=10pt] ---
+Start Date
+
+--- [y=2688, x=829, size=10pt] ---
+Job Position
+
+--- [y=2692, x=617, size=10pt] ---
+01-Jan-2026
+
+--- [y=2692, x=953, size=10pt] ---
+Payroll Specialist
+
+--- [y=2706, x=-273, size=10pt] ---
+CON/2026/0042
+
+--- [y=2706, x=-143, size=10pt] ---
+Aarav Mehta
+
+--- [y=2706, x=2, size=10pt] ---
+01-Jan-26
+
+--- [y=2706, x=87, size=10pt] ---
+—
+
+--- [y=2706, x=172, size=10pt] ---
+₹85,000
+
+--- [y=2706, x=284, size=10pt] ---
+Running
+
+--- [y=2728, x=493, size=10pt] ---
+End Date
+
+--- [y=2728, x=829, size=10pt] ---
+Wage / Month
+
+--- [y=2732, x=617, size=10pt] ---
+—
+
+--- [y=2732, x=953, size=10pt] ---
+₹85,000
+
+--- [y=2754, x=-273, size=10pt] ---
+CON/2025/0018
+
+--- [y=2754, x=-143, size=10pt] ---
+Aarav Mehta
+
+--- [y=2754, x=2, size=10pt] ---
+01-Jul-25
+
+--- [y=2754, x=87, size=10pt] ---
+31-Dec-25
+
+--- [y=2754, x=172, size=10pt] ---
+₹78,000
+
+--- [y=2754, x=284, size=10pt] ---
+Expired
+
+--- [y=2768, x=493, size=10pt] ---
+Status
+
+--- [y=2768, x=829, size=10pt] ---
+Working Schedule
+
+--- [y=2772, x=617, size=10pt] ---
+Running
+
+--- [y=2772, x=953, size=10pt] ---
+40 Hours / Week
+
+--- [y=2802, x=-273, size=10pt] ---
+CON/2026/0031
+
+--- [y=2802, x=-143, size=10pt] ---
+Sara Khan
+
+--- [y=2802, x=2, size=10pt] ---
+01-Jan-26
+
+--- [y=2802, x=87, size=10pt] ---
+—
+
+--- [y=2802, x=172, size=10pt] ---
+₹95,000
+
+--- [y=2802, x=284, size=10pt] ---
+Running
+
+--- [y=2836, x=505, size=11pt] ---
+Salary Structure / Notes
+
+--- [y=2862, x=505, size=11pt] ---
+Structure Type: Employee Salary
+This running contract is the source for payroll calculation in the active period.
+
+--- [y=2948, x=-281, size=12pt] ---
+Useful note: retain contract history, but make the active Running contract obvious because payroll depends on it.
+
+--- [y=2948, x=493, size=12pt] ---
+Useful note: for the problem statement, one employee should not have multiple Running contracts for the same period.
+
+--- [y=3323, x=-782, size=20pt] ---
+2) Attendance Flow
+
+--- [y=3345, x=-782, size=12pt] ---
+Attendance records can be opened from the Attendance menu or from the Employee Form smart button.
+
+--- [y=3417, x=1299, size=18pt] ---
+Attendance Widget
+
+--- [y=3421, x=1777, size=14pt] ---
+⏱
+
+--- [y=3426, x=-732, size=13pt] ---
+Employees ▼
+
+--- [y=3426, x=-624, size=13pt] ---
+Contracts ▼
+
+--- [y=3426, x=-516, size=13pt] ---
+Attendance
+
+--- [y=3426, x=-416, size=13pt] ---
+Time Off ▼
+
+--- [y=3426, x=-316, size=13pt] ---
+Payroll
+
+--- [y=3426, x=202, size=13pt] ---
+Employees ▼
+
+--- [y=3426, x=310, size=13pt] ---
+Contracts ▼
+
+--- [y=3426, x=418, size=13pt] ---
+Attendance
+
+--- [y=3426, x=518, size=13pt] ---
+Time Off ▼
+
+--- [y=3426, x=618, size=13pt] ---
+Payroll
+
+--- [y=3428, x=-768, size=12pt] ---
+HR
+
+--- [y=3428, x=166, size=12pt] ---
+HR
+
+--- [y=3471, x=-764, size=22pt] ---
+Attendance
+
+--- [y=3471, x=170, size=22pt] ---
+Attendance / Aarav Mehta / 02-Sep-2026
+
+--- [y=3477, x=1309, size=14pt] ---
+Welcome back
+
+--- [y=3503, x=-764, size=12pt] ---
+List view of employee attendance records
+
+--- [y=3503, x=170, size=12pt] ---
+Form view of one attendance record
+
+--- [y=3511, x=1309, size=24pt] ---
+User Name!
+
+--- [y=3541, x=1898, size=16pt] ---
+i
+
+--- [y=3544, x=-743, size=11pt] ---
+NEW
+
+--- [y=3544, x=-682, size=11pt] ---
+Search attendance…
+
+--- [y=3544, x=-388, size=11pt] ---
+Today
+
+--- [y=3544, x=-296, size=11pt] ---
+Employee: Aarav
+
+--- [y=3544, x=187, size=11pt] ---
+EDIT
+
+--- [y=3546, x=1902, size=16pt] ---
+Clicking the attendance icon
+opens the Check In / Check Out
+popup.
+
+--- [y=3578, x=2365, size=28pt] ---
+Attendances: 
+
+- Attendance can be accessed globally or from an individual employee.
+- Store check-in, check-out, worked hours, and attendance status.
+- When opened from an employee, only that employee’s attendance should be shown.
+- Attendance data should be usable later for reporting/dashboard insights.
+
+--- [y=3581, x=170, size=10pt] ---
+Employee
+
+--- [y=3581, x=566, size=10pt] ---
+Department
+
+--- [y=3585, x=294, size=10pt] ---
+Aarav Mehta
+
+--- [y=3585, x=690, size=10pt] ---
+Finance
+
+--- [y=3593, x=1309, size=18pt] ---
+9:48 AM
+
+--- [y=3593, x=1443, size=18pt] ---
+—  Now
+
+--- [y=3593, x=1713, size=18pt] ---
+6h56
+
+--- [y=3599, x=-756, size=10pt] ---
+Employee
+
+--- [y=3599, x=-576, size=10pt] ---
+Check In
+
+--- [y=3599, x=-416, size=10pt] ---
+Check Out
+
+--- [y=3599, x=-256, size=10pt] ---
+Worked Hours
+
+--- [y=3599, x=-136, size=10pt] ---
+Status
+
+--- [y=3621, x=170, size=10pt] ---
+Check In
+
+--- [y=3621, x=566, size=10pt] ---
+Manager
+
+--- [y=3625, x=294, size=10pt] ---
+02-Sep-2026 09:05
+
+--- [y=3625, x=690, size=10pt] ---
+Sara Khan
+
+--- [y=3637, x=-756, size=10pt] ---
+Aarav Mehta
+
+--- [y=3637, x=-576, size=10pt] ---
+09:05
+
+--- [y=3637, x=-416, size=10pt] ---
+18:10
+
+--- [y=3637, x=-256, size=10pt] ---
+9.08
+
+--- [y=3637, x=-136, size=10pt] ---
+Present
+
+--- [y=3655, x=1309, size=18pt] ---
+Today
+
+--- [y=3655, x=1713, size=18pt] ---
+6h56
+
+--- [y=3661, x=170, size=10pt] ---
+Check Out
+
+--- [y=3661, x=566, size=10pt] ---
+Status
+
+--- [y=3665, x=294, size=10pt] ---
+02-Sep-2026 18:10
+
+--- [y=3665, x=690, size=10pt] ---
+Present
+
+--- [y=3681, x=-756, size=10pt] ---
+Sara Khan
+
+--- [y=3681, x=-576, size=10pt] ---
+09:15
+
+--- [y=3681, x=-416, size=10pt] ---
+18:02
+
+--- [y=3681, x=-256, size=10pt] ---
+8.78
+
+--- [y=3681, x=-136, size=10pt] ---
+Present
+
+--- [y=3683, x=144, size=11pt] ---
+Open selected attendance record
+
+--- [y=3701, x=170, size=10pt] ---
+Worked Hours
+
+--- [y=3701, x=566, size=10pt] ---
+Overtime
+
+--- [y=3705, x=294, size=10pt] ---
+9.08
+
+--- [y=3705, x=690, size=10pt] ---
+0.50 hrs
+
+--- [y=3717, x=1487, size=20pt] ---
+Check Out
+
+--- [y=3725, x=-756, size=10pt] ---
+John Dsouza
+
+--- [y=3725, x=-576, size=10pt] ---
+09:32
+
+--- [y=3725, x=-416, size=10pt] ---
+17:58
+
+--- [y=3725, x=-256, size=10pt] ---
+8.43
+
+--- [y=3725, x=-136, size=10pt] ---
+Present
+
+--- [y=3767, x=1309, size=12pt] ---
+Employees can mark attendance from the quick widget and review records from the Attendance module.
+
+--- [y=3769, x=-756, size=10pt] ---
+Neha Patel
+
+--- [y=3769, x=-576, size=10pt] ---
+—
+
+--- [y=3769, x=-416, size=10pt] ---
+—
+
+--- [y=3769, x=-256, size=10pt] ---
+0.00
+
+--- [y=3769, x=-136, size=10pt] ---
+Absent
+
+--- [y=3773, x=182, size=11pt] ---
+Notes
+
+--- [y=3797, x=182, size=11pt] ---
+System-generated from check in/out or manually corrected by an authorized user.
+
+--- [y=3836, x=1319, size=14pt] ---
+ATTENDANCE QUICK ACTION NOTE
+
+--- [y=3867, x=-764, size=12pt] ---
+Useful note: list view should help users review raw check-in / check-out data and identify missing punches quickly.
+
+--- [y=3867, x=170, size=12pt] ---
+Useful note: worked hours and overtime should be easy to read because they may later influence payroll or reporting.
+
+--- [y=3870, x=1319, size=13pt] ---
+• Clicking the red attendance icon should open a popup.
+• If there is no active session, show Check In.
+• If the user is already checked in, show Check Out.
+• The popup should display elapsed time till now.
+• After successful Check In, the status indicator changes to green.
+
+--- [y=4095, x=-785, size=20pt] ---
+3) Time Off Flow
+
+--- [y=4117, x=-785, size=12pt] ---
+Requests, Allocations and Time Off Types must be reached from Time Off ▼ in the navbar. Do not add separate page buttons for them.
+
+--- [y=4174, x=227, size=28pt] ---
+Time Off:
+
+- Requests should support a simple approval flow.
+- For leave types that require allocation, approved leave should reduce the
+employee’s available balance.
+- Time Off Types should define how each leave type behaves. The exact
+policies and validations are open to interpretation.
+
+--- [y=4192, x=-646, size=17pt] ---
+Menus under Time Off
+
+--- [y=4250, x=-602, size=15pt] ---
+Dashboard
+
+--- [y=4294, x=-597, size=15pt] ---
+Time offs
+
+--- [y=4334, x=-622, size=16pt] ---
+Time off Types
+
+--- [y=4377, x=-601, size=16pt] ---
+Allocations
+
+--- [y=4561, x=664, size=13pt] ---
+Employees ▼
+
+--- [y=4561, x=772, size=13pt] ---
+Contracts ▼
+
+--- [y=4561, x=880, size=13pt] ---
+Attendance
+
+--- [y=4561, x=980, size=13pt] ---
+Time Off ▼
+
+--- [y=4561, x=1080, size=13pt] ---
+Payroll
+
+--- [y=4563, x=628, size=12pt] ---
+HR
+
+--- [y=4567, x=-127, size=13pt] ---
+Employees ▼
+
+--- [y=4567, x=-19, size=13pt] ---
+Contracts ▼
+
+--- [y=4567, x=89, size=13pt] ---
+Attendance
+
+--- [y=4567, x=189, size=13pt] ---
+Time Off ▼
+
+--- [y=4567, x=289, size=13pt] ---
+Payroll
+
+--- [y=4569, x=-163, size=12pt] ---
+HR
+
+--- [y=4576, x=-961, size=13pt] ---
+Employees ▼
+
+--- [y=4576, x=-856, size=13pt] ---
+Contracts ▼
+
+--- [y=4576, x=-751, size=13pt] ---
+Attendance
+
+--- [y=4576, x=-654, size=13pt] ---
+Time Off ▼
+
+--- [y=4576, x=-557, size=13pt] ---
+Payroll
+
+--- [y=4576, x=1476, size=13pt] ---
+Employees ▼
+
+--- [y=4576, x=1584, size=13pt] ---
+Contracts ▼
+
+--- [y=4576, x=1692, size=13pt] ---
+Attendance
+
+--- [y=4576, x=1792, size=13pt] ---
+Time Off ▼
+
+--- [y=4576, x=1892, size=13pt] ---
+Payroll
+
+--- [y=4578, x=-996, size=12pt] ---
+HR
+
+--- [y=4578, x=1440, size=12pt] ---
+HR
+
+--- [y=4606, x=632, size=22pt] ---
+Allocations
+
+--- [y=4612, x=-159, size=22pt] ---
+Time Off Request / Aarav Mehta
+
+--- [y=4619, x=-992, size=21pt] ---
+Time Off Requests
+
+--- [y=4621, x=1444, size=22pt] ---
+Allocation / Aarav Mehta
+
+--- [y=4638, x=632, size=12pt] ---
+List view opened from Time Off ▼ → Allocations
+
+--- [y=4644, x=-159, size=12pt] ---
+Form view of one request
+
+--- [y=4651, x=-992, size=12pt] ---
+List view opened from Time Off ▼ → Requests
+
+--- [y=4653, x=1444, size=12pt] ---
+Form view of one allocation record
+
+--- [y=4679, x=653, size=11pt] ---
+NEW
+
+--- [y=4679, x=714, size=11pt] ---
+Search allocations…
+
+--- [y=4681, x=-143, size=11pt] ---
+Approve
+
+--- [y=4682, x=-78, size=11pt] ---
+Refuse
+
+--- [y=4690, x=-972, size=11pt] ---
+NEW
+
+--- [y=4690, x=-913, size=11pt] ---
+Search requests…
+
+--- [y=4690, x=-689, size=11pt] ---
+My Team
+
+--- [y=4694, x=1457, size=11pt] ---
+Approve
+
+--- [y=4694, x=1461, size=11pt] ---
+EDIT
+
+--- [y=4695, x=1525, size=11pt] ---
+Refuse
+
+--- [y=4722, x=-159, size=10pt] ---
+Employee
+
+--- [y=4722, x=147, size=10pt] ---
+Duration
+
+--- [y=4726, x=-35, size=10pt] ---
+Aarav Mehta
+
+--- [y=4726, x=271, size=10pt] ---
+3 Days
+
+--- [y=4731, x=1444, size=10pt] ---
+Employee
+
+--- [y=4731, x=1750, size=10pt] ---
+Taken
+
+--- [y=4734, x=640, size=10pt] ---
+Employee
+
+--- [y=4734, x=790, size=10pt] ---
+Type
+
+--- [y=4734, x=910, size=10pt] ---
+Allocated
+
+--- [y=4734, x=1000, size=10pt] ---
+Taken
+
+--- [y=4734, x=1080, size=10pt] ---
+Remaining
+
+--- [y=4734, x=1170, size=10pt] ---
+Status
+
+--- [y=4735, x=1568, size=10pt] ---
+Aarav Mehta
+
+--- [y=4735, x=1874, size=10pt] ---
+8 Days
+
+--- [y=4744, x=-985, size=10pt] ---
+Employee
+
+--- [y=4744, x=-849, size=10pt] ---
+Type
+
+--- [y=4744, x=-742, size=10pt] ---
+Start
+
+--- [y=4744, x=-658, size=10pt] ---
+End
+
+--- [y=4744, x=-574, size=10pt] ---
+Duration
+
+--- [y=4744, x=-487, size=10pt] ---
+Status
+
+--- [y=4762, x=-159, size=10pt] ---
+Time Off Type
+
+--- [y=4762, x=147, size=10pt] ---
+Status
+
+--- [y=4766, x=-35, size=10pt] ---
+Paid Time Off
+
+--- [y=4766, x=271, size=10pt] ---
+Approved
+
+--- [y=4767, x=1288, size=16pt] ---
+open allocation
+
+--- [y=4771, x=1444, size=10pt] ---
+Time Off Type
+
+--- [y=4771, x=1750, size=10pt] ---
+Remaining
+
+--- [y=4772, x=640, size=10pt] ---
+Aarav Mehta
+
+--- [y=4772, x=790, size=10pt] ---
+Paid Time Off
+
+--- [y=4772, x=910, size=10pt] ---
+20 days
+
+--- [y=4772, x=1000, size=10pt] ---
+8 days
+
+--- [y=4772, x=1080, size=10pt] ---
+12 days
+
+--- [y=4772, x=1170, size=10pt] ---
+Approved
+
+--- [y=4775, x=1568, size=10pt] ---
+Paid Time Off
+
+--- [y=4775, x=1874, size=10pt] ---
+12 Days
+
+--- [y=4781, x=-985, size=10pt] ---
+Aarav Mehta
+
+--- [y=4781, x=-849, size=10pt] ---
+Paid Time Off
+
+--- [y=4781, x=-742, size=10pt] ---
+12-Sep
+
+--- [y=4781, x=-658, size=10pt] ---
+14-Sep
+
+--- [y=4781, x=-574, size=10pt] ---
+3 Days
+
+--- [y=4781, x=-487, size=10pt] ---
+Approved
+
+--- [y=4783, x=-406, size=6pt] ---
+Approve
+
+--- [y=4784, x=-372, size=6pt] ---
+Refuse
+
+--- [y=4802, x=-159, size=10pt] ---
+Start Date
+
+--- [y=4802, x=147, size=10pt] ---
+Approver
+
+--- [y=4806, x=-35, size=10pt] ---
+12-Sep-2026
+
+--- [y=4806, x=271, size=10pt] ---
+Sara Khan
+
+--- [y=4811, x=1444, size=10pt] ---
+Allocated
+
+--- [y=4811, x=1750, size=10pt] ---
+Approver
+
+--- [y=4815, x=1568, size=10pt] ---
+20 Days
+
+--- [y=4815, x=1874, size=10pt] ---
+Sara Khan
+
+--- [y=4816, x=640, size=10pt] ---
+Sara Khan
+
+--- [y=4816, x=790, size=10pt] ---
+Paid Time Off
+
+--- [y=4816, x=910, size=10pt] ---
+18 days
+
+--- [y=4816, x=1000, size=10pt] ---
+4 days
+
+--- [y=4816, x=1080, size=10pt] ---
+14 days
+
+--- [y=4816, x=1170, size=10pt] ---
+Approved
+
+--- [y=4824, x=-985, size=10pt] ---
+Sara Khan
+
+--- [y=4824, x=-849, size=10pt] ---
+Sick Leave
+
+--- [y=4824, x=-742, size=10pt] ---
+18-Sep
+
+--- [y=4824, x=-658, size=10pt] ---
+18-Sep
+
+--- [y=4824, x=-574, size=10pt] ---
+1 Day
+
+--- [y=4824, x=-487, size=10pt] ---
+Approved
+
+--- [y=4825, x=-406, size=6pt] ---
+Approve
+
+--- [y=4825, x=-370, size=6pt] ---
+Refuse
+
+--- [y=4842, x=-159, size=10pt] ---
+End Date
+
+--- [y=4842, x=147, size=10pt] ---
+Allocation Used
+
+--- [y=4843, x=-298, size=16pt] ---
+Open time off
+
+--- [y=4846, x=-35, size=10pt] ---
+14-Sep-2026
+
+--- [y=4846, x=271, size=10pt] ---
+Paid Time Off 2026
+
+--- [y=4851, x=1444, size=10pt] ---
+Status
+
+--- [y=4851, x=1750, size=10pt] ---
+Validity
+
+--- [y=4855, x=1568, size=10pt] ---
+Approved
+
+--- [y=4855, x=1874, size=10pt] ---
+2026 Annual Balance
+
+--- [y=4860, x=640, size=10pt] ---
+Neha Patel
+
+--- [y=4860, x=790, size=10pt] ---
+Comp Off
+
+--- [y=4860, x=910, size=10pt] ---
+2 days
+
+--- [y=4860, x=1000, size=10pt] ---
+1 day
+
+--- [y=4860, x=1080, size=10pt] ---
+1 day
+
+--- [y=4860, x=1170, size=10pt] ---
+To Approve
+
+--- [y=4866, x=-985, size=10pt] ---
+John Dsouza
+
+--- [y=4866, x=-849, size=10pt] ---
+Comp Off
+
+--- [y=4866, x=-742, size=10pt] ---
+27-Sep
+
+--- [y=4866, x=-658, size=10pt] ---
+27-Sep
+
+--- [y=4866, x=-574, size=10pt] ---
+1 Day
+
+--- [y=4866, x=-487, size=10pt] ---
+To Approve
+
+--- [y=4868, x=-403, size=6pt] ---
+Approve
+
+--- [y=4869, x=-367, size=6pt] ---
+Refuse
+
+--- [y=4912, x=-147, size=11pt] ---
+Reason
+
+--- [y=4921, x=1456, size=11pt] ---
+Description
+
+--- [y=4938, x=-147, size=11pt] ---
+Family vacation
+
+--- [y=4947, x=1456, size=11pt] ---
+Annual leave balance granted at start of policy year.
+
+--- [y=4966, x=632, size=12pt] ---
+Useful note: the list should expose the balance math at a glance — Allocated, Taken and Remaining.
+
+--- [y=4969, x=-992, size=11pt] ---
+Useful note: request status should show the approval lifecycle clearly.
+
+--- [y=4987, x=-159, size=9pt] ---
+Useful note: if the selected type requires allocation, the request should clearly show which balance was consumed.
+
+--- [y=4988, x=1444, size=12pt] ---
+Useful note: approved allocation is what creates available leave balance for the employee.
+
+--- [y=5018, x=853, size=11pt] ---
+Open selected allocation
+
+--- [y=5141, x=31, size=13pt] ---
+Employees ▼
+
+--- [y=5141, x=139, size=13pt] ---
+Contracts ▼
+
+--- [y=5141, x=247, size=13pt] ---
+Attendance
+
+--- [y=5141, x=347, size=13pt] ---
+Time Off ▼
+
+--- [y=5141, x=447, size=13pt] ---
+Payroll
+
+--- [y=5143, x=-5, size=12pt] ---
+HR
+
+--- [y=5149, x=770, size=13pt] ---
+Employees ▼
+
+--- [y=5149, x=878, size=13pt] ---
+Contracts ▼
+
+--- [y=5149, x=986, size=13pt] ---
+Attendance
+
+--- [y=5149, x=1086, size=13pt] ---
+Time Off ▼
+
+--- [y=5149, x=1186, size=13pt] ---
+Payroll
+
+--- [y=5151, x=734, size=12pt] ---
+HR
+
+--- [y=5186, x=-1, size=22pt] ---
+Time Off Types
+
+--- [y=5194, x=738, size=22pt] ---
+Time Off Type / Paid Time Off
+
+--- [y=5218, x=-1, size=12pt] ---
+List view opened from Time Off ▼ → Time Off Types
+
+--- [y=5226, x=738, size=12pt] ---
+Form view of one time off type
+
+--- [y=5259, x=20, size=11pt] ---
+NEW
+
+--- [y=5259, x=81, size=11pt] ---
+Search time off types…
+
+--- [y=5267, x=755, size=11pt] ---
+EDIT
+
+--- [y=5304, x=738, size=10pt] ---
+Type Name
+
+--- [y=5304, x=1044, size=10pt] ---
+Approval
+
+--- [y=5308, x=862, size=10pt] ---
+Paid Time Off
+
+--- [y=5308, x=1168, size=10pt] ---
+Manager
+
+--- [y=5314, x=7, size=10pt] ---
+Type
+
+--- [y=5314, x=177, size=10pt] ---
+Unit
+
+--- [y=5314, x=267, size=10pt] ---
+Allocation
+
+--- [y=5314, x=377, size=10pt] ---
+Approval
+
+--- [y=5314, x=487, size=10pt] ---
+Status
+
+--- [y=5344, x=738, size=10pt] ---
+Unit
+
+--- [y=5344, x=1044, size=10pt] ---
+Payroll / Work Entry
+
+--- [y=5348, x=862, size=10pt] ---
+Days
+
+--- [y=5348, x=1168, size=10pt] ---
+Leave Work Entry
+
+--- [y=5348, x=609, size=9pt] ---
+Open selected type
+
+--- [y=5352, x=7, size=10pt] ---
+Paid Time Off
+
+--- [y=5352, x=177, size=10pt] ---
+Days
+
+--- [y=5352, x=267, size=10pt] ---
+Required
+
+--- [y=5352, x=377, size=10pt] ---
+Manager
+
+--- [y=5352, x=487, size=10pt] ---
+Active
+
+--- [y=5384, x=738, size=10pt] ---
+Requires Allocation
+
+--- [y=5384, x=1044, size=10pt] ---
+Display Color
+
+--- [y=5388, x=862, size=10pt] ---
+Yes
+
+--- [y=5388, x=1168, size=10pt] ---
+Blue
+
+--- [y=5396, x=7, size=10pt] ---
+Sick Leave
+
+--- [y=5396, x=177, size=10pt] ---
+Days
+
+--- [y=5396, x=267, size=10pt] ---
+No
+
+--- [y=5396, x=377, size=10pt] ---
+Manager
+
+--- [y=5396, x=487, size=10pt] ---
+Active
+
+--- [y=5424, x=738, size=10pt] ---
+Active
+
+--- [y=5428, x=862, size=10pt] ---
+True
+
+--- [y=5440, x=7, size=10pt] ---
+Comp Off
+
+--- [y=5440, x=177, size=10pt] ---
+Hours
+
+--- [y=5440, x=267, size=10pt] ---
+Required
+
+--- [y=5440, x=377, size=10pt] ---
+Officer
+
+--- [y=5440, x=487, size=10pt] ---
+Active
+
+--- [y=5494, x=750, size=11pt] ---
+Configuration Notes
+
+--- [y=5520, x=750, size=11pt] ---
+Standard annual leave. Balance comes from approved allocations.
+
+--- [y=5546, x=-1, size=12pt] ---
+Useful note: this list defines policy rules, not employee transactions.
+
+--- [y=5554, x=738, size=12pt] ---
+Useful note: Time Off Type drives approval behavior and whether a request needs an allocation.
+
+--- [y=5722, x=-763, size=36pt] ---
+4) Payroll — Payrun & Payslips
+
+--- [y=5903, x=-313, size=24pt] ---
+Menus under Payroll
+
+--- [y=5940, x=2615, size=28pt] ---
+Payrun Creation:
+
+Creating a Payrun happens in two steps:
+
+- Select the payroll scope, such as employee type, salary structure, and period.
+- Select the employees to include.
+- Continue only moves to employee selection. A Payrun is created only after clicking “Create
+Payrun”.
+Only the selected employees should be included in that Payrun.
+
+
+Payruns & Payslips:
+
+A Payrun represents payroll processing for a particular period.
+Each selected employee should have a Payslip linked to the Payrun.
+Computing payroll should use the employee’s applicable contract and selected salary structure.
+Payslips should show understandable components such as Basic, Allowances, Deductions, Gross,
+and Net Salary.
+Payroll issues, such as missing required information or duplicate payslips, should be visible to the
+user.
+
+
+Payroll Workflow:
+
+The intended flow is broadly:
+
+Draft → Compute → Validate → Mark Paid
+
+Paid/finalised payroll should remain available as historical data.
+
+
+Salary Structures & Salary Rules:
+
+A Salary Structure contains the rules used to calculate salary.
+Salary Rules can represent Basic Salary, Allowances, Deductions, Gross, Net, etc.
+Rules should be processed according to their sequence.
+Different calculation methods may be supported, such as fixed amounts, percentages, or formulas.
+
+Participants are free to design the calculation engine as long as salary rules actually drive Payslip
+calculations.
+
+
+Payslip PDF:
+
+Users should be able to generate/print a Payslip showing the employee’s payroll calculation for
+that period.
+Sending Payslips can also be supported from the Payrun.
+
+
+Payroll Dashboard:
+
+The dashboard should use actual data created through the HR and Payroll flows rather than
+hardcoded values.
+
+It should provide useful payroll/HR insights such as:
+
+Salary totals
+Payslip status
+Salary by department
+Salary trends
+Attendance overview
+Time Off overview
+Payroll warnings or items requiring attention
+
+Filters such as Period, Department, Employee Type, or Company should affect the relevant
+dashboard data.
+
+--- [y=5986, x=-251, size=21pt] ---
+Dashboard
+
+--- [y=6048, x=-244, size=21pt] ---
+Payruns
+
+--- [y=6103, x=-248, size=21pt] ---
+Payslips
+
+--- [y=6169, x=-253, size=21pt] ---
+Structures
+
+--- [y=6230, x=-247, size=21pt] ---
+Rules
+
+--- [y=6311, x=770, size=24pt] ---
+The Payrun is created only after employee selection.
+
+--- [y=6368, x=1545, size=26pt] ---
+×
+
+--- [y=6370, x=430, size=24pt] ---
+Select Employee Records
+
+--- [y=6434, x=822, size=16pt] ---
+Search employees...
+
+--- [y=6436, x=1362, size=16pt] ---
+1–22 / 22
+
+--- [y=6464, x=-640, size=24pt] ---
+New Pay Run
+
+--- [y=6471, x=9, size=26pt] ---
+×
+
+--- [y=6489, x=440, size=16pt] ---
+✓
+
+--- [y=6489, x=490, size=16pt] ---
+Employee
+
+--- [y=6489, x=750, size=16pt] ---
+Working Hours
+
+--- [y=6489, x=970, size=16pt] ---
+Start Date
+
+--- [y=6489, x=1160, size=16pt] ---
+Wage
+
+--- [y=6528, x=-629, size=16pt] ---
+Pay Structure
+
+--- [y=6529, x=440, size=16pt] ---
+☐
+
+--- [y=6529, x=490, size=16pt] ---
+Anita Oliver
+
+--- [y=6529, x=750, size=16pt] ---
+40 hours/week
+
+--- [y=6529, x=970, size=16pt] ---
+Jan 1
+
+--- [y=6529, x=1160, size=16pt] ---
+$ 4,500.00
+
+--- [y=6532, x=-487, size=16pt] ---
+United States: Regular Pay
+
+--- [y=6557, x=-323, size=20pt] ---
+→
+
+--- [y=6559, x=-485, size=16pt] ---
+Sep 1
+
+--- [y=6559, x=-269, size=16pt] ---
+Sep 30
+
+--- [y=6563, x=187, size=16pt] ---
+on continue
+
+--- [y=6571, x=440, size=16pt] ---
+☐
+
+--- [y=6571, x=490, size=16pt] ---
+Audrey Peterson
+
+--- [y=6571, x=750, size=16pt] ---
+40 hours/week
+
+--- [y=6571, x=970, size=16pt] ---
+Jan 1
+
+--- [y=6571, x=1160, size=16pt] ---
+$ 4,000.00
+
+--- [y=6590, x=-629, size=16pt] ---
+Period
+
+--- [y=6613, x=440, size=16pt] ---
+☐
+
+--- [y=6613, x=490, size=16pt] ---
+Billy Kyle
+
+--- [y=6613, x=750, size=16pt] ---
+40 hours/week
+
+--- [y=6613, x=970, size=16pt] ---
+Sep 2
+
+--- [y=6613, x=1160, size=16pt] ---
+$ 3,100.00
+
+--- [y=6655, x=440, size=16pt] ---
+☐
+
+--- [y=6655, x=490, size=16pt] ---
+Eli Lambert
+
+--- [y=6655, x=750, size=16pt] ---
+40 hours/week
+
+--- [y=6655, x=970, size=16pt] ---
+Jan 1
+
+--- [y=6655, x=1160, size=16pt] ---
+$ 4,350.00
+
+--- [y=6655, x=-615, size=16pt] ---
+Continue
+
+--- [y=6657, x=-493, size=16pt] ---
+Discard
+
+--- [y=6697, x=440, size=16pt] ---
+☐
+
+--- [y=6697, x=490, size=16pt] ---
+Paul Williams
+
+--- [y=6697, x=750, size=16pt] ---
+40 hours/week
+
+--- [y=6697, x=970, size=16pt] ---
+Jul 1
+
+--- [y=6697, x=1160, size=16pt] ---
+$ 3,950.00
+
+--- [y=6714, x=431, size=16pt] ---
+Create Payrun
+
+--- [y=6750, x=450, size=16pt] ---
+Create payrun
+
+--- [y=6753, x=610, size=16pt] ---
+Back
+
+--- [y=6754, x=-698, size=16pt] ---
+Participant note: this popup collects the payrun scope only. Continue should not create the Payrun yet.
+
+--- [y=6813, x=542, size=16pt] ---
+Participant note: user selects one or more eligible employees, then clicks Create Payrun. The created Payrun should contain only the selected employees.
+
+--- [y=6888, x=-1192, size=13pt] ---
+Employees ▼
+
+--- [y=6888, x=-1088, size=13pt] ---
+Contracts ▼
+
+--- [y=6888, x=-984, size=13pt] ---
+Attendance
+
+--- [y=6888, x=-888, size=13pt] ---
+Time Off ▼
+
+--- [y=6888, x=-792, size=13pt] ---
+Payroll
+
+--- [y=6890, x=-1228, size=12pt] ---
+HR
+
+--- [y=6896, x=-188, size=13pt] ---
+Employees ▼
+
+--- [y=6896, x=-84, size=13pt] ---
+Contracts ▼
+
+--- [y=6896, x=20, size=13pt] ---
+Attendance
+
+--- [y=6896, x=116, size=13pt] ---
+Time Off ▼
+
+--- [y=6896, x=212, size=13pt] ---
+Payroll
+
+--- [y=6898, x=-224, size=12pt] ---
+HR
+
+--- [y=6912, x=1743, size=13pt] ---
+Employees ▼
+
+--- [y=6912, x=1847, size=13pt] ---
+Contracts ▼
+
+--- [y=6912, x=1951, size=13pt] ---
+Attendance
+
+--- [y=6912, x=2047, size=13pt] ---
+Time Off ▼
+
+--- [y=6912, x=2143, size=13pt] ---
+Payroll
+
+--- [y=6914, x=1707, size=12pt] ---
+HR
+
+--- [y=6915, x=742, size=13pt] ---
+Employees ▼
+
+--- [y=6915, x=846, size=13pt] ---
+Contracts ▼
+
+--- [y=6915, x=950, size=13pt] ---
+Attendance
+
+--- [y=6915, x=1046, size=13pt] ---
+Time Off ▼
+
+--- [y=6915, x=1142, size=13pt] ---
+Payroll
+
+--- [y=6917, x=706, size=12pt] ---
+HR
+
+--- [y=6933, x=-1224, size=22pt] ---
+Payruns
+
+--- [y=6941, x=-220, size=22pt] ---
+Payrun / February 2026
+
+--- [y=6957, x=1711, size=22pt] ---
+Payslip / Aarav Mehta / February 2026
+
+--- [y=6960, x=710, size=22pt] ---
+Payslips
+
+--- [y=6965, x=-1224, size=12pt] ---
+Payrun view for payroll periods
+
+--- [y=6973, x=-220, size=12pt] ---
+Open one Payrun to compute and manage its payslips
+
+--- [y=6989, x=1711, size=12pt] ---
+Detailed salary computation for one employee
+
+--- [y=6992, x=710, size=12pt] ---
+List view of employee payslips
+
+--- [y=7006, x=-1203, size=11pt] ---
+NEW
+
+--- [y=7006, x=-1142, size=11pt] ---
+Search payruns…
+
+--- [y=7006, x=-890, size=11pt] ---
+2026
+
+--- [y=7014, x=-78, size=11pt] ---
+VALIDATE
+
+--- [y=7014, x=31, size=11pt] ---
+MARK PAID
+
+--- [y=7014, x=308, size=11pt] ---
+SEND PAYSLIPS
+
+--- [y=7015, x=-193, size=11pt] ---
+COMPUTE
+
+--- [y=7030, x=1738, size=11pt] ---
+COMPUTE
+
+--- [y=7030, x=1836, size=11pt] ---
+MARK PAID
+
+--- [y=7031, x=1936, size=11pt] ---
+PRINT PAYSLIP
+
+--- [y=7033, x=731, size=11pt] ---
+NEW
+
+--- [y=7033, x=792, size=11pt] ---
+Search payslips…
+
+--- [y=7033, x=1044, size=11pt] ---
+Period: Feb 2026
+
+--- [y=7055, x=-220, size=10pt] ---
+Name
+
+--- [y=7059, x=-96, size=10pt] ---
+February 2026
+
+--- [y=7065, x=-1208, size=15pt] ---
+January 2026
+
+--- [y=7066, x=-918, size=11pt] ---
+42 employees
+
+--- [y=7066, x=-728, size=11pt] ---
+Paid
+
+--- [y=7071, x=1711, size=10pt] ---
+Employee
+
+--- [y=7071, x=2047, size=10pt] ---
+Period
+
+--- [y=7075, x=1835, size=10pt] ---
+Aarav Mehta
+
+--- [y=7075, x=2171, size=10pt] ---
+01-Feb — 28-Feb
+
+--- [y=7087, x=716, size=10pt] ---
+Employee
+
+--- [y=7087, x=841, size=10pt] ---
+Warning
+
+--- [y=7087, x=951, size=10pt] ---
+Period
+
+--- [y=7087, x=1061, size=10pt] ---
+Basic
+
+--- [y=7087, x=1136, size=10pt] ---
+Gross
+
+--- [y=7087, x=1211, size=10pt] ---
+Net
+
+--- [y=7087, x=1286, size=10pt] ---
+Structure
+
+--- [y=7087, x=1391, size=10pt] ---
+Status
+
+--- [y=7087, x=-574, size=14pt] ---
+↗
+
+--- [y=7089, x=-1208, size=10pt] ---
+01-Jan-2026 — 31-Jan-2026
+
+--- [y=7091, x=-728, size=10pt] ---
+1 warning
+
+--- [y=7095, x=-220, size=10pt] ---
+Salary Structure
+
+--- [y=7099, x=-96, size=10pt] ---
+Regular Salary
+
+--- [y=7111, x=1711, size=10pt] ---
+Salary Structure
+
+--- [y=7111, x=2047, size=10pt] ---
+Status
+
+--- [y=7115, x=1835, size=10pt] ---
+Regular Salary
+
+--- [y=7115, x=2171, size=10pt] ---
+Done
+
+--- [y=7124, x=716, size=9pt] ---
+Aarav Mehta
+
+--- [y=7124, x=841, size=9pt] ---
+—
+
+--- [y=7124, x=951, size=9pt] ---
+01-Feb — 28-Feb
+
+--- [y=7124, x=1061, size=9pt] ---
+₹50k
+
+--- [y=7124, x=1136, size=9pt] ---
+₹80k
+
+--- [y=7124, x=1211, size=9pt] ---
+₹75k
+
+--- [y=7124, x=1286, size=9pt] ---
+Regular
+
+--- [y=7124, x=1391, size=9pt] ---
+Done
+
+--- [y=7135, x=-220, size=10pt] ---
+Period
+
+--- [y=7139, x=-96, size=10pt] ---
+01-Feb — 28-Feb
+
+--- [y=7151, x=1711, size=10pt] ---
+Pay Run
+
+--- [y=7151, x=2047, size=10pt] ---
+Worked Days
+
+--- [y=7155, x=1835, size=10pt] ---
+February 2026
+
+--- [y=7155, x=2171, size=10pt] ---
+22
+
+--- [y=7166, x=716, size=9pt] ---
+Sara Khan
+
+--- [y=7166, x=841, size=9pt] ---
+A/C missing
+
+--- [y=7166, x=951, size=9pt] ---
+01-Feb — 28-Feb
+
+--- [y=7166, x=1061, size=9pt] ---
+₹60k
+
+--- [y=7166, x=1136, size=9pt] ---
+₹96k
+
+--- [y=7166, x=1211, size=9pt] ---
+₹88k
+
+--- [y=7166, x=1286, size=9pt] ---
+Regular
+
+--- [y=7166, x=1391, size=9pt] ---
+Done
+
+--- [y=7167, x=-1208, size=15pt] ---
+February 2026
+
+--- [y=7168, x=-918, size=11pt] ---
+42 employees
+
+--- [y=7168, x=-728, size=11pt] ---
+Validated
+
+--- [y=7175, x=-220, size=10pt] ---
+Status
+
+--- [y=7179, x=-96, size=10pt] ---
+Validated
+
+--- [y=7189, x=-574, size=14pt] ---
+↗
+
+--- [y=7191, x=-1208, size=10pt] ---
+01-Feb-2026 — 28-Feb-2026
+
+--- [y=7193, x=-728, size=10pt] ---
+2 warnings
+
+--- [y=7208, x=-421, size=16pt] ---
+Open Payrun
+
+--- [y=7208, x=716, size=9pt] ---
+John Dsouza
+
+--- [y=7208, x=841, size=9pt] ---
+Duplicate
+
+--- [y=7208, x=951, size=9pt] ---
+01-Feb — 28-Feb
+
+--- [y=7208, x=1061, size=9pt] ---
+₹45k
+
+--- [y=7208, x=1136, size=9pt] ---
+₹72k
+
+--- [y=7208, x=1211, size=9pt] ---
+₹66k
+
+--- [y=7208, x=1286, size=9pt] ---
+Regular
+
+--- [y=7208, x=1391, size=9pt] ---
+Draft
+
+--- [y=7213, x=1711, size=12pt] ---
+Salary Computation
+
+--- [y=7223, x=-220, size=12pt] ---
+Payslips in this Payrun
+
+--- [y=7224, x=1506, size=16pt] ---
+Open payslip
+
+--- [y=7250, x=716, size=9pt] ---
+Neha Patel
+
+--- [y=7250, x=841, size=9pt] ---
+—
+
+--- [y=7250, x=951, size=9pt] ---
+01-Feb — 28-Feb
+
+--- [y=7250, x=1061, size=9pt] ---
+₹40k
+
+--- [y=7250, x=1136, size=9pt] ---
+₹64k
+
+--- [y=7250, x=1211, size=9pt] ---
+₹59k
+
+--- [y=7250, x=1286, size=9pt] ---
+Regular
+
+--- [y=7250, x=1391, size=9pt] ---
+Done
+
+--- [y=7250, x=1719, size=10pt] ---
+Rule
+
+--- [y=7250, x=1979, size=10pt] ---
+Category
+
+--- [y=7250, x=2109, size=10pt] ---
+Amount
+
+--- [y=7250, x=2229, size=10pt] ---
+Code
+
+--- [y=7260, x=-214, size=10pt] ---
+Employee
+
+--- [y=7260, x=-84, size=10pt] ---
+Warning
+
+--- [y=7260, x=36, size=10pt] ---
+Worked
+
+--- [y=7260, x=106, size=10pt] ---
+Basic
+
+--- [y=7260, x=186, size=10pt] ---
+Gross
+
+--- [y=7260, x=266, size=10pt] ---
+Net
+
+--- [y=7260, x=346, size=10pt] ---
+Status
+
+--- [y=7260, x=426, size=10pt] ---
+PDF
+
+--- [y=7269, x=-1208, size=15pt] ---
+March 2026
+
+--- [y=7270, x=-918, size=11pt] ---
+42 employees
+
+--- [y=7270, x=-728, size=11pt] ---
+Draft
+
+--- [y=7280, x=1719, size=9pt] ---
+Basic Salary
+
+--- [y=7280, x=1979, size=9pt] ---
+Basic
+
+--- [y=7280, x=2109, size=9pt] ---
+₹50,000
+
+--- [y=7280, x=2229, size=9pt] ---
+BASIC
+
+--- [y=7291, x=-574, size=14pt] ---
+↗
+
+--- [y=7293, x=-1208, size=10pt] ---
+01-Mar-2026 — 31-Mar-2026
+
+--- [y=7295, x=-214, size=10pt] ---
+Aarav Mehta
+
+--- [y=7295, x=-84, size=10pt] ---
+—
+
+--- [y=7295, x=36, size=10pt] ---
+22
+
+--- [y=7295, x=106, size=10pt] ---
+₹50k
+
+--- [y=7295, x=186, size=10pt] ---
+₹80k
+
+--- [y=7295, x=266, size=10pt] ---
+₹75k
+
+--- [y=7295, x=346, size=10pt] ---
+Done
+
+--- [y=7295, x=426, size=10pt] ---
+PDF
+
+--- [y=7295, x=-728, size=10pt] ---
+No warnings
+
+--- [y=7298, x=1360, size=10pt] ---
+Open selected payslip
+
+--- [y=7304, x=1719, size=9pt] ---
+House Rent Allowance
+
+--- [y=7304, x=1979, size=9pt] ---
+Allowance
+
+--- [y=7304, x=2109, size=9pt] ---
+₹20,000
+
+--- [y=7304, x=2229, size=9pt] ---
+HRA
+
+--- [y=7328, x=1719, size=9pt] ---
+Standard Allowance
+
+--- [y=7328, x=1979, size=9pt] ---
+Allowance
+
+--- [y=7328, x=2109, size=9pt] ---
+₹10,000
+
+--- [y=7328, x=2229, size=9pt] ---
+STD
+
+--- [y=7333, x=-214, size=10pt] ---
+Sara Khan
+
+--- [y=7333, x=-84, size=10pt] ---
+A/C missing
+
+--- [y=7333, x=36, size=10pt] ---
+22
+
+--- [y=7333, x=106, size=10pt] ---
+₹60k
+
+--- [y=7333, x=186, size=10pt] ---
+₹96k
+
+--- [y=7333, x=266, size=10pt] ---
+₹88k
+
+--- [y=7333, x=346, size=10pt] ---
+Done
+
+--- [y=7333, x=426, size=10pt] ---
+PDF
+
+--- [y=7352, x=1719, size=9pt] ---
+Gross Salary
+
+--- [y=7352, x=1979, size=9pt] ---
+Gross
+
+--- [y=7352, x=2109, size=9pt] ---
+₹80,000
+
+--- [y=7352, x=2229, size=9pt] ---
+GROSS
+
+--- [y=7371, x=-214, size=10pt] ---
+John Dsouza
+
+--- [y=7371, x=-84, size=10pt] ---
+Duplicate
+
+--- [y=7371, x=36, size=10pt] ---
+20
+
+--- [y=7371, x=106, size=10pt] ---
+₹45k
+
+--- [y=7371, x=186, size=10pt] ---
+₹72k
+
+--- [y=7371, x=266, size=10pt] ---
+₹66k
+
+--- [y=7371, x=346, size=10pt] ---
+Draft
+
+--- [y=7371, x=426, size=10pt] ---
+PDF
+
+--- [y=7376, x=1719, size=9pt] ---
+Provident Fund
+
+--- [y=7376, x=1979, size=9pt] ---
+Deduction
+
+--- [y=7376, x=2109, size=9pt] ---
+-₹3,000
+
+--- [y=7376, x=2229, size=9pt] ---
+PF
+
+--- [y=7389, x=-1224, size=12pt] ---
+Useful note: each Payrun represents one payroll period and groups the payslips generated for that period.
+
+--- [y=7400, x=1719, size=9pt] ---
+Professional Tax
+
+--- [y=7400, x=1979, size=9pt] ---
+Deduction
+
+--- [y=7400, x=2109, size=9pt] ---
+-₹2,000
+
+--- [y=7400, x=2229, size=9pt] ---
+PT
+
+--- [y=7416, x=710, size=12pt] ---
+Useful note: selecting any payslip opens the detailed salary computation and PDF action for that employee.
+
+--- [y=7416, x=-235, size=11pt] ---
+Useful note: warnings such as missing account data or duplicate payslips should be visible before payroll is finalized.
+
+--- [y=7424, x=1719, size=9pt] ---
+Net Salary
+
+--- [y=7424, x=1979, size=9pt] ---
+Net
+
+--- [y=7424, x=2109, size=9pt] ---
+₹75,000
+
+--- [y=7424, x=2229, size=9pt] ---
+NET
+
+--- [y=7447, x=1711, size=12pt] ---
+Useful note: the Print action generates the employee payslip as PDF; that PDF can be sent from the parent Payrun.
+
+--- [y=7475, x=-1248, size=20pt] ---
+5) Payroll Configuration — Salary Structures & Rules
+
+--- [y=7513, x=146, size=10pt] ---
+Configured structure is selected when a Payrun is created
+
+--- [y=7546, x=-1192, size=13pt] ---
+Employees ▼
+
+--- [y=7546, x=-1088, size=13pt] ---
+Contracts ▼
+
+--- [y=7546, x=-984, size=13pt] ---
+Attendance
+
+--- [y=7546, x=-888, size=13pt] ---
+Time Off ▼
+
+--- [y=7546, x=-792, size=13pt] ---
+Payroll
+
+--- [y=7548, x=-1228, size=12pt] ---
+HR
+
+--- [y=7554, x=-188, size=13pt] ---
+Employees ▼
+
+--- [y=7554, x=-84, size=13pt] ---
+Contracts ▼
+
+--- [y=7554, x=20, size=13pt] ---
+Attendance
+
+--- [y=7554, x=116, size=13pt] ---
+Time Off ▼
+
+--- [y=7554, x=212, size=13pt] ---
+Payroll
+
+--- [y=7556, x=-224, size=12pt] ---
+HR
+
+--- [y=7570, x=1743, size=13pt] ---
+Employees ▼
+
+--- [y=7570, x=1847, size=13pt] ---
+Contracts ▼
+
+--- [y=7570, x=1951, size=13pt] ---
+Attendance
+
+--- [y=7570, x=2047, size=13pt] ---
+Time Off ▼
+
+--- [y=7570, x=2143, size=13pt] ---
+Payroll
+
+--- [y=7572, x=1707, size=12pt] ---
+HR
+
+--- [y=7573, x=742, size=13pt] ---
+Employees ▼
+
+--- [y=7573, x=846, size=13pt] ---
+Contracts ▼
+
+--- [y=7573, x=950, size=13pt] ---
+Attendance
+
+--- [y=7573, x=1046, size=13pt] ---
+Time Off ▼
+
+--- [y=7573, x=1142, size=13pt] ---
+Payroll
+
+--- [y=7575, x=706, size=12pt] ---
+HR
+
+--- [y=7591, x=-1224, size=22pt] ---
+Salary Structures
+
+--- [y=7599, x=-220, size=22pt] ---
+Salary Structure / Regular Salary
+
+--- [y=7615, x=1711, size=22pt] ---
+Salary Rule / Basic Salary
+
+--- [y=7618, x=710, size=22pt] ---
+Salary Rules
+
+--- [y=7623, x=-1224, size=12pt] ---
+List view
+
+--- [y=7631, x=-220, size=12pt] ---
+Form view with its salary rules
+
+--- [y=7647, x=1711, size=12pt] ---
+Form view
+
+--- [y=7650, x=710, size=12pt] ---
+List view
+
+--- [y=7664, x=-1203, size=11pt] ---
+NEW
+
+--- [y=7664, x=-1142, size=11pt] ---
+Search structures…
+
+--- [y=7688, x=1728, size=11pt] ---
+EDIT
+
+--- [y=7691, x=731, size=11pt] ---
+NEW
+
+--- [y=7691, x=792, size=11pt] ---
+Search salary rules…
+
+--- [y=7691, x=1054, size=11pt] ---
+Regular Salary
+
+--- [y=7713, x=-220, size=10pt] ---
+Structure Name
+
+--- [y=7713, x=156, size=10pt] ---
+Active
+
+--- [y=7717, x=-96, size=10pt] ---
+Regular Salary
+
+--- [y=7717, x=280, size=10pt] ---
+True
+
+--- [y=7719, x=-1216, size=10pt] ---
+Structure Name
+
+--- [y=7719, x=-956, size=10pt] ---
+Rules
+
+--- [y=7719, x=-856, size=10pt] ---
+Employees
+
+--- [y=7719, x=-736, size=10pt] ---
+Active
+
+--- [y=7729, x=1711, size=10pt] ---
+Rule Name
+
+--- [y=7729, x=2057, size=10pt] ---
+Salary Structure
+
+--- [y=7733, x=1835, size=10pt] ---
+Basic Salary
+
+--- [y=7733, x=2181, size=10pt] ---
+Regular Salary
+
+--- [y=7746, x=718, size=10pt] ---
+Rule Name
+
+--- [y=7746, x=938, size=10pt] ---
+Code
+
+--- [y=7746, x=1028, size=10pt] ---
+Category
+
+--- [y=7746, x=1158, size=10pt] ---
+Structure
+
+--- [y=7746, x=1298, size=10pt] ---
+Sequence
+
+--- [y=7758, x=-1216, size=10pt] ---
+Regular Salary
+
+--- [y=7758, x=-956, size=10pt] ---
+12 rules
+
+--- [y=7758, x=-856, size=10pt] ---
+42 employees
+
+--- [y=7758, x=-736, size=10pt] ---
+Active
+
+--- [y=7765, x=-220, size=12pt] ---
+Salary Rules
+
+--- [y=7769, x=1711, size=10pt] ---
+Code
+
+--- [y=7769, x=2057, size=10pt] ---
+Computation
+
+--- [y=7773, x=1835, size=10pt] ---
+BASIC
+
+--- [y=7773, x=2181, size=10pt] ---
+Percentage of Wage
+
+--- [y=7783, x=718, size=10pt] ---
+Basic Salary
+
+--- [y=7783, x=938, size=10pt] ---
+BASIC
+
+--- [y=7783, x=1028, size=10pt] ---
+Basic
+
+--- [y=7783, x=1158, size=10pt] ---
+Regular Salary
+
+--- [y=7783, x=1298, size=10pt] ---
+1
+
+--- [y=7802, x=-212, size=10pt] ---
+Rule Name
+
+--- [y=7802, x=68, size=10pt] ---
+Code
+
+--- [y=7802, x=168, size=10pt] ---
+Category
+
+--- [y=7802, x=298, size=10pt] ---
+Sequence
+
+--- [y=7804, x=-1216, size=10pt] ---
+Intern Salary
+
+--- [y=7804, x=-956, size=10pt] ---
+8 rules
+
+--- [y=7804, x=-856, size=10pt] ---
+6 employees
+
+--- [y=7804, x=-736, size=10pt] ---
+Active
+
+--- [y=7809, x=1711, size=10pt] ---
+Category
+
+--- [y=7809, x=2057, size=10pt] ---
+Percentage
+
+--- [y=7813, x=1835, size=10pt] ---
+Basic
+
+--- [y=7813, x=2181, size=10pt] ---
+50%
+
+--- [y=7823, x=718, size=10pt] ---
+House Rent Allowance
+
+--- [y=7823, x=938, size=10pt] ---
+HRA
+
+--- [y=7823, x=1028, size=10pt] ---
+Allowance
+
+--- [y=7823, x=1158, size=10pt] ---
+Regular Salary
+
+--- [y=7823, x=1298, size=10pt] ---
+10
+
+--- [y=7830, x=-213, size=9pt] ---
+Basic Salary
+
+--- [y=7830, x=67, size=9pt] ---
+BASIC
+
+--- [y=7830, x=167, size=9pt] ---
+Basic
+
+--- [y=7830, x=297, size=9pt] ---
+1
+
+--- [y=7849, x=-430, size=16pt] ---
+open structure
+
+--- [y=7849, x=-213, size=9pt] ---
+House Rent Allowance
+
+--- [y=7849, x=67, size=9pt] ---
+HRA
+
+--- [y=7849, x=167, size=9pt] ---
+Allowance
+
+--- [y=7849, x=297, size=9pt] ---
+10
+
+--- [y=7849, x=1711, size=10pt] ---
+Sequence
+
+--- [y=7849, x=2057, size=10pt] ---
+Quantity
+
+--- [y=7850, x=-1216, size=10pt] ---
+Contractor
+
+--- [y=7850, x=-956, size=10pt] ---
+6 rules
+
+--- [y=7850, x=-856, size=10pt] ---
+9 employees
+
+--- [y=7850, x=-736, size=10pt] ---
+Active
+
+--- [y=7853, x=1835, size=10pt] ---
+1
+
+--- [y=7853, x=2181, size=10pt] ---
+1
+
+--- [y=7863, x=718, size=10pt] ---
+Standard Allowance
+
+--- [y=7863, x=938, size=10pt] ---
+STD
+
+--- [y=7863, x=1028, size=10pt] ---
+Allowance
+
+--- [y=7863, x=1158, size=10pt] ---
+Regular Salary
+
+--- [y=7863, x=1298, size=10pt] ---
+20
+
+--- [y=7868, x=-213, size=9pt] ---
+Standard Allowance
+
+--- [y=7868, x=67, size=9pt] ---
+STD
+
+--- [y=7868, x=167, size=9pt] ---
+Allowance
+
+--- [y=7868, x=297, size=9pt] ---
+20
+
+--- [y=7869, x=1492, size=16pt] ---
+Open salary rule
+
+--- [y=7887, x=-213, size=9pt] ---
+Performance Bonus
+
+--- [y=7887, x=67, size=9pt] ---
+BONUS
+
+--- [y=7887, x=167, size=9pt] ---
+Allowance
+
+--- [y=7887, x=297, size=9pt] ---
+30
+
+--- [y=7903, x=718, size=10pt] ---
+Performance Bonus
+
+--- [y=7903, x=938, size=10pt] ---
+BONUS
+
+--- [y=7903, x=1028, size=10pt] ---
+Allowance
+
+--- [y=7903, x=1158, size=10pt] ---
+Regular Salary
+
+--- [y=7903, x=1298, size=10pt] ---
+30
+
+--- [y=7905, x=1711, size=12pt] ---
+Computation options from the source
+
+--- [y=7906, x=-213, size=9pt] ---
+Leave Travel Allowance
+
+--- [y=7906, x=67, size=9pt] ---
+LTA
+
+--- [y=7906, x=167, size=9pt] ---
+Allowance
+
+--- [y=7906, x=297, size=9pt] ---
+40
+
+--- [y=7925, x=-213, size=9pt] ---
+Fixed Allowance
+
+--- [y=7925, x=67, size=9pt] ---
+FIX
+
+--- [y=7925, x=167, size=9pt] ---
+Allowance
+
+--- [y=7925, x=297, size=9pt] ---
+50
+
+--- [y=7943, x=718, size=10pt] ---
+Leave Travel Allowance
+
+--- [y=7943, x=938, size=10pt] ---
+LTA
+
+--- [y=7943, x=1028, size=10pt] ---
+Allowance
+
+--- [y=7943, x=1158, size=10pt] ---
+Regular Salary
+
+--- [y=7943, x=1298, size=10pt] ---
+40
+
+--- [y=7944, x=-213, size=9pt] ---
+Gross Salary
+
+--- [y=7944, x=67, size=9pt] ---
+GROSS
+
+--- [y=7944, x=167, size=9pt] ---
+Gross
+
+--- [y=7944, x=297, size=9pt] ---
+60
+
+--- [y=7947, x=1727, size=11pt] ---
+Fixed Amount
+
+--- [y=7947, x=1907, size=11pt] ---
+Percentage of Wage
+
+--- [y=7947, x=2117, size=11pt] ---
+Python Code
+
+--- [y=7963, x=-213, size=9pt] ---
+LWF fund
+
+--- [y=7963, x=67, size=9pt] ---
+LWF
+
+--- [y=7963, x=167, size=9pt] ---
+Deduction
+
+--- [y=7963, x=297, size=9pt] ---
+70
+
+--- [y=7982, x=-213, size=9pt] ---
+Provident Fund
+
+--- [y=7982, x=67, size=9pt] ---
+PF
+
+--- [y=7982, x=167, size=9pt] ---
+Deduction
+
+--- [y=7982, x=297, size=9pt] ---
+80
+
+--- [y=7983, x=718, size=10pt] ---
+Fixed Allowance
+
+--- [y=7983, x=938, size=10pt] ---
+FIX
+
+--- [y=7983, x=1028, size=10pt] ---
+Allowance
+
+--- [y=7983, x=1158, size=10pt] ---
+Regular Salary
+
+--- [y=7983, x=1298, size=10pt] ---
+50
+
+--- [y=7989, x=1727, size=10pt] ---
+Example expression: result = categories['BASIC']
+
+--- [y=8001, x=-213, size=9pt] ---
+ESIC
+
+--- [y=8001, x=67, size=9pt] ---
+ESIC
+
+--- [y=8001, x=167, size=9pt] ---
+Deduction
+
+--- [y=8001, x=297, size=9pt] ---
+90
+
+--- [y=8015, x=-1224, size=12pt] ---
+Structures group salary rules; rules define the ordered salary computation used by a payslip. Both require List and Form views.
+
+--- [y=8020, x=-213, size=9pt] ---
+Professional Tax
+
+--- [y=8020, x=67, size=9pt] ---
+PT
+
+--- [y=8020, x=167, size=9pt] ---
+Deduction
+
+--- [y=8020, x=297, size=9pt] ---
+100
+
+--- [y=8023, x=718, size=10pt] ---
+Gross Salary
+
+--- [y=8023, x=938, size=10pt] ---
+GROSS
+
+--- [y=8023, x=1028, size=10pt] ---
+Gross
+
+--- [y=8023, x=1158, size=10pt] ---
+Regular Salary
+
+--- [y=8023, x=1298, size=10pt] ---
+60
+
+--- [y=8039, x=-213, size=9pt] ---
+Net Salary
+
+--- [y=8039, x=67, size=9pt] ---
+NET
+
+--- [y=8039, x=167, size=9pt] ---
+Net
+
+--- [y=8039, x=297, size=9pt] ---
+110
+
+--- [y=8049, x=-1227, size=11pt] ---
+Useful note: the Salary Structure selected on a Payrun determines which set of salary rules will calculate each payslip.
+
+--- [y=8069, x=-220, size=12pt] ---
+Useful note: rule order matters. Keep sequence visible so participants understand the calculation order.
+Rules created here is just for reference
+
+--- [y=8074, x=710, size=12pt] ---
+Useful note: List view should expose name, code, category, structure and sequence — the fields needed to understand 
+a payroll rule quickly.
+
+--- [y=8085, x=1711, size=12pt] ---
+Useful note: a Salary Rule needs a clear computation method and category because these drive the lines displayed 
+hon the final payslip.
+
+--- [y=8164, x=-450, size=16pt] ---
+Continue into dashboard view
+
+--- [y=8169, x=1597, size=20pt] ---
+Computation Note:
+ - Fixed Amount: uses the exact value entered in the rule, e.g. Meal Allowance = 2,000.
+ - Percentage: calculates the rule as a percentage of a selected base such as Contract Wage,
+Basic Salary, or Gross Salary, e.g. HRA = 20% × Basic Salary.
+ - Python Code / Formula: is used for advanced calculations where fixed or percentage methods
+are not sufficient, such as attendance-based salary, overtime, unpaid leave deductions, or
+calculations using multiple salary-rule values.
+
+--- [y=8223, x=-1242, size=28pt] ---
+6) Payroll Dashboard
+
+--- [y=8255, x=-1242, size=18pt] ---
+Dashboard challenge: combine Payroll with HR data from multiple models and present useful insights with cards, charts, and summaries.
+
+--- [y=8296, x=-1156, size=18pt] ---
+Employees
+
+--- [y=8296, x=-1016, size=18pt] ---
+Attendance
+
+--- [y=8296, x=-872, size=18pt] ---
+Time Off
+
+--- [y=8296, x=-732, size=18pt] ---
+Payroll
+
+--- [y=8297, x=-1214, size=18pt] ---
+HR
+
+--- [y=8355, x=-1218, size=26pt] ---
+Payroll Dashboard
+
+--- [y=8389, x=-1218, size=16pt] ---
+Dashboard should help payroll/HR users understand payments, staffing impact, leave patterns, and attendance quality for the selected period.
+
+--- [y=8475, x=-1218, size=15pt] ---
+Period
+
+--- [y=8475, x=-958, size=15pt] ---
+Department
+
+--- [y=8475, x=-698, size=15pt] ---
+Employee Type
+
+--- [y=8475, x=-438, size=15pt] ---
+Company
+
+--- [y=8503, x=-1208, size=15pt] ---
+Sep 2026
+
+--- [y=8503, x=-948, size=15pt] ---
+All Departments
+
+--- [y=8503, x=-688, size=15pt] ---
+All Types
+
+--- [y=8503, x=-428, size=15pt] ---
+OXP Pvt Ltd
+
+--- [y=8571, x=-1200, size=16pt] ---
+Total Net Salary Paid
+
+--- [y=8571, x=-682, size=16pt] ---
+Payslips Generated
+
+--- [y=8571, x=-164, size=16pt] ---
+Avg Salary / Employee
+
+--- [y=8571, x=354, size=16pt] ---
+Approved Time Off Days
+
+--- [y=8571, x=872, size=16pt] ---
+Attendance Health
+
+--- [y=8599, x=-1200, size=28pt] ---
+₹ 18.4L
+
+--- [y=8599, x=-682, size=28pt] ---
+148
+
+--- [y=8599, x=-164, size=28pt] ---
+₹ 12,432
+
+--- [y=8599, x=354, size=28pt] ---
+34 Days
+
+--- [y=8599, x=872, size=28pt] ---
+94%
+
+--- [y=8639, x=-1200, size=14pt] ---
++8.5% vs previous month
+
+--- [y=8639, x=-682, size=14pt] ---
+142 paid, 6 pending
+
+--- [y=8639, x=-164, size=14pt] ---
+Based on current payrun
+
+--- [y=8639, x=354, size=14pt] ---
+Across selected period
+
+--- [y=8639, x=872, size=14pt] ---
+Present / reviewed records
+
+--- [y=8721, x=-1200, size=20pt] ---
+Salary Cost by Department
+
+--- [y=8721, x=-252, size=20pt] ---
+Monthly Net Salary Trend
+
+--- [y=8721, x=536, size=20pt] ---
+Payslip Status & Payroll Alerts
+
+--- [y=8749, x=-1200, size=14pt] ---
+Source: Payslips + Employee Department
+
+--- [y=8749, x=-252, size=14pt] ---
+Source: historical Payslips / Payruns
+
+--- [y=8749, x=536, size=14pt] ---
+Source: Payrun + Payslip validation
+
+--- [y=8765, x=-528, size=13pt] ---
+₹ 170k
+
+--- [y=8785, x=-942, size=13pt] ---
+₹ 150k
+
+--- [y=8793, x=542, size=16pt] ---
+Status split
+
+--- [y=8793, x=1102, size=16pt] ---
+Current alerts
+
+--- [y=8805, x=-666, size=13pt] ---
+₹ 130k
+
+--- [y=8825, x=-1080, size=13pt] ---
+₹ 110k
+
+--- [y=8825, x=1102, size=15pt] ---
+• 2 employees missing bank account
+
+--- [y=8845, x=-804, size=13pt] ---
+₹ 90k
+
+--- [y=8857, x=1102, size=15pt] ---
+• 1 duplicate payslip warning
+
+--- [y=8883, x=140, size=13pt] ---
+15.0L
+
+--- [y=8884, x=570, size=15pt] ---
+Paid
+
+--- [y=8889, x=1102, size=15pt] ---
+• 4 drafts still not validated
+
+--- [y=8912, x=570, size=15pt] ---
+Done
+
+--- [y=8921, x=1102, size=15pt] ---
+• 3 contracts expiring this month
+
+--- [y=8940, x=570, size=15pt] ---
+Pending
+
+--- [y=8967, x=-1076, size=14pt] ---
+HR
+
+--- [y=8967, x=-938, size=14pt] ---
+Sales
+
+--- [y=8967, x=-800, size=14pt] ---
+Support
+
+--- [y=8967, x=-662, size=14pt] ---
+Finance
+
+--- [y=8967, x=-524, size=14pt] ---
+IT
+
+--- [y=8968, x=570, size=15pt] ---
+Warning
+
+--- [y=8969, x=-178, size=13pt] ---
+Apr
+
+--- [y=8969, x=-68, size=13pt] ---
+May
+
+--- [y=8969, x=42, size=13pt] ---
+Jun
+
+--- [y=8969, x=152, size=13pt] ---
+Jul
+
+--- [y=8969, x=262, size=13pt] ---
+Aug
+
+--- [y=8969, x=372, size=13pt] ---
+Sep
+
+--- [y=9039, x=-78, size=13pt] ---
+15.2L
+
+--- [y=9047, x=-1200, size=20pt] ---
+Attendance Overview
+
+--- [y=9047, x=-552, size=20pt] ---
+Time Off Overview
+
+--- [y=9047, x=196, size=20pt] ---
+Department Overview
+
+--- [y=9047, x=844, size=20pt] ---
+Models to Aggregate
+
+--- [y=9049, x=-188, size=13pt] ---
+14.8L
+
+--- [y=9069, x=32, size=13pt] ---
+14.3L
+
+--- [y=9075, x=-1200, size=14pt] ---
+Source: Attendance
+
+--- [y=9075, x=-552, size=14pt] ---
+Source: Time Off Requests + Allocations
+
+--- [y=9075, x=196, size=14pt] ---
+Source: Employee + Contract + Payslip totals
+
+--- [y=9075, x=844, size=14pt] ---
+This is the actual challenge behind the dashboard.
+
+--- [y=9079, x=362, size=13pt] ---
+18.4L
+
+--- [y=9089, x=252, size=13pt] ---
+17.1L
+
+--- [y=9097, x=-1168, size=13pt] ---
+94
+
+--- [y=9103, x=208, size=13pt] ---
+Department
+
+--- [y=9103, x=399, size=13pt] ---
+Headcount
+
+--- [y=9103, x=504, size=13pt] ---
+Monthly Salary
+
+--- [y=9111, x=844, size=15pt] ---
+• Employees / Departments → headcount, ownership, grouping
+
+--- [y=9117, x=-542, size=15pt] ---
+Type
+
+--- [y=9117, x=-362, size=15pt] ---
+Approved Days
+
+--- [y=9117, x=-212, size=15pt] ---
+Pending
+
+--- [y=9117, x=-92, size=15pt] ---
+Remaining Balance
+
+--- [y=9121, x=-778, size=13pt] ---
+22
+
+--- [y=9127, x=-798, size=15pt] ---
+Missing check-outs: 5
+Manual attendance edits: 7
+Attendance coverage: 94%
+
+--- [y=9133, x=208, size=13pt] ---
+IT
+
+--- [y=9133, x=399, size=13pt] ---
+18
+
+--- [y=9133, x=504, size=13pt] ---
+₹ 4.2L
+
+--- [y=9137, x=844, size=15pt] ---
+• Contracts → wage, schedule, active employees
+
+--- [y=9151, x=-542, size=15pt] ---
+Paid Time Off
+
+--- [y=9151, x=-362, size=15pt] ---
+24
+
+--- [y=9151, x=-212, size=15pt] ---
+3
+
+--- [y=9151, x=-92, size=15pt] ---
+118 Days
+
+--- [y=9160, x=208, size=13pt] ---
+Sales
+
+--- [y=9160, x=399, size=13pt] ---
+22
+
+--- [y=9160, x=504, size=13pt] ---
+₹ 5.7L
+
+--- [y=9163, x=844, size=15pt] ---
+• Payruns / Payslips → salary totals, paid vs pending, trend data
+
+--- [y=9173, x=-1038, size=13pt] ---
+18
+
+--- [y=9182, x=-908, size=13pt] ---
+9
+
+--- [y=9185, x=-542, size=15pt] ---
+Sick Leave
+
+--- [y=9185, x=-362, size=15pt] ---
+6
+
+--- [y=9185, x=-212, size=15pt] ---
+1
+
+--- [y=9185, x=-92, size=15pt] ---
+N/A
+
+--- [y=9188, x=208, size=13pt] ---
+HR
+
+--- [y=9188, x=399, size=13pt] ---
+8
+
+--- [y=9188, x=504, size=13pt] ---
+₹ 1.9L
+
+--- [y=9189, x=844, size=15pt] ---
+• Attendance → presence, absences, late entries, overtime
+
+--- [y=9215, x=844, size=15pt] ---
+• Time Off Requests / Allocations → leave taken and leave balances
+
+--- [y=9216, x=208, size=13pt] ---
+Support
+
+--- [y=9216, x=399, size=13pt] ---
+14
+
+--- [y=9216, x=504, size=13pt] ---
+₹ 3.1L
+
+--- [y=9219, x=-1174, size=13pt] ---
+Present
+
+--- [y=9219, x=-1044, size=13pt] ---
+Late
+
+--- [y=9219, x=-914, size=13pt] ---
+Absent
+
+--- [y=9219, x=-784, size=13pt] ---
+Overtime
+
+--- [y=9219, x=-542, size=15pt] ---
+Comp Off
+
+--- [y=9219, x=-362, size=15pt] ---
+4
+
+--- [y=9219, x=-212, size=15pt] ---
+2
+
+--- [y=9219, x=-92, size=15pt] ---
+11 Days
+
