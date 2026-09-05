@@ -47,6 +47,10 @@ import {
   warnings,
   allocationBalance,
   monthEnd,
+  scheduleRows,
+  scheduleRowForDate,
+  scheduleWeeklyHours,
+  employeeSchedule,
 } from '@/lib/domain';
 import { Avatar, Badge, DataTable, Field, Picker, niceMonth, downloadCsv } from '@/components/peoplepay-ui';
 import Dashboard from '@/components/payroll-dashboard';
@@ -438,6 +442,17 @@ export default function Home() {
       ? s?.allocations.find((r) => r.id === modal.record?.id)
       : null;
 
+  const canReviewLeave = (request: Row) => {
+    const role = currentUser?.role;
+    if (!role) return false;
+    if (role === 'Admin') return true;
+    const workflow = leaveType(request.typeId)?.approvalWorkflow || 'HR Approval';
+    if (workflow === 'No Approval') return false;
+    if (workflow === 'Manager Approval') return role === 'HR Manager';
+    return ['HR Manager', 'HR Payroll Manager'].includes(role);
+  };
+  const canReviewAllocation = !!currentUser && ['Admin', 'HR Manager', 'HR Payroll Manager'].includes(currentUser.role);
+
   const currentClock =
     mounted && clockNow && s
       ? s.attendance.find(
@@ -463,18 +478,19 @@ export default function Home() {
     </button>
   );
 
-  const attendanceStatus = (a: Row) =>
-    !a.checkIn
-      ? 'Absent'
-      : !a.checkOut
-      ? 'Missing check-out'
-      : a.checkIn > (s?.schedules.find((sc) => sc.id === employee(a.employeeId)?.scheduleId)?.start || '09:00')
-      ? 'Late'
-      : 'Present';
+  const attendanceStatus = (a: Row) => {
+    if (!a.checkIn) return 'Absent';
+    if (!a.checkOut) return 'Missing check-out';
+    const schedule = s ? employeeSchedule(s, a.employeeId, a.date) : undefined;
+    const expected = scheduleRowForDate(schedule, a.date)?.start || '09:00';
+    return a.checkIn > expected ? 'Late' : 'Present';
+  };
 
   const runSlipColumns = [
     { title: 'Employee', render: cellEmployee },
     { title: 'Recorded days', render: (p: Row) => p.workedDays },
+    { title: 'Payable days', render: (p: Row) => p.payableDays ?? p.scheduledDays ?? '—' },
+    { title: 'Unpaid leave', render: (p: Row) => p.unpaidLeaveDays || 0 },
     { title: 'Basic', render: (p: Row) => money(p.basic) },
     { title: 'Gross', render: (p: Row) => money(p.gross) },
     { title: 'Deductions', render: (p: Row) => money(p.deductions) },
@@ -1136,14 +1152,10 @@ export default function Home() {
                   </button>
                 ),
               },
-              { title: 'Working days', render: (r) => r.days.map((d: string) => d.slice(0, 3)).join(', ') },
-              { title: 'Hours', render: (r) => r.start + ' – ' + r.end },
-              { title: 'Daily break', render: (r) => r.breakHours + ' hr' },
-              {
-                title: 'Weekly hours',
-                render: (r) =>
-                  ((hours({ id: r.id, checkIn: r.start, checkOut: r.end }) - r.breakHours) * r.days.length).toFixed(1),
-              },
+              { title: 'Type', render: (r) => r.type || 'Fixed' },
+              { title: 'Working days', render: (r) => scheduleRows(r).filter((row) => row.working).map((row) => row.day.slice(0, 3)).join(', ') },
+              { title: 'Daily hours', render: (r) => scheduleRows(r).filter((row) => row.working).map((row) => `${row.day.slice(0, 3)} ${row.start}–${row.end}`).join(', ') },
+              { title: 'Weekly hours', render: (r) => scheduleWeeklyHours(r).toFixed(1) },
             ]}
           />
         )}
@@ -1326,7 +1338,8 @@ export default function Home() {
             <DetailRow label="Recorded Days" value={`${att.length} shifts`} />
             <DetailRow label="Completed Check-outs" value={`${complete} of ${present}`} />
             <DetailRow label="Missing Check-outs" value={`${missing} days`} />
-            <DetailRow label="Expected Start" value={sched?.start || '09:00'} />
+            <DetailRow label="Schedule Type" value={sched?.type || 'Fixed'} />
+            <DetailRow label="Weekly Hours" value={`${scheduleWeeklyHours(sched).toFixed(1)} hours`} />
           </DetailSection>
 
           <DetailSection title="STATISTICS">
@@ -1432,14 +1445,14 @@ export default function Home() {
               key={r.id}
               avatar={initials(emp?.name || 'TO')}
               title={emp?.name || 'Employee'}
-              subtitle={`${leaveType(r.typeId)?.name} · ${r.duration}d`}
+              subtitle={`${leaveType(r.typeId)?.name} · ${r.duration} ${leaveType(r.typeId)?.unit?.toLowerCase() || 'days'}`}
               badge={r.status}
               active={isSel}
               onClick={() => setActiveId(r.id)}
               progress={{
                 label: 'Duration',
                 value: Math.min(r.duration * 10, 100),
-                displayValue: `${r.duration} days`,
+                displayValue: `${r.duration} ${leaveType(r.typeId)?.unit?.toLowerCase() || 'days'}`,
                 variant: r.status === 'Approved' ? 'green' : 'gold',
               }}
             />
@@ -1534,7 +1547,8 @@ export default function Home() {
               },
               { title: 'Unit', render: (r) => r.unit },
               { title: 'Allocation', render: (r) => (r.requiresAllocation ? 'Required' : 'Not required') },
-              { title: 'Approval', render: () => 'HR approval' },
+              { title: 'Approval', render: (r) => r.approvalWorkflow || 'HR Approval' },
+              { title: 'Payroll', render: (r) => r.payrollImpact || 'Paid' },
               { title: 'Status', render: () => <Badge value="Active" /> },
             ]}
           />
@@ -1553,7 +1567,7 @@ export default function Home() {
         >
           <DetailSection title="REQUEST DETAILS">
             <DetailRow label="Time Off Type" value={leaveType(activeReq.typeId)?.name} />
-            <DetailRow label="Duration" value={`${activeReq.duration} days`} />
+            <DetailRow label="Duration" value={`${activeReq.duration} ${leaveType(activeReq.typeId)?.unit?.toLowerCase() || 'days'}`} />
             <DetailRow label="Start Date" value={activeReq.start} />
             <DetailRow label="End Date" value={activeReq.end} />
             <DetailRow label="Approver" value={activeReq.approver || 'Awaiting HR Action'} />
@@ -1569,7 +1583,7 @@ export default function Home() {
 
           <DetailSection title="APPROVAL STATUS">
             {activeReq.status === 'Pending' ? (
-              ['Admin', 'HR Manager', 'HR Payroll User', 'HR Payroll Manager'].includes(currentUser.role) ? (
+              canReviewLeave(activeReq) ? (
                 <div className="flex flex-col gap-2">
                   <button
                     className="pill-btn pill-btn-black w-full justify-center !py-2 cursor-pointer"
@@ -1588,7 +1602,7 @@ export default function Home() {
                 </div>
               ) : (
                 <div className="p-3 rounded-xl bg-amber-50 text-xs text-amber-800 border border-amber-200 text-center">
-                  Pending review by HR Manager.
+                  Pending {leaveType(activeReq.typeId)?.approvalWorkflow || 'HR Approval'}.
                 </div>
               )
             ) : (
@@ -2501,7 +2515,7 @@ export default function Home() {
                     >
                       Edit
                     </button>
-                    {modal.kind === 'request' && (
+                    {modal.kind === 'request' && canReviewLeave(reviewedRecord) && (
                       <button
                         className="pill-btn !py-1.5 cursor-pointer"
                         disabled={busy}
@@ -2510,19 +2524,21 @@ export default function Home() {
                         Refuse
                       </button>
                     )}
-                    <button
-                      className="pill-btn pill-btn-black !py-1.5 cursor-pointer"
-                      disabled={busy}
-                      onClick={() =>
-                        void act(
-                          modal.kind === 'request' ? 'approveLeave' : 'approveAllocation',
-                          { id: reviewedRecord.id },
-                          'Approved.'
-                        )
-                      }
-                    >
-                      Approve
-                    </button>
+                    {(modal.kind === 'request' ? canReviewLeave(reviewedRecord) : canReviewAllocation) && (
+                      <button
+                        className="pill-btn pill-btn-black !py-1.5 cursor-pointer"
+                        disabled={busy}
+                        onClick={() =>
+                          void act(
+                            modal.kind === 'request' ? 'approveLeave' : 'approveAllocation',
+                            { id: reviewedRecord.id },
+                            'Approved.'
+                          )
+                        }
+                      >
+                        Approve
+                      </button>
+                    )}
                   </>
                 )}
                 <button className="pill-btn !py-1.5 cursor-pointer" onClick={() => setModal(null)}>
@@ -2545,6 +2561,19 @@ export default function Home() {
                   </p>
                 </div>
                 <Badge value={modal.record.status || 'Computed'} />
+              </div>
+
+              <div className="grid grid-cols-3 gap-2">
+                {[
+                  ['Scheduled days', modal.record.scheduledDays ?? '—'],
+                  ['Payable days', modal.record.payableDays ?? modal.record.scheduledDays ?? '—'],
+                  ['Unpaid leave', modal.record.unpaidLeaveDays || 0],
+                ].map(([label, value]) => (
+                  <div key={String(label)} className="rounded-xl border border-slate-100 bg-slate-50 p-3">
+                    <span className="block text-[10px] font-semibold uppercase tracking-wide text-slate-400">{label}</span>
+                    <span className="mt-1 block text-sm font-bold text-slate-900">{value}</span>
+                  </div>
+                ))}
               </div>
 
               <DataTable

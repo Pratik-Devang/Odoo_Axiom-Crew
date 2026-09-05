@@ -45,8 +45,16 @@ export function canMutateWorkspace(
     return false;
   }
 
-  if (['approveLeave', 'refuseLeave', 'approveAllocation'].includes(action)) {
-    return ['HR Manager', 'HR Payroll User', 'HR Payroll Manager'].includes(user.role);
+  if (action === 'approveAllocation') {
+    return ['HR Manager', 'HR Payroll Manager'].includes(user.role);
+  }
+
+  if (['approveLeave', 'refuseLeave'].includes(action)) {
+    const request = workspace.requests.find((item) => item.id === payload.id);
+    const leaveType = workspace.leaveTypes.find((item) => item.id === request?.typeId);
+    if (!request || !leaveType || leaveType.approvalWorkflow === 'No Approval') return false;
+    if (leaveType.approvalWorkflow === 'Manager Approval') return user.role === 'HR Manager';
+    return ['HR Manager', 'HR Payroll Manager'].includes(user.role);
   }
 
   if (action === 'createPayrun' || action === 'compute') {

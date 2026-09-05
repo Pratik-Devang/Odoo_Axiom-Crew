@@ -24,6 +24,8 @@ export async function createPayslipPdf(employee: Row, slip: Row, structureName: 
   draw(employee.email || '');
   draw(`Salary structure: ${structureName}`);
   draw(`Recorded worked days: ${slip.workedDays || 0}`);
+  draw(`Scheduled days: ${slip.scheduledDays || 0} | Payable days: ${slip.payableDays || 0}`);
+  if (slip.unpaidLeaveDays) draw(`Unpaid leave: ${slip.unpaidLeaveDays} day(s)`);
   y -= 16;
   draw('SALARY COMPONENTS', 11, true);
   page.drawLine({ start: { x: 48, y: y + 5 }, end: { x: 547, y: y + 5 }, thickness: 1, color: rgb(0.85, 0.85, 0.85) });

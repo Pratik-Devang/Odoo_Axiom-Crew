@@ -18,12 +18,46 @@ CREATE TABLE IF NOT EXISTS roles (
 CREATE TABLE IF NOT EXISTS schedules (
     id VARCHAR(50) PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
+    schedule_type VARCHAR(50) NOT NULL DEFAULT 'Fixed',
     days JSONB NOT NULL DEFAULT '["Monday","Tuesday","Wednesday","Thursday","Friday"]'::jsonb,
+    work_rows JSONB NOT NULL DEFAULT '[]'::jsonb,
     start_time VARCHAR(10) NOT NULL DEFAULT '09:00',
     end_time VARCHAR(10) NOT NULL DEFAULT '18:00',
     break_hours NUMERIC(4,2) NOT NULL DEFAULT 1.0,
+    weekly_hours NUMERIC(6,2) NOT NULL DEFAULT 0,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
+
+ALTER TABLE schedules ADD COLUMN IF NOT EXISTS schedule_type VARCHAR(50) NOT NULL DEFAULT 'Fixed';
+ALTER TABLE schedules ADD COLUMN IF NOT EXISTS work_rows JSONB NOT NULL DEFAULT '[]'::jsonb;
+ALTER TABLE schedules ADD COLUMN IF NOT EXISTS weekly_hours NUMERIC(6,2) NOT NULL DEFAULT 0;
+
+UPDATE schedules AS schedule
+SET work_rows = (
+    SELECT jsonb_agg(jsonb_build_object(
+        'id', weekday.name,
+        'day', weekday.name,
+        'working', schedule.days ? weekday.name,
+        'start', schedule.start_time,
+        'end', schedule.end_time,
+        'breakHours', schedule.break_hours
+    ) ORDER BY weekday.position)
+    FROM (VALUES
+        (0, 'Sunday'), (1, 'Monday'), (2, 'Tuesday'), (3, 'Wednesday'),
+        (4, 'Thursday'), (5, 'Friday'), (6, 'Saturday')
+    ) AS weekday(position, name)
+)
+WHERE work_rows = '[]'::jsonb;
+
+UPDATE schedules AS schedule
+SET weekly_hours = COALESCE((
+    SELECT ROUND(SUM(
+        EXTRACT(EPOCH FROM ((work_row->>'end')::time - (work_row->>'start')::time)) / 3600
+        - COALESCE((work_row->>'breakHours')::numeric, 0)
+    ), 2)
+    FROM jsonb_array_elements(schedule.work_rows) AS work_row
+    WHERE COALESCE((work_row->>'working')::boolean, false)
+), 0);
 
 -- 3. EMPLOYEES
 CREATE TABLE IF NOT EXISTS employees (
@@ -118,8 +152,13 @@ CREATE TABLE IF NOT EXISTS leave_types (
     name VARCHAR(100) NOT NULL,
     unit VARCHAR(20) NOT NULL DEFAULT 'Days', -- 'Days', 'Hours'
     requires_allocation BOOLEAN NOT NULL DEFAULT true,
+    approval_workflow VARCHAR(50) NOT NULL DEFAULT 'HR Approval',
+    payroll_impact VARCHAR(50) NOT NULL DEFAULT 'Paid',
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
+
+ALTER TABLE leave_types ADD COLUMN IF NOT EXISTS approval_workflow VARCHAR(50) NOT NULL DEFAULT 'HR Approval';
+ALTER TABLE leave_types ADD COLUMN IF NOT EXISTS payroll_impact VARCHAR(50) NOT NULL DEFAULT 'Paid';
 
 -- 11. LEAVE ALLOCATIONS
 CREATE TABLE IF NOT EXISTS leave_allocations (
@@ -177,9 +216,16 @@ CREATE TABLE IF NOT EXISTS payslips (
     deductions NUMERIC(12,2) NOT NULL DEFAULT 0,
     net NUMERIC(12,2) NOT NULL DEFAULT 0,
     worked_days INTEGER NOT NULL DEFAULT 0,
+    scheduled_days NUMERIC(6,2) NOT NULL DEFAULT 0,
+    unpaid_leave_days NUMERIC(6,2) NOT NULL DEFAULT 0,
+    payable_days NUMERIC(6,2) NOT NULL DEFAULT 0,
     lines JSONB NOT NULL DEFAULT '[]'::jsonb,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
+
+ALTER TABLE payslips ADD COLUMN IF NOT EXISTS scheduled_days NUMERIC(6,2) NOT NULL DEFAULT 0;
+ALTER TABLE payslips ADD COLUMN IF NOT EXISTS unpaid_leave_days NUMERIC(6,2) NOT NULL DEFAULT 0;
+ALTER TABLE payslips ADD COLUMN IF NOT EXISTS payable_days NUMERIC(6,2) NOT NULL DEFAULT 0;
 
 -- ====================================================================
 -- SEED RBAC ROLES
@@ -211,21 +257,27 @@ BEGIN
 
     IF w_json IS NOT NULL THEN
         -- 1. Schedules
-        INSERT INTO schedules (id, name, days, start_time, end_time, break_hours)
+        INSERT INTO schedules (id, name, schedule_type, days, work_rows, start_time, end_time, break_hours, weekly_hours)
         SELECT 
             x->>'id',
             x->>'name',
+            COALESCE(x->>'type', 'Fixed'),
             COALESCE(x->'days', '["Monday","Tuesday","Wednesday","Thursday","Friday"]'::jsonb),
+            COALESCE(x->'workRows', '[]'::jsonb),
             COALESCE(x->>'start', '09:00'),
             COALESCE(x->>'end', '18:00'),
-            COALESCE((x->>'breakHours')::numeric, 1.0)
+            COALESCE((x->>'breakHours')::numeric, 1.0),
+            COALESCE((x->>'weeklyHours')::numeric, 0)
         FROM jsonb_array_elements(w_json->'schedules') AS x
         ON CONFLICT (id) DO UPDATE SET
             name = EXCLUDED.name,
+            schedule_type = EXCLUDED.schedule_type,
             days = EXCLUDED.days,
+            work_rows = EXCLUDED.work_rows,
             start_time = EXCLUDED.start_time,
             end_time = EXCLUDED.end_time,
-            break_hours = EXCLUDED.break_hours;
+            break_hours = EXCLUDED.break_hours,
+            weekly_hours = EXCLUDED.weekly_hours;
 
         -- 2. Employees
         INSERT INTO employees (id, name, email, phone, department, position, type, status, manager, location, schedule_id, bank)
@@ -323,17 +375,21 @@ BEGIN
             status = EXCLUDED.status;
 
         -- 7. Leave Types
-        INSERT INTO leave_types (id, name, unit, requires_allocation)
+        INSERT INTO leave_types (id, name, unit, requires_allocation, approval_workflow, payroll_impact)
         SELECT 
             x->>'id',
             x->>'name',
             COALESCE(x->>'unit', 'Days'),
-            COALESCE((x->>'requiresAllocation')::boolean, true)
+            COALESCE((x->>'requiresAllocation')::boolean, true),
+            COALESCE(x->>'approvalWorkflow', 'HR Approval'),
+            COALESCE(x->>'payrollImpact', 'Paid')
         FROM jsonb_array_elements(w_json->'leaveTypes') AS x
         ON CONFLICT (id) DO UPDATE SET
             name = EXCLUDED.name,
             unit = EXCLUDED.unit,
-            requires_allocation = EXCLUDED.requires_allocation;
+            requires_allocation = EXCLUDED.requires_allocation,
+            approval_workflow = EXCLUDED.approval_workflow,
+            payroll_impact = EXCLUDED.payroll_impact;
 
         -- 8. Leave Allocations
         INSERT INTO leave_allocations (id, employee_id, type_id, amount, start_date, end_date, status)
@@ -401,7 +457,7 @@ BEGIN
         ON CONFLICT (payrun_id, employee_id) DO NOTHING;
 
         -- 13. Payslips
-        INSERT INTO payslips (id, payrun_id, employee_id, period, structure_id, contract_id, basic, gross, deductions, net, worked_days, lines)
+        INSERT INTO payslips (id, payrun_id, employee_id, period, structure_id, contract_id, basic, gross, deductions, net, worked_days, scheduled_days, unpaid_leave_days, payable_days, lines)
         SELECT 
             slip->>'id',
             p->>'id',
@@ -414,15 +470,50 @@ BEGIN
             COALESCE((slip->>'deductions')::numeric, 0),
             COALESCE((slip->>'net')::numeric, 0),
             COALESCE((slip->>'workedDays')::integer, 0),
+            COALESCE((slip->>'scheduledDays')::numeric, 0),
+            COALESCE((slip->>'unpaidLeaveDays')::numeric, 0),
+            COALESCE((slip->>'payableDays')::numeric, 0),
             COALESCE(slip->'lines', '[]'::jsonb)
         FROM jsonb_array_elements(w_json->'payruns') AS p,
         LATERAL jsonb_array_elements(p->'slips') AS slip
         ON CONFLICT (id) DO UPDATE SET
             net = EXCLUDED.net,
             gross = EXCLUDED.gross,
-            deductions = EXCLUDED.deductions;
+            deductions = EXCLUDED.deductions,
+            scheduled_days = EXCLUDED.scheduled_days,
+            unpaid_leave_days = EXCLUDED.unpaid_leave_days,
+            payable_days = EXCLUDED.payable_days;
     END IF;
 END $$;
+
+-- JSON workspaces created before per-day schedules existed import an empty
+-- work_rows array. Normalize those rows after the JSON migration as well.
+UPDATE schedules AS schedule
+SET work_rows = (
+    SELECT jsonb_agg(jsonb_build_object(
+        'id', weekday.name,
+        'day', weekday.name,
+        'working', schedule.days ? weekday.name,
+        'start', schedule.start_time,
+        'end', schedule.end_time,
+        'breakHours', schedule.break_hours
+    ) ORDER BY weekday.position)
+    FROM (VALUES
+        (0, 'Sunday'), (1, 'Monday'), (2, 'Tuesday'), (3, 'Wednesday'),
+        (4, 'Thursday'), (5, 'Friday'), (6, 'Saturday')
+    ) AS weekday(position, name)
+)
+WHERE work_rows = '[]'::jsonb;
+
+UPDATE schedules AS schedule
+SET weekly_hours = COALESCE((
+    SELECT ROUND(SUM(
+        EXTRACT(EPOCH FROM ((work_row->>'end')::time - (work_row->>'start')::time)) / 3600
+        - COALESCE((work_row->>'breakHours')::numeric, 0)
+    ), 2)
+    FROM jsonb_array_elements(schedule.work_rows) AS work_row
+    WHERE COALESCE((work_row->>'working')::boolean, false)
+), 0);
 
 -- Demo credentials are stored as scrypt hashes. Existing password hashes are
 -- never overwritten when the migration is re-run.

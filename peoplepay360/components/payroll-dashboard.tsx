@@ -26,6 +26,9 @@ import {
   hours,
   allocationBalance,
   monthEnd,
+  employeeSchedule,
+  scheduleRowForDate,
+  workingDaysBetween,
 } from '@/lib/domain';
 import { Picker, DataTable, Badge, niceMonth } from './peoplepay-ui';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
@@ -116,9 +119,8 @@ export default function Dashboard({
   const complete = present.filter((a) => a.checkOut);
   const missing = present.length - complete.length;
   const late = present.filter((a) => {
-    const e = s.employees.find((e) => e.id === a.employeeId);
-    const sc = s.schedules.find((sc) => sc.id === e?.scheduleId);
-    return a.checkIn > (sc?.start || '09:00');
+    const row = scheduleRowForDate(employeeSchedule(s, a.employeeId, a.date), a.date);
+    return a.checkIn > (row?.start || '09:00');
   }).length;
   const health = attendance.length
     ? Math.round((complete.length / attendance.length) * 100)
@@ -708,11 +710,12 @@ export default function Dashboard({
                               n +
                               (t.unit === 'Hours'
                                 ? r.duration
-                                : Math.round(
-                                    (Date.parse(r.end < monthEnd(period) ? r.end : monthEnd(period)) -
-                                      Date.parse(r.start > period + '-01' ? r.start : period + '-01')) /
-                                      86400000
-                                  ) + 1),
+                                : workingDaysBetween(
+                                    s,
+                                    r.employeeId,
+                                    r.start > period + '-01' ? r.start : period + '-01',
+                                    r.end < monthEnd(period) ? r.end : monthEnd(period)
+                                  )),
                             0
                           ) +
                         ' ' +

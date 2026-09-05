@@ -96,11 +96,12 @@ If two sessions edit concurrently, the later stale request returns a conflict. R
 
 ## Current boundaries
 
-- Opens as a clearly labeled **demo administrator**. User creation, passwords and server-enforced roles are not implemented. Use fictional data; do not expose this version as a real multi-user HR service.
+- Provides local password authentication, admin-managed user accounts and server-enforced role and employee record scopes. The seeded accounts and data are for demonstration and should be replaced before real use.
 - Payslips are generated as PDF files. Bulk delivery requires an SMTP server configured through the environment variables above.
 - Sample salary components are demonstration rules, not statutory tax or contribution logic.
 - Full-month contracts only; no partial-period wage proration.
-- Leave uses inclusive calendar days. Hourly requests must be on one day. Weekend/holiday exclusion, approval chains and payroll-linked unpaid leave remain to implement.
+- Day-based leave counts the employee's scheduled working days. Hourly requests must be on one scheduled working day. Leave types support automatic, manager and HR approval policies plus paid, unpaid and no-payroll-impact treatments. Approved unpaid leave creates a prorated payslip deduction.
+- Public-holiday calendars and role-specific multi-stage approval chains remain to implement.
 - Attendance is one same-day record per employee/date. No overnight shifts or multiple daily sessions. The quick widget represents the demo administrator, Nisha Rao.
 - Attendance is displayed on payslips but does not automatically alter monthly salary. Formula inputs currently include WAGE and earlier salary rule codes.
 - Department and employee-type reporting joins the current employee record; historical department snapshots are a follow-up.

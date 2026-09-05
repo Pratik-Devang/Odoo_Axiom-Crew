@@ -13,10 +13,13 @@ export const roles = pgTable('roles', {
 export const schedules = pgTable('schedules', {
   id: text('id').primaryKey(),
   name: text('name').notNull(),
+  type: text('schedule_type').notNull().default('Fixed'),
   days: jsonb('days').notNull(),
+  workRows: jsonb('work_rows').notNull().default([]),
   startTime: text('start_time').notNull().default('09:00'),
   endTime: text('end_time').notNull().default('18:00'),
   breakHours: numeric('break_hours').notNull().default('1.0'),
+  weeklyHours: numeric('weekly_hours').notNull().default('0'),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
 });
 
@@ -114,6 +117,8 @@ export const leaveTypes = pgTable('leave_types', {
   name: text('name').notNull(),
   unit: text('unit').notNull().default('Days'),
   requiresAllocation: boolean('requires_allocation').notNull().default(true),
+  approvalWorkflow: text('approval_workflow').notNull().default('HR Approval'),
+  payrollImpact: text('payroll_impact').notNull().default('Paid'),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
 });
 
@@ -178,6 +183,9 @@ export const payslips = pgTable('payslips', {
   deductions: numeric('deductions').notNull().default('0'),
   net: numeric('net').notNull().default('0'),
   workedDays: integer('worked_days').notNull().default(0),
+  scheduledDays: numeric('scheduled_days').notNull().default('0'),
+  unpaidLeaveDays: numeric('unpaid_leave_days').notNull().default('0'),
+  payableDays: numeric('payable_days').notNull().default('0'),
   lines: jsonb('lines').notNull().default([]),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
 });
