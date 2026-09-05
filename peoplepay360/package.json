@@ -8,11 +8,10 @@
     "scripts": {
         "dev": "vinext dev",
         "build": "vinext build",
-        "start": "wrangler dev --config dist/server/wrangler.json",
+        "start": "vinext start",
         "lint": "oxlint",
         "format": "oxfmt",
         "db:generate": "drizzle-kit generate",
-        "db:setup": "wrangler d1 execute DB --local --config wrangler.local.json --file db/bootstrap.sql",
         "typecheck": "tsc --noEmit"
     },
     "dependencies": {

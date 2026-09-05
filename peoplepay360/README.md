@@ -10,11 +10,15 @@ Use Node.js 22.13 or later. From this folder:
 npm.cmd install
 npm.cmd run db:setup
 npm.cmd run dev
+```bash
+npm install
+npm run dev
 ```
 
 Open the local URL printed by the development server (normally http://localhost:3000).
 
 `npm.cmd` avoids PowerShell's script-execution restriction on `npm.ps1`. On macOS/Linux, use `npm` instead. Dependencies are already installed in this checkout; installation is needed for another machine or a fresh clone.
+The application runs directly against your local PostgreSQL database configured via `DATABASE_URL` in `.env.local` without any Cloudflare or Wrangler dependencies.
 
 The local database setup creates the schema only. The first API read inserts the fictional OXP sample company if no workspace exists. Reopening the app does not reset existing records. Wrangler and the development server share the local `.wrangler/state` database directory; run both from this project folder. No external database account is needed for local development.
 

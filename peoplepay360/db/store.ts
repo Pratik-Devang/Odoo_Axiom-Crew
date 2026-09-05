@@ -5,7 +5,8 @@ import type { PoolClient } from 'pg';
 /**
  * Read the entire workspace from normalized PostgreSQL relational tables.
  */
-async function readRelational(client: PoolClient): Promise<Workspace> {
+async function readRelational(): Promise<Workspace> {
+  const pool = getPgPool();
   const [
     employeesRes,
     contractsRes,
@@ -20,40 +21,40 @@ async function readRelational(client: PoolClient): Promise<Workspace> {
     payslipsRes,
     auditRes,
   ] = await Promise.all([
-    client.query(
+    pool.query(
       'SELECT id, name, email, COALESCE(phone, \'\') AS phone, department, position, type, status, COALESCE(manager, \'\') AS manager, COALESCE(location, \'Mumbai\') AS location, COALESCE(schedule_id, \'sch1\') AS "scheduleId", COALESCE(bank, \'\') AS bank FROM employees ORDER BY id'
     ),
-    client.query(
+    pool.query(
       `SELECT id, employee_id AS "employeeId", to_char(start_date, 'YYYY-MM-DD') AS "start", COALESCE(to_char(end_date, 'YYYY-MM-DD'), '') AS "end", wage::float AS wage, COALESCE(structure_id, '') AS "structureId", COALESCE(schedule_id, '') AS "scheduleId", status FROM contracts ORDER BY id`
     ),
-    client.query(
+    pool.query(
       `SELECT id, employee_id AS "employeeId", to_char(date, 'YYYY-MM-DD') AS "date", COALESCE(check_in, '') AS "checkIn", COALESCE(check_out, '') AS "checkOut", edited FROM attendance ORDER BY date, employee_id`
     ),
-    client.query(
+    pool.query(
       `SELECT id, employee_id AS "employeeId", type_id AS "typeId", to_char(start_date, 'YYYY-MM-DD') AS "start", to_char(end_date, 'YYYY-MM-DD') AS "end", duration::float AS duration, COALESCE(reason, '') AS reason, status, COALESCE(approver, '') AS approver FROM leave_requests ORDER BY id`
     ),
-    client.query(
+    pool.query(
       `SELECT id, employee_id AS "employeeId", type_id AS "typeId", amount::float AS amount, to_char(start_date, 'YYYY-MM-DD') AS "start", to_char(end_date, 'YYYY-MM-DD') AS "end", status FROM leave_allocations ORDER BY id`
     ),
-    client.query(
+    pool.query(
       'SELECT id, name, unit, requires_allocation AS "requiresAllocation" FROM leave_types ORDER BY id'
     ),
-    client.query(
+    pool.query(
       "SELECT id, name, code, category, sequence, method, COALESCE(base, '') AS base, COALESCE(value::float, 0) AS value, COALESCE(expression, '') AS expression FROM salary_rules ORDER BY sequence"
     ),
-    client.query(
+    pool.query(
       `SELECT s.id, s.name, s.active, COALESCE(array_remove(array_agg(sr.rule_id ORDER BY r.sequence), NULL), ARRAY[]::varchar[]) AS "ruleIds" FROM salary_structures s LEFT JOIN salary_structure_rules sr ON s.id = sr.structure_id LEFT JOIN salary_rules r ON sr.rule_id = r.id GROUP BY s.id, s.name, s.active ORDER BY s.id`
     ),
-    client.query(
+    pool.query(
       'SELECT id, name, days, start_time AS "start", end_time AS "end", break_hours::float AS "breakHours" FROM schedules ORDER BY id'
     ),
-    client.query(
+    pool.query(
       `SELECT p.id, p.name, p.period, COALESCE(p.structure_id, '') AS "structureId", p.status, COALESCE((SELECT array_agg(employee_id) FROM payrun_employees WHERE payrun_id = p.id), ARRAY[]::varchar[]) AS "employeeIds" FROM payruns p ORDER BY p.period`
     ),
-    client.query(
+    pool.query(
       'SELECT id, payrun_id AS "payrunId", employee_id AS "employeeId", period, COALESCE(structure_id, \'\') AS "structureId", COALESCE(contract_id, \'\') AS "contractId", basic::float AS basic, gross::float AS gross, deductions::float AS deductions, net::float AS net, worked_days AS "workedDays", lines FROM payslips ORDER BY id'
     ),
-    client.query(
+    pool.query(
       'SELECT id, action, to_char(at, \'YYYY-MM-DD"T"HH24:MI:SS"Z"\') AS at, actor FROM audit_logs ORDER BY at DESC LIMIT 100'
     ),
   ]);
@@ -488,39 +489,11 @@ export async function readWorkspace(): Promise<{ data: Workspace; revision: numb
         return { data: initial, revision };
       }
 
-      const data = await readRelational(client);
+      const data = await readRelational();
       return { data, revision };
     } finally {
       client.release();
     }
-  }
-
-  // Fallback to Cloudflare D1
-  try {
-    const { env } = await import('cloudflare:workers');
-    const db = env?.DB;
-    if (db) {
-      let row = await db
-        .prepare('SELECT data, revision FROM workspace WHERE id = ?')
-        .bind('demo')
-        .first<{ data: string; revision: number }>();
-
-      if (!row) {
-        await db
-          .prepare('INSERT OR IGNORE INTO workspace (id, data, revision) VALUES (?, ?, 0)')
-          .bind('demo', JSON.stringify(seed()))
-          .run();
-        row = await db
-          .prepare('SELECT data, revision FROM workspace WHERE id = ?')
-          .bind('demo')
-          .first<{ data: string; revision: number }>();
-      }
-
-      if (!row) throw new Error('Workspace could not be loaded.');
-      return { data: JSON.parse(row.data), revision: row.revision };
-    }
-  } catch {
-    // Cloudflare binding not available
   }
 
   throw new Error(
@@ -562,15 +535,5 @@ export async function writeWorkspace(data: unknown, revision: number) {
     }
   }
 
-  // Fallback to Cloudflare D1
-  const { env } = await import('cloudflare:workers');
-  if (!env?.DB) {
-    throw new Error('No database configured.');
-  }
-
-  return env.DB.prepare(
-    'UPDATE workspace SET data = ?, revision = revision + 1 WHERE id = ? AND revision = ?'
-  )
-    .bind(serialized, 'demo', revision)
-    .run();
+  throw new Error('No database configured. Please configure DATABASE_URL in .env.local to connect to PostgreSQL.');
 }
