@@ -30,6 +30,7 @@ import {
   Eye,
   Key,
   Mail,
+  ChevronRight,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -176,6 +177,7 @@ const ROLE_STYLES: Record<string, string> = {
 
 function defaultRouteForRole(role: string): string {
   if (role === 'Employee') return 'attendance';
+  if (role === 'HR Manager') return 'users';
   if (role === 'HR Manager') return 'employees';
   if (role === 'HR Payroll User') return 'payruns';
   return 'overview';
@@ -381,6 +383,8 @@ export default function Home() {
         if (v === 'dashboard') v = 'overview';
       } else if (v === 'time-off') {
         v = 'requests';
+      } else if ((v === 'employees' || v === 'employee' || v === 'admin/employees') && currentUser?.role === 'Admin') {
+        v = 'users';
       }
       if (v && (titles[v] || v === 'overview' || v === 'employee' || v === 'run' || v === 'users')) {
         setView(v);
@@ -391,10 +395,10 @@ export default function Home() {
     read();
     window.addEventListener('hashchange', read);
     return () => window.removeEventListener('hashchange', read);
-  }, []);
+  }, [currentUser]);
 
   function navigate(v: string, id?: string) {
-    let resolvedView = v;
+    let resolvedView = (v === 'employees' || v === 'employee' || v === 'admin/employees') && currentUser?.role === 'Admin' ? 'users' : v;
     let resolvedId = id || '';
     let newQuery = '';
 
@@ -552,7 +556,7 @@ export default function Home() {
       className="flex items-center gap-2 text-left hover:underline cursor-pointer"
       onClick={() => {
         setActiveId(r.employeeId);
-        navigate('employees');
+        navigate('users');
       }}
     >
       <Avatar name={empName(r.employeeId)} />
@@ -1035,6 +1039,7 @@ export default function Home() {
       </MasterList>
     );
 
+
     // CENTER COLUMN: Directory Grid or Data Table
     centerContent = (
       <div className="workora-table-container">
@@ -1243,43 +1248,7 @@ export default function Home() {
     const filteredContracts = filtered(s.contracts);
     const activeContractRecord = s.contracts.find((c) => c.id === activeId) || filteredContracts[0];
 
-    leftSlot = (
-      <MasterList
-        title="Contracts"
-        count={filteredContracts.length}
-        search={query}
-        onSearchChange={setQuery}
-        searchPlaceholder="Search contracts…"
-        isEmpty={filteredContracts.length === 0}
-      >
-        {filteredContracts.map((c) => {
-          const emp = employee(c.employeeId);
-          const isSel = c.id === activeContractRecord?.id;
-          const isRunning = !c.end || c.end >= todayIso;
-          return (
-            <MasterCard
-              key={c.id}
-              avatar={initials(emp?.name || 'CT')}
-              title={emp?.name || 'Contract'}
-              subtitle={
-                c.id.startsWith('c') && c.id.length < 5
-                  ? `CON/2026/${String(+c.id.slice(1) + 1).padStart(4, '0')}`
-                  : c.id.slice(0, 8).toUpperCase()
-              }
-              badge={isRunning ? 'Running' : 'Expired'}
-              active={isSel}
-              onClick={() => setActiveId(c.id)}
-              progress={{
-                label: 'Monthly Wage',
-                value: 100,
-                displayValue: money(c.wage),
-                variant: 'gold',
-              }}
-            />
-          );
-        })}
-      </MasterList>
-    );
+
 
     centerContent = (
       <div className="workora-table-container">
@@ -1454,39 +1423,7 @@ export default function Home() {
       })
       .sort((a, b) => b.date.localeCompare(a.date));
 
-    leftSlot = (
-      <MasterList
-        title={currentUser.role === 'Employee' ? 'My Profile' : 'Staff Attendance'}
-        count={employeePool.length}
-        search={query}
-        onSearchChange={setQuery}
-        searchPlaceholder="Filter team…"
-      >
-        {employeePool.map((e) => {
-          const att = s.attendance.filter((a) => a.employeeId === e.id && a.date.startsWith(period));
-          const presentCount = att.filter((a) => a.checkIn).length;
-          const rate = att.length ? Math.round((presentCount / att.length) * 100) : 0;
-          const isSel = e.id === activeEmp?.id;
-          return (
-            <MasterCard
-              key={e.id}
-              avatar={initials(e.name)}
-              title={e.name}
-              subtitle={e.department}
-              badge={rate >= 80 ? 'Present' : rate > 0 ? 'Late' : 'Absent'}
-              active={isSel}
-              onClick={() => setActiveId(e.id)}
-              progress={{
-                label: 'Attendance Rate',
-                value: rate,
-                displayValue: `${rate}%`,
-                variant: rate >= 80 ? 'gold' : 'dark',
-              }}
-            />
-          );
-        })}
-      </MasterList>
-    );
+
 
     centerContent = (
       <div className="workora-table-container">
@@ -1629,38 +1566,7 @@ export default function Home() {
     const filteredRequests = filtered(baseRequests);
     const activeReq = baseRequests.find((r) => r.id === activeId) || filteredRequests[0];
 
-    leftSlot = (
-      <MasterList
-        title={currentUser.role === 'Employee' ? 'My Requests' : 'Leave Requests'}
-        count={filteredRequests.length}
-        search={query}
-        onSearchChange={setQuery}
-        searchPlaceholder="Filter requests…"
-        isEmpty={filteredRequests.length === 0}
-      >
-        {filteredRequests.map((r) => {
-          const emp = employee(r.employeeId);
-          const isSel = r.id === activeReq?.id;
-          return (
-            <MasterCard
-              key={r.id}
-              avatar={initials(emp?.name || 'TO')}
-              title={emp?.name || 'Employee'}
-              subtitle={`${leaveType(r.typeId)?.name} · ${r.duration} ${leaveType(r.typeId)?.unit?.toLowerCase() || 'days'}`}
-              badge={r.status}
-              active={isSel}
-              onClick={() => setActiveId(r.id)}
-              progress={{
-                label: 'Duration',
-                value: Math.min(r.duration * 10, 100),
-                displayValue: `${r.duration} ${leaveType(r.typeId)?.unit?.toLowerCase() || 'days'}`,
-                variant: r.status === 'Approved' ? 'green' : 'gold',
-              }}
-            />
-          );
-        })}
-      </MasterList>
-    );
+
 
     centerContent = (
       <div className="workora-table-container">
@@ -2338,7 +2244,7 @@ export default function Home() {
             setModal({ kind: 'userForm' });
           }}
         >
-          <Plus size={14} /> New User Account
+          <Plus size={14} /> New User
         </button>
       </>
     );
@@ -2545,113 +2451,133 @@ export default function Home() {
             className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs transition-opacity"
             onClick={() => setSelectedUserDrawer(null)}
           />
-          <div className="fixed inset-y-0 right-0 max-w-full flex pl-10">
-            <div className="w-screen max-w-lg bg-white border-l border-[#e5ded4] shadow-2xl flex flex-col h-full animate-in slide-in-from-right duration-250">
+          <div className="fixed inset-y-0 right-0 max-w-full flex pl-6 py-4">
+            <div className="w-screen max-w-md bg-white border border-[#e5ded4] rounded-l-3xl shadow-2xl flex flex-col h-full overflow-hidden animate-in slide-in-from-right duration-250">
               
-              {/* Header */}
-              <div className="p-5 border-b border-[#e5ded4] bg-[#faf8f5] flex items-center justify-between shrink-0">
-                <div className="flex items-center gap-3">
-                  <Avatar name={selectedUserDrawer.name} />
-                  <div>
-                    <h2 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
-                      {selectedUserDrawer.name}
-                      <span className={`text-[10px] px-2 py-0.5 rounded-full border font-bold ${ROLE_STYLES[selectedUserDrawer.roleName || ''] || 'bg-slate-100 text-slate-700'}`}>
-                        {selectedUserDrawer.roleName || selectedUserDrawer.roleId}
-                      </span>
-                    </h2>
-                    <p className="text-xs text-slate-500">{selectedUserDrawer.email}</p>
-                  </div>
-                </div>
+              {/* Profile Header (Centered Avatar & Details matching uploaded design) */}
+              <div className="p-6 pb-4 bg-white relative border-b border-[#f0ece5] text-center shrink-0">
                 <button
                   onClick={() => setSelectedUserDrawer(null)}
-                  className="p-1.5 rounded-full hover:bg-slate-200/60 text-slate-500 cursor-pointer"
+                  className="absolute top-4 right-4 p-1.5 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
                   title="Close Drawer"
                 >
                   <XCircle size={20} />
                 </button>
+
+                <div className="w-20 h-20 rounded-full bg-[#1a1a1a] text-white text-2xl font-bold flex items-center justify-center border-4 border-[#f7f4ee] shadow-sm mx-auto mb-2.5">
+                  {initials(selectedUserDrawer.name)}
+                </div>
+
+                <h2 className="text-lg font-bold text-slate-900 tracking-tight">
+                  {selectedUserDrawer.name}
+                </h2>
+
+                <p className="text-xs text-slate-500 font-medium mt-0.5">
+                  {selectedUserDrawer.email.split('@')[0]} · {selectedUserDrawer.department || 'Engineering'}
+                </p>
+
+                <div className="flex justify-center mt-2.5">
+                  <span className={`inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-semibold border ${
+                    selectedUserDrawer.active 
+                      ? 'bg-[#f0fdf4] text-emerald-700 border-emerald-200' 
+                      : 'bg-slate-100 text-slate-600 border-slate-200'
+                  }`}>
+                    <span className={`w-1.5 h-1.5 rounded-full ${selectedUserDrawer.active ? 'bg-emerald-500' : 'bg-slate-400'}`} />
+                    {selectedUserDrawer.active ? 'Active' : 'Deactivated'}
+                  </span>
+                </div>
               </div>
 
               {/* Body with Collapsible Accordion Dropdowns */}
-              <div className="flex-1 overflow-y-auto p-5 space-y-4">
-                <DetailSection title="ACCOUNT PERMISSIONS & SCOPE">
-                  <DetailRow label="Role Level" value={selectedUserDrawer.roleName || selectedUserDrawer.roleId} />
-                  <DetailRow
-                    label="Access Scope"
-                    value={
-                      selectedUserDrawer.roleId === 'admin'
-                        ? 'Universal Control'
-                        : selectedUserDrawer.roleId === 'employee'
-                        ? 'Self-service Portal'
-                        : 'Department Operations'
-                    }
-                  />
-                  <DetailRow label="Work Email" value={selectedUserDrawer.email} />
-                  <DetailRow label="Account Status" value={selectedUserDrawer.active ? 'Active Account' : 'Deactivated'} />
-                </DetailSection>
-
-                {/* COMPRESSED DROPDOWN ACCORDIONS */}
-                <details className="group border border-[#e5ded4] rounded-2xl bg-[#faf8f5]/60 overflow-hidden text-xs my-2">
-                  <summary className="flex items-center justify-between px-3.5 py-2.5 bg-[#f5efe6] hover:bg-[#ebdcc8]/60 cursor-pointer font-bold text-xs text-slate-800 transition-colors select-none">
+              <div className="flex-1 overflow-y-auto p-5 space-y-4 bg-white">
+                
+                {/* 1. BASIC INFORMATION (Collapsible) */}
+                <details className="group border border-[#e5ded4] rounded-2xl bg-[#faf8f5]/60 overflow-hidden text-xs" open>
+                  <summary className="flex items-center justify-between px-4 py-3 bg-[#f5efe6] hover:bg-[#ebdcc8]/60 cursor-pointer font-bold text-xs text-slate-800 transition-colors select-none">
                     <span className="flex items-center gap-1.5">
                       <ChevronDown className="size-4 text-[#c99a2e] transition-transform duration-200 group-open:rotate-180" />
-                      Basic Work & Profile Information
+                      BASIC INFORMATION
                     </span>
                     <span className="text-[10px] text-slate-500 font-semibold uppercase tracking-wide group-open:hidden">Expand</span>
                     <span className="text-[10px] text-slate-500 font-semibold uppercase tracking-wide hidden group-open:inline">Collapse</span>
                   </summary>
 
-                  <div className="p-3.5 space-y-3 border-t border-[#e5ded4] bg-white">
-                    <DetailRow label="Department" value={selectedUserDrawer.department || 'Engineering'} />
-                    <DetailRow label="Position" value={selectedUserDrawer.position || 'Team Member'} />
-                    <DetailRow label="Phone" value={selectedUserDrawer.phone || '+91 90000 10000'} />
-                    <DetailRow label="Employment Type" value={selectedUserDrawer.type || 'Full-time'} />
-                    <DetailRow label="Manager" value={selectedUserDrawer.manager || 'Sara Khan'} />
-                    <DetailRow label="Location" value={selectedUserDrawer.location || 'Mumbai'} />
-                    <DetailRow label="Bank Reference" value={selectedUserDrawer.bank || 'Standard Payroll Direct'} />
+                  <div className="p-4 space-y-2.5 border-t border-[#e5ded4] bg-white">
+                    <div className="flex items-center justify-between py-1 border-b border-slate-50">
+                      <span className="text-xs text-slate-400 font-medium">Department</span>
+                      <span className="text-xs text-slate-900 font-bold">{selectedUserDrawer.department || 'Engineering'}</span>
+                    </div>
+                    <div className="flex items-center justify-between py-1 border-b border-slate-50">
+                      <span className="text-xs text-slate-400 font-medium">Manager</span>
+                      <span className="text-xs text-slate-900 font-bold">{selectedUserDrawer.manager || 'Sara Khan'}</span>
+                    </div>
+                    <div className="flex items-center justify-between py-1 border-b border-slate-50">
+                      <span className="text-xs text-slate-400 font-medium">Work Schedule</span>
+                      <span className="text-xs text-slate-900 font-bold">{selectedUserDrawer.scheduleName || 'Standard workweek'}</span>
+                    </div>
+                    <div className="flex items-center justify-between py-1 border-b border-slate-50">
+                      <span className="text-xs text-slate-400 font-medium">Location</span>
+                      <span className="text-xs text-slate-900 font-bold">{selectedUserDrawer.location || 'Mumbai'}</span>
+                    </div>
+                    <div className="flex items-center justify-between py-1 border-b border-slate-50">
+                      <span className="text-xs text-slate-400 font-medium">Employee Type</span>
+                      <span className="text-xs text-slate-900 font-bold">{selectedUserDrawer.type || 'Full-time'}</span>
+                    </div>
+                    <div className="flex items-center justify-between py-1">
+                      <span className="text-xs text-slate-400 font-medium">Bank Reference</span>
+                      <span className="text-xs text-slate-900 font-bold font-mono">{selectedUserDrawer.bank || 'egshhdasf'}</span>
+                    </div>
                   </div>
                 </details>
 
-                <details className="group border border-[#e5ded4] rounded-2xl bg-[#faf8f5]/60 overflow-hidden text-xs my-2">
-                  <summary className="flex items-center justify-between px-3.5 py-2.5 bg-[#f5efe6] hover:bg-[#ebdcc8]/60 cursor-pointer font-bold text-xs text-slate-800 transition-colors select-none">
+                {/* 2. DOCUMENTS & CONTRACTS (Collapsible) */}
+                <details className="group border border-[#e5ded4] rounded-2xl bg-[#faf8f5]/60 overflow-hidden text-xs">
+                  <summary className="flex items-center justify-between px-4 py-3 bg-[#f5efe6] hover:bg-[#ebdcc8]/60 cursor-pointer font-bold text-xs text-slate-800 transition-colors select-none">
                     <span className="flex items-center gap-1.5">
                       <ChevronDown className="size-4 text-[#c99a2e] transition-transform duration-200 group-open:rotate-180" />
-                      Contracts & Work Policies
+                      DOCUMENTS & CONTRACTS
                     </span>
                     <span className="text-[10px] text-slate-500 font-semibold uppercase tracking-wide group-open:hidden">Expand</span>
                     <span className="text-[10px] text-slate-500 font-semibold uppercase tracking-wide hidden group-open:inline">Collapse</span>
                   </summary>
 
-                  <div className="p-3.5 space-y-3 border-t border-[#e5ded4] bg-white">
-                    <DocChip
-                      name={`Terms: ${money(85000)} /mo`}
-                      meta="Active Full-time Contract"
-                      onClick={() => {
-                        setSelectedUserDrawer(null);
-                        navigate('contracts');
-                      }}
-                    />
-                    <DocChip
-                      name="Standard Workweek Policy"
-                      meta="09:00 – 18:00 (Mon - Fri)"
-                      onClick={() => {
-                        setSelectedUserDrawer(null);
-                        navigate('schedules');
-                      }}
-                    />
+                  <div className="p-4 space-y-2.5 border-t border-[#e5ded4] bg-white">
+                    <div 
+                      className="rounded-2xl border border-[#e8e2d8] bg-[#fcfbfa] p-3 flex items-center justify-between hover:bg-[#f7f4ee] cursor-pointer transition-colors shadow-2xs"
+                      onClick={() => { setSelectedUserDrawer(null); navigate('contracts'); }}
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <FileText className="size-4 text-[#8a7a6d]" />
+                        <span className="text-xs font-bold text-slate-900">Create employment contract</span>
+                      </div>
+                      <span className="text-xs text-slate-400 font-medium flex items-center gap-1">Draft <ChevronRight size={13} /></span>
+                    </div>
+
+                    <div 
+                      className="rounded-2xl border border-[#e8e2d8] bg-[#fcfbfa] p-3 flex items-center justify-between hover:bg-[#f7f4ee] cursor-pointer transition-colors shadow-2xs"
+                      onClick={() => { setSelectedUserDrawer(null); navigate('schedules'); }}
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <FileText className="size-4 text-[#8a7a6d]" />
+                        <span className="text-xs font-bold text-slate-900">Standard workweek...</span>
+                      </div>
+                      <span className="text-xs text-slate-400 font-medium flex items-center gap-1">09:00 – 18:00 <ChevronRight size={13} /></span>
+                    </div>
                   </div>
                 </details>
 
-                <details className="group border border-[#e5ded4] rounded-2xl bg-[#faf8f5]/60 overflow-hidden text-xs my-2">
-                  <summary className="flex items-center justify-between px-3.5 py-2.5 bg-[#f5efe6] hover:bg-[#ebdcc8]/60 cursor-pointer font-bold text-xs text-slate-800 transition-colors select-none">
+                {/* 3. STATISTICS & ATTENDANCE (Collapsible) */}
+                <details className="group border border-[#e5ded4] rounded-2xl bg-[#faf8f5]/60 overflow-hidden text-xs">
+                  <summary className="flex items-center justify-between px-4 py-3 bg-[#f5efe6] hover:bg-[#ebdcc8]/60 cursor-pointer font-bold text-xs text-slate-800 transition-colors select-none">
                     <span className="flex items-center gap-1.5">
                       <ChevronDown className="size-4 text-[#c99a2e] transition-transform duration-200 group-open:rotate-180" />
-                      Attendance & Leave Statistics
+                      STATISTICS & ATTENDANCE
                     </span>
                     <span className="text-[10px] text-slate-500 font-semibold uppercase tracking-wide group-open:hidden">Expand</span>
                     <span className="text-[10px] text-slate-500 font-semibold uppercase tracking-wide hidden group-open:inline">Collapse</span>
                   </summary>
 
-                  <div className="p-3.5 space-y-3 border-t border-[#e5ded4] bg-white">
+                  <div className="p-4 space-y-3 border-t border-[#e5ded4] bg-white">
                     <StatBar
                       label="Shift Attendance Rate"
                       value={92}
@@ -2659,7 +2585,7 @@ export default function Home() {
                       variant="gold"
                     />
                     <StatBar
-                      label="Approved Leave Balance"
+                      label="Approved Leave Pool"
                       value={80}
                       displayValue="16 days"
                       variant="green"
@@ -2667,18 +2593,30 @@ export default function Home() {
                   </div>
                 </details>
 
-                <details className="group border border-[#e5ded4] rounded-2xl bg-[#faf8f5]/60 overflow-hidden text-xs my-2">
-                  <summary className="flex items-center justify-between px-3.5 py-2.5 bg-[#f5efe6] hover:bg-[#ebdcc8]/60 cursor-pointer font-bold text-xs text-slate-800 transition-colors select-none">
+                {/* 4. ACCOUNT PERMISSIONS & RESPONSIBILITIES (Collapsible) */}
+                <details className="group border border-[#e5ded4] rounded-2xl bg-[#faf8f5]/60 overflow-hidden text-xs">
+                  <summary className="flex items-center justify-between px-4 py-3 bg-[#f5efe6] hover:bg-[#ebdcc8]/60 cursor-pointer font-bold text-xs text-slate-800 transition-colors select-none">
                     <span className="flex items-center gap-1.5">
                       <ChevronDown className="size-4 text-[#c99a2e] transition-transform duration-200 group-open:rotate-180" />
-                      Role Responsibilities Overview
+                      ACCOUNT PERMISSIONS
                     </span>
                     <span className="text-[10px] text-slate-500 font-semibold uppercase tracking-wide group-open:hidden">Expand</span>
                     <span className="text-[10px] text-slate-500 font-semibold uppercase tracking-wide hidden group-open:inline">Collapse</span>
                   </summary>
 
-                  <div className="p-3.5 border-t border-[#e5ded4] bg-white">
-                    <p className="text-xs text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-100 leading-relaxed">
+                  <div className="p-4 space-y-3 border-t border-[#e5ded4] bg-white">
+                    <DetailRow label="Role Level" value={selectedUserDrawer.roleName || selectedUserDrawer.roleId} />
+                    <DetailRow
+                      label="Access Scope"
+                      value={
+                        selectedUserDrawer.roleId === 'admin'
+                          ? 'Universal Control'
+                          : selectedUserDrawer.roleId === 'employee'
+                          ? 'Self-service Portal'
+                          : 'Department Operations'
+                      }
+                    />
+                    <p className="text-xs text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-100 leading-relaxed mt-2">
                       {selectedUserDrawer.roleId === 'admin'
                         ? 'Full system governance, security settings, user provisioning, role assignments, and all HR/Payroll modules.'
                         : selectedUserDrawer.roleId === 'payroll_manager'
@@ -2693,7 +2631,7 @@ export default function Home() {
                 </details>
               </div>
 
-              {/* Footer */}
+              {/* Drawer Footer Actions */}
               <div className="p-4 border-t border-[#e5ded4] bg-[#faf8f5] flex items-center justify-between shrink-0">
                 <button
                   className="pill-btn pill-btn-black !py-2 justify-center text-xs font-semibold cursor-pointer"

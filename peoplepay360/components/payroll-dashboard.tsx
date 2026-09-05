@@ -243,7 +243,7 @@ export default function Dashboard({
             id: 'bank',
             title: `${bankMissing.length} missing bank account${bankMissing.length > 1 ? 's' : ''}`,
             detail: bankMissing.map((e) => e.name).join(', '),
-            view: 'employees',
+            view: 'users',
             employeeId: bankMissing[0].id,
             priority: 'ACTION',
           },
@@ -1014,7 +1014,7 @@ export default function Dashboard({
                   className="flex-1 h-8 text-xs rounded-xl bg-[#1a1a1a] text-white hover:bg-[#333] cursor-pointer"
                   onClick={() => {
                     setSelectedId(null);
-                    navigate('employees', selectedEmp.id);
+                    navigate('users', selectedEmp.id);
                   }}
                 >
                   View Profile
