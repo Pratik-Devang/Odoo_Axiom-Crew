@@ -327,15 +327,33 @@ export default function Home() {
   }, []);
 
   function navigate(v: string, id?: string) {
-    setView(v);
-    setActiveId(id || '');
+    let resolvedView = v;
+    let resolvedId = id || '';
+    let newQuery = '';
+
+    if (resolvedId.startsWith('dept:')) {
+      const deptName = resolvedId.replace('dept:', '');
+      setDepartment(deptName);
+      newQuery = deptName;
+      resolvedId = '';
+    } else if (resolvedId.startsWith('stat:')) {
+      const statName = resolvedId.replace('stat:', '');
+      newQuery = statName === 'present' ? 'Present' : statName === 'late' ? 'Late' : statName === 'absent' ? 'Absent' : '';
+      resolvedId = '';
+    } else if (resolvedId.startsWith('period:')) {
+      setPeriod(resolvedId.replace('period:', ''));
+      resolvedId = '';
+    }
+
+    setView(resolvedView);
+    setActiveId(resolvedId);
     setFilterId('');
-    setQuery('');
+    setQuery(newQuery);
     setModal(null);
     setError('');
     setMessage('');
-    const targetHash = v === 'users' ? 'admin/users' : v === 'overview' ? 'payroll/dashboard' : v;
-    window.history.replaceState(null, '', '#' + targetHash + (id ? '/' + encodeURIComponent(id) : ''));
+    const targetHash = resolvedView === 'users' ? 'admin/users' : resolvedView === 'overview' ? 'payroll/dashboard' : resolvedView;
+    window.history.replaceState(null, '', '#' + targetHash + (resolvedId ? '/' + encodeURIComponent(resolvedId) : ''));
   }
 
   function related(v: string, id: string) {
@@ -1250,7 +1268,21 @@ export default function Home() {
       : s.attendance;
 
     const filteredAttendance = baseAttendance
-      .filter((a) => (!filterId || a.employeeId === filterId) && (!period || a.date.startsWith(period)))
+      .filter((a) => {
+        const matchesEmpFilter = !filterId || a.employeeId === filterId;
+        const matchesPeriod = !period || a.date.startsWith(period);
+        const emp = employee(a.employeeId);
+        const matchesDept = department === 'All' || emp?.department === department;
+        const status = attendanceStatus(a);
+        const hoursWorked = hours(a);
+        const matchesQuery =
+          !query ||
+          [emp?.name, emp?.department, a.date, status].some((x) =>
+            String(x || '').toLowerCase().includes(query.toLowerCase())
+          ) ||
+          (query.toLowerCase() === 'over9' && hoursWorked > 9);
+        return matchesEmpFilter && matchesPeriod && matchesDept && matchesQuery;
+      })
       .sort((a, b) => b.date.localeCompare(a.date));
 
     leftSlot = (
@@ -1873,7 +1905,12 @@ export default function Home() {
 
           {view === 'payslips' && (
             <DataTable
-              rows={filtered(allSlips).filter((p) => !period || p.period === period)}
+              rows={filtered(allSlips).filter((p) => {
+                const matchesPeriod = !period || p.period === period;
+                const emp = employee(p.employeeId);
+                const matchesDept = department === 'All' || emp?.department === department;
+                return matchesPeriod && matchesDept;
+              })}
               columns={[
                 { title: 'Period', render: (p) => niceMonth(p.period) },
                 ...runSlipColumns.slice(0, -1),
