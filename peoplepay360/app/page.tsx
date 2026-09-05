@@ -18,6 +18,17 @@ import {
   XCircle,
   CalendarDays,
   Sparkles,
+  Shield,
+  ShieldAlert,
+  Lock,
+  LogOut,
+  UserCheck,
+  AlertCircle,
+  Users,
+  Briefcase,
+  Wallet,
+  Eye,
+  Key,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -26,6 +37,9 @@ import { Checkbox } from '@/components/ui/checkbox';
 import {
   type Workspace,
   type Row,
+  type AppUser,
+  type UserRole,
+  canView,
   money,
   hours,
   activeContract,
@@ -60,10 +74,53 @@ function initials(name: string) {
 }
 
 type Modal = {
-  kind: 'form' | 'request' | 'allocation' | 'wizard' | 'slip' | 'clock' | 'about';
+  kind: 'form' | 'request' | 'allocation' | 'wizard' | 'slip' | 'clock' | 'about' | 'userForm';
   collection?: string;
   record?: Row;
 };
+
+async function readApiResponse(response: Response): Promise<any> {
+  const text = await response.text();
+  if (!text) return {};
+
+  try {
+    return JSON.parse(text);
+  } catch {
+    const message = text
+      .replace(/^Error:\s*/i, '')
+      .replace(/<[^>]*>/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .slice(0, 240);
+    throw new Error(message || `The server returned an invalid response (${response.status}).`);
+  }
+}
+
+
+const DEMO_ACCOUNTS = [
+  { role: 'Admin', email: 'admin@oxp.example', password: 'admin123', desc: 'Full workspace & user management' },
+  { role: 'HR Payroll Manager', email: 'nisha@oxp.example', password: 'payrollmgr123', desc: 'Author rules, payrun wizard, validate & mark paid' },
+  { role: 'HR Payroll User', email: 'payroll.user@oxp.example', password: 'payroll123', desc: 'Review payruns, compute payslip calculations' },
+  { role: 'HR Manager', email: 'sara@oxp.example', password: 'hrmanager123', desc: 'Employee profiles, contracts & leave approvals' },
+  { role: 'Employee', email: 'john@oxp.example', password: 'employee123', desc: 'Self-service attendance, requests & payslips' },
+];
+
+const DEFAULT_LOGIN = DEMO_ACCOUNTS[0];
+
+const ROLE_STYLES: Record<string, string> = {
+  Admin: 'bg-rose-50 text-rose-700 border-rose-200',
+  'HR Payroll Manager': 'bg-amber-50 text-amber-800 border-amber-200',
+  'HR Payroll User': 'bg-blue-50 text-blue-700 border-blue-200',
+  'HR Manager': 'bg-emerald-50 text-emerald-700 border-emerald-200',
+  Employee: 'bg-slate-100 text-slate-700 border-slate-200',
+};
+
+function defaultRouteForRole(role: string): string {
+  if (role === 'Employee') return 'attendance';
+  if (role === 'HR Manager') return 'employees';
+  if (role === 'HR Payroll User') return 'payruns';
+  return 'overview';
+}
 
 export default function Home() {
   const [s, setS] = useState<Workspace | null>(null);
@@ -84,12 +141,134 @@ export default function Home() {
   const [mounted, setMounted] = useState(false);
   const todayIso = mounted && clockNow ? clockNow.toISOString().slice(0, 10) : '2026-09-05';
 
+  // Authentication & RBAC states
+  const [currentUser, setCurrentUser] = useState<AppUser | null>(null);
+  const [authLoading, setAuthLoading] = useState(true);
+  const [loginEmail, setLoginEmail] = useState(DEFAULT_LOGIN.email);
+  const [loginPassword, setLoginPassword] = useState(DEFAULT_LOGIN.password);
+  const [loginError, setLoginError] = useState('');
+  const [loginBusy, setLoginBusy] = useState(false);
+
+  // Admin users state
+  const [systemUsers, setSystemUsers] = useState<any[]>([]);
+  const [systemRoles, setSystemRoles] = useState<any[]>([]);
+  const [userFormData, setUserFormData] = useState({
+    id: '',
+    name: '',
+    email: '',
+    roleId: 'employee',
+    employeeId: '',
+    password: '',
+    active: true,
+  });
+
+  const checkAuth = useCallback(async () => {
+    try {
+      const res = await fetch('/api/auth/me', { cache: 'no-store' });
+      if (res.ok) {
+        const body = await res.json();
+        if (body?.user) {
+          setCurrentUser(body.user);
+          return body.user;
+        }
+      }
+      setCurrentUser(null);
+      return null;
+    } catch {
+      setCurrentUser(null);
+      return null;
+    } finally {
+      setAuthLoading(false);
+    }
+  }, []);
+
+  const loadUsers = useCallback(async () => {
+    try {
+      const r = await fetch('/api/users', { cache: 'no-store' });
+      if (r.ok) {
+        const body = await r.json();
+        setSystemUsers(body.users || []);
+        setSystemRoles(body.roles || []);
+      }
+    } catch (e) {
+      console.error('Failed to load users:', e);
+    }
+  }, []);
+
+  async function handleLogin(emailToUse?: string, passToUse?: string) {
+    const email = (emailToUse ?? loginEmail).trim();
+    const password = (passToUse ?? loginPassword).trim();
+    if (!email || !password) {
+      setLoginError('Please enter both work email and password.');
+      return;
+    }
+    setLoginBusy(true);
+    setLoginError('');
+    try {
+      const r = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+      const data = await readApiResponse(r);
+      if (!r.ok) {
+        throw new Error(data.error || 'Authentication failed.');
+      }
+      setCurrentUser(data.user);
+      setLoginEmail('');
+      setLoginPassword('');
+      await load();
+      if (data.user.role === 'Admin') {
+        await loadUsers();
+      }
+      const defRoute = defaultRouteForRole(data.user.role);
+      navigate(defRoute);
+    } catch (err: any) {
+      setLoginError(err.message || 'Login failed.');
+    } finally {
+      setLoginBusy(false);
+    }
+  }
+
+  async function handleLogout() {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+    } catch {}
+    setCurrentUser(null);
+    setLoginEmail(DEFAULT_LOGIN.email);
+    setLoginPassword(DEFAULT_LOGIN.password);
+    setView('overview');
+    window.location.hash = '';
+  }
+
+  async function handleSaveUser(e: React.FormEvent) {
+    e.preventDefault();
+    setBusy(true);
+    setError('');
+    try {
+      const r = await fetch('/api/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(userFormData),
+      });
+      const body = await readApiResponse(r);
+      if (!r.ok) throw new Error(body.error || 'Failed to save user.');
+      await loadUsers();
+      setMessage(userFormData.id ? 'User updated successfully.' : 'New user provisioned.');
+      setModal(null);
+    } catch (err: any) {
+      setError(err.message || 'Unable to save user.');
+    } finally {
+      setBusy(false);
+    }
+  }
+
   const load = useCallback(async () => {
     try {
       setError('');
       const r = await fetch('/api/workspace', { cache: 'no-store' });
-      const body = (await r.json()) as any;
-      if (!r.ok) throw new Error(body.error);
+      const body = await readApiResponse(r);
+      if (!r.ok) throw new Error(body.error || 'Unable to load the workspace.');
       setS(body.data);
       setRevision(body.revision);
     } catch (e) {
@@ -99,15 +278,33 @@ export default function Home() {
 
   useEffect(() => {
     setMounted(true);
+    void checkAuth();
     void load();
     const timer = setInterval(() => setClockNow(new Date()), 30000);
     return () => clearInterval(timer);
-  }, [load]);
+  }, [checkAuth, load]);
+
+  useEffect(() => {
+    if (currentUser?.role === 'Admin') {
+      void loadUsers();
+    }
+  }, [currentUser, loadUsers]);
 
   useEffect(() => {
     const read = () => {
-      const [v, id] = window.location.hash.slice(1).split('/');
-      if (v && (titles[v] || v === 'overview' || v === 'employee' || v === 'run')) {
+      const hash = window.location.hash.slice(1);
+      if (!hash) return;
+      const [vRaw, id] = hash.split('/');
+      let v = vRaw;
+      if (v === 'admin' && id === 'users') {
+        v = 'users';
+      } else if (v.startsWith('payroll/')) {
+        v = v.replace('payroll/', '');
+        if (v === 'dashboard') v = 'overview';
+      } else if (v === 'time-off') {
+        v = 'requests';
+      }
+      if (v && (titles[v] || v === 'overview' || v === 'employee' || v === 'run' || v === 'users')) {
         setView(v);
         setActiveId(decodeURIComponent(id || ''));
         setFilterId('');
@@ -126,7 +323,8 @@ export default function Home() {
     setModal(null);
     setError('');
     setMessage('');
-    window.history.replaceState(null, '', '#' + v + (id ? '/' + encodeURIComponent(id) : ''));
+    const targetHash = v === 'users' ? 'admin/users' : v === 'overview' ? 'payroll/dashboard' : v;
+    window.history.replaceState(null, '', '#' + targetHash + (id ? '/' + encodeURIComponent(id) : ''));
   }
 
   function related(v: string, id: string) {
@@ -149,7 +347,7 @@ export default function Home() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action, payload, revision }),
       });
-      const b = (await r.json()) as any;
+      const b = await readApiResponse(r);
       if (!r.ok) throw new Error(b.error || 'Unable to save.');
       setS(b.data);
       setRevision(b.revision);
@@ -257,23 +455,146 @@ export default function Home() {
 
   const exportPayroll = () => {
     if (!s) return;
+    const slipsToExport = currentUser?.role === 'Employee'
+      ? allSlips.filter((p) => p.employeeId === currentUser.employeeId)
+      : allSlips.filter((p) => p.period === period);
+
     downloadCsv('peoplepay-payroll.csv', [
       ['Period', 'Employee', 'Department', 'Gross', 'Deductions', 'Net', 'Status'],
-      ...allSlips
-        .filter((p) => p.period === period)
-        .map((p) => [
-          p.period,
-          empName(p.employeeId),
-          employee(p.employeeId)?.department,
-          p.gross,
-          p.deductions,
-          p.net,
-          p.status,
-        ]),
+      ...slipsToExport.map((p) => [
+        p.period,
+        empName(p.employeeId),
+        employee(p.employeeId)?.department,
+        p.gross,
+        p.deductions,
+        p.net,
+        p.status,
+      ]),
     ]);
   };
 
   const departments = s ? [...new Set(s.employees.map((e) => e.department))] : [];
+
+  /* ─────────────────────────────────────────────────────────
+     LOGIN SCREEN (Crextio Design System)
+     ───────────────────────────────────────────────────────── */
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-[#fcfbf9] flex flex-col items-center justify-center p-6 text-center">
+        <RefreshCw className="size-8 text-slate-400 animate-spin mb-3" />
+        <h2 className="text-sm font-semibold text-slate-800">Verifying secure session…</h2>
+        <p className="text-xs text-slate-500 mt-1">Connecting to PeoplePay360 database</p>
+      </div>
+    );
+  }
+
+  if (!currentUser) {
+    return (
+      <div className="min-h-screen bg-[#fcfbf9] flex flex-col justify-center items-center px-4 py-12">
+        <div className="w-full max-w-md bg-white rounded-3xl border border-[#e5ded4] shadow-sm p-8 space-y-6">
+          <div className="text-center space-y-2">
+            <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-amber-50 border border-amber-200/60 shadow-2xs mb-1">
+              <img src="/logo.jpg" alt="PeoplePay360" className="w-10 h-10 rounded-xl object-contain" />
+            </div>
+            <h1 className="text-xl font-extrabold tracking-tight text-slate-900">
+              peoplepay<span className="text-[#e6a817]">360</span>
+            </h1>
+            <p className="text-xs text-[#8a7a6d]">Sign in to access your role-based workspace</p>
+          </div>
+
+          {loginError && (
+            <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-700 flex items-center gap-2">
+              <AlertCircle size={15} className="shrink-0" />
+              <span>{loginError}</span>
+            </div>
+          )}
+
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              void handleLogin();
+            }}
+            className="space-y-4"
+          >
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">Work Email</label>
+              <div className="pill-search !py-2 w-full bg-slate-50 border border-slate-200 focus-within:border-slate-400 focus-within:bg-white transition-all">
+                <input
+                  type="email"
+                  name="email"
+                  autoComplete="username"
+                  required
+                  value={loginEmail}
+                  onChange={(e) => setLoginEmail(e.target.value)}
+                  placeholder="e.g. admin@oxp.example"
+                  className="w-full text-xs outline-none bg-transparent"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">Password</label>
+              <div className="pill-search !py-2 w-full bg-slate-50 border border-slate-200 focus-within:border-slate-400 focus-within:bg-white transition-all">
+                <input
+                  type="password"
+                  name="password"
+                  autoComplete="current-password"
+                  required
+                  value={loginPassword}
+                  onChange={(e) => setLoginPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="w-full text-xs outline-none bg-transparent"
+                />
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={loginBusy}
+              className="w-full pill-btn pill-btn-black !py-2.5 justify-center text-xs font-semibold cursor-pointer disabled:opacity-50"
+            >
+              {loginBusy ? 'Signing In…' : 'Sign In'}
+            </button>
+          </form>
+
+          <div className="pt-4 border-t border-[#f0ece5]">
+            <div className="text-[11px] font-semibold text-[#8a7a6d] uppercase tracking-wider text-center mb-3">
+              Quick Switch / Demo Role Logins
+            </div>
+            <div className="space-y-1.5">
+              {DEMO_ACCOUNTS.map((demo) => (
+                <button
+                  key={demo.role}
+                  type="button"
+                  onClick={() => void handleLogin(demo.email, demo.password)}
+                  disabled={loginBusy}
+                  className="w-full flex items-center justify-between p-2.5 rounded-xl border border-[#e5ded4] hover:border-slate-400 hover:bg-[#faf8f5] transition-all text-left cursor-pointer group"
+                >
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-7 h-7 rounded-lg bg-slate-100 flex items-center justify-center text-[10px] font-bold text-slate-700 group-hover:bg-[#1a1a1a] group-hover:text-white transition-colors">
+                      {demo.role.split(' ').map(n => n[0]).slice(0, 2).join('')}
+                    </div>
+                    <div>
+                      <div className="text-xs font-semibold text-slate-900 leading-tight flex items-center gap-1.5">
+                        {demo.role}
+                        <span className={`text-[9px] px-1.5 py-0.2 rounded border font-semibold ${ROLE_STYLES[demo.role] || ''}`}>
+                          Role
+                        </span>
+                      </div>
+                      <div className="text-[10px] text-slate-400">{demo.desc}</div>
+                    </div>
+                  </div>
+                  <span className="text-[11px] text-[#c99a2e] font-semibold group-hover:underline">
+                    Sign In →
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   /* ─────────────────────────────────────────────────────────
      SLOT GENERATORS FOR EACH VIEW (Crextio 3-Column Template)
@@ -285,6 +606,9 @@ export default function Home() {
   let centerContent: React.ReactNode = null;
   let rightSlot: React.ReactNode = null;
   let backAction: (() => void) | undefined = undefined;
+
+  // RBAC Permission Check
+  const hasAccess = canView(currentUser.role, view);
 
   if (!s) {
     centerContent = (
@@ -303,6 +627,29 @@ export default function Home() {
         </Button>
       </div>
     );
+  } else if (!hasAccess) {
+    pageTitle = 'Access Restricted';
+    centerContent = (
+      <div className="workora-card text-center py-16 space-y-4 max-w-xl mx-auto">
+        <div className="w-12 h-12 rounded-2xl bg-amber-50 border border-amber-200 flex items-center justify-center mx-auto text-[#c99a2e]">
+          <ShieldAlert size={24} />
+        </div>
+        <div>
+          <h2 className="text-base font-bold text-slate-900">Access Restricted</h2>
+          <p className="text-xs text-slate-500 mt-1">
+            Your current role <span className="font-semibold text-slate-800">{currentUser.role}</span> does not have authorization to view the <span className="font-semibold text-slate-800">{titles[view] || view}</span> section.
+          </p>
+        </div>
+        <div className="pt-2">
+          <button
+            className="pill-btn pill-btn-black !py-2 cursor-pointer"
+            onClick={() => navigate(defaultRouteForRole(currentUser.role))}
+          >
+            Return to Allowed Workspace
+          </button>
+        </div>
+      </div>
+    );
   } else if (view === 'overview') {
     pageTitle = 'People & Operations Workflow';
     headerActions = (
@@ -318,17 +665,19 @@ export default function Home() {
           <Download size={14} />
           Export
         </button>
-        <button
-          className="pill-btn pill-btn-black"
-          onClick={() => {
-            setError('');
-            setModal({ kind: 'wizard' });
-          }}
-        >
-          <Plus size={14} />
-          New Payrun
-          <ChevronDown size={13} className="ml-1 opacity-70" />
-        </button>
+        {['Admin', 'HR Payroll Manager'].includes(currentUser.role) && (
+          <button
+            className="pill-btn pill-btn-black"
+            onClick={() => {
+              setError('');
+              setModal({ kind: 'wizard' });
+            }}
+          >
+            <Plus size={14} />
+            New Payrun
+            <ChevronDown size={13} className="ml-1 opacity-70" />
+          </button>
+        )}
       </>
     );
     // Dashboard itself implements the full 3-column Crextio layout
@@ -379,10 +728,12 @@ export default function Home() {
           <Download size={14} />
           Export
         </button>
-        <button className="pill-btn pill-btn-black" onClick={() => openForm('employees')}>
-          <Plus size={14} />
-          New Employee
-        </button>
+        {['Admin', 'HR Manager'].includes(currentUser.role) && (
+          <button className="pill-btn pill-btn-black" onClick={() => openForm('employees')}>
+            <Plus size={14} />
+            New Employee
+          </button>
+        )}
       </>
     );
 
@@ -806,7 +1157,7 @@ export default function Home() {
       );
     }
   } else if (view === 'attendance') {
-    pageTitle = 'Attendance & Shifts';
+    pageTitle = currentUser.role === 'Employee' ? 'My Attendance & Shifts' : 'Attendance & Shifts';
     headerActions = (
       <>
         <Input
@@ -820,27 +1171,46 @@ export default function Home() {
           <Download size={14} />
           Export
         </button>
-        <button className="pill-btn pill-btn-black" onClick={() => openForm('attendance')}>
-          <Plus size={14} />
-          New Entry
+        <button
+          className="pill-btn pill-btn-black"
+          onClick={() => {
+            if (currentUser.role === 'Employee') {
+              setModal({ kind: 'clock' });
+            } else {
+              openForm('attendance');
+            }
+          }}
+        >
+          <Clock3 size={14} />
+          {currentUser.role === 'Employee' ? 'Check In / Out' : 'New Entry'}
         </button>
       </>
     );
 
-    const activeEmp = employee(activeId) || s.employees[0];
-    const filteredAttendance = filtered(s.attendance)
-      .filter((a) => !period || a.date.startsWith(period))
+    // Filter attendance for Employee role to self only
+    const employeePool = currentUser.role === 'Employee' && currentUser.employeeId
+      ? s.employees.filter((e) => e.id === currentUser.employeeId)
+      : s.employees;
+
+    const activeEmp = employee(activeId) || employeePool[0];
+
+    const baseAttendance = currentUser.role === 'Employee' && currentUser.employeeId
+      ? s.attendance.filter((a) => a.employeeId === currentUser.employeeId)
+      : s.attendance;
+
+    const filteredAttendance = baseAttendance
+      .filter((a) => (!filterId || a.employeeId === filterId) && (!period || a.date.startsWith(period)))
       .sort((a, b) => b.date.localeCompare(a.date));
 
     leftSlot = (
       <MasterList
-        title="Staff Attendance"
-        count={s.employees.length}
+        title={currentUser.role === 'Employee' ? 'My Profile' : 'Staff Attendance'}
+        count={employeePool.length}
         search={query}
         onSearchChange={setQuery}
         searchPlaceholder="Filter team…"
       >
-        {s.employees.map((e) => {
+        {employeePool.map((e) => {
           const att = s.attendance.filter((a) => a.employeeId === e.id && a.date.startsWith(period));
           const presentCount = att.filter((a) => a.checkIn).length;
           const rate = att.length ? Math.round((presentCount / att.length) * 100) : 0;
@@ -949,51 +1319,66 @@ export default function Home() {
       );
     }
   } else if (['requests', 'allocations', 'leaveTypes'].includes(view)) {
-    pageTitle = 'Time Off & Leave Management';
+    pageTitle = currentUser.role === 'Employee' ? 'My Time Off Requests' : 'Time Off & Leave Management';
     headerActions = (
       <>
-        <div className="flex items-center bg-slate-100 p-0.5 rounded-full border border-slate-200">
-          <button
-            className={
-              'px-3 py-1 rounded-full text-xs font-medium cursor-pointer ' +
-              (view === 'requests' ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-500')
+        {currentUser.role !== 'Employee' && (
+          <div className="flex items-center bg-slate-100 p-0.5 rounded-full border border-slate-200">
+            <button
+              className={
+                'px-3 py-1 rounded-full text-xs font-medium cursor-pointer ' +
+                (view === 'requests' ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-500')
+              }
+              onClick={() => navigate('requests')}
+            >
+              Requests
+            </button>
+            <button
+              className={
+                'px-3 py-1 rounded-full text-xs font-medium cursor-pointer ' +
+                (view === 'allocations' ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-500')
+              }
+              onClick={() => navigate('allocations')}
+            >
+              Allocations
+            </button>
+            <button
+              className={
+                'px-3 py-1 rounded-full text-xs font-medium cursor-pointer ' +
+                (view === 'leaveTypes' ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-500')
+              }
+              onClick={() => navigate('leaveTypes')}
+            >
+              Policies
+            </button>
+          </div>
+        )}
+        <button
+          className="pill-btn pill-btn-black"
+          onClick={() => {
+            if (currentUser.role === 'Employee') {
+              openForm('requests', defaults('requests', s, currentUser.employeeId));
+            } else {
+              openForm(view);
             }
-            onClick={() => navigate('requests')}
-          >
-            Requests
-          </button>
-          <button
-            className={
-              'px-3 py-1 rounded-full text-xs font-medium cursor-pointer ' +
-              (view === 'allocations' ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-500')
-            }
-            onClick={() => navigate('allocations')}
-          >
-            Allocations
-          </button>
-          <button
-            className={
-              'px-3 py-1 rounded-full text-xs font-medium cursor-pointer ' +
-              (view === 'leaveTypes' ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-500')
-            }
-            onClick={() => navigate('leaveTypes')}
-          >
-            Policies
-          </button>
-        </div>
-        <button className="pill-btn pill-btn-black" onClick={() => openForm(view)}>
+          }}
+        >
           <Plus size={14} />
           {view === 'requests' ? 'New Request' : view === 'allocations' ? 'New Allocation' : 'New Policy'}
         </button>
       </>
     );
 
-    const filteredRequests = filtered(s.requests);
-    const activeReq = s.requests.find((r) => r.id === activeId) || filteredRequests[0];
+    const baseRequests = currentUser.role === 'Employee' && currentUser.employeeId
+      ? s.requests.filter((r) => r.employeeId === currentUser.employeeId)
+      : s.requests;
+
+    const filteredRequests = filtered(baseRequests);
+    const activeReq = baseRequests.find((r) => r.id === activeId) || filteredRequests[0];
 
     leftSlot = (
       <MasterList
-        title="Leave Requests"
+        title={currentUser.role === 'Employee' ? 'My Requests' : 'Leave Requests'}
         count={filteredRequests.length}
         search={query}
         onSearchChange={setQuery}
@@ -1143,24 +1528,30 @@ export default function Home() {
             </DetailSection>
           )}
 
-          <DetailSection title="QUICK ACTIONS">
+          <DetailSection title="APPROVAL STATUS">
             {activeReq.status === 'Pending' ? (
-              <div className="flex flex-col gap-2">
-                <button
-                  className="pill-btn pill-btn-black w-full justify-center !py-2 cursor-pointer"
-                  disabled={busy}
-                  onClick={() => void act('approveLeave', { id: activeReq.id }, 'Request approved.')}
-                >
-                  <CheckCircle2 size={14} /> Approve Request
-                </button>
-                <button
-                  className="pill-btn w-full justify-center !py-2 text-rose-600 border-rose-200 hover:bg-rose-50 cursor-pointer"
-                  disabled={busy}
-                  onClick={() => void act('refuseLeave', { id: activeReq.id }, 'Request refused.')}
-                >
-                  <XCircle size={14} /> Refuse
-                </button>
-              </div>
+              ['Admin', 'HR Manager'].includes(currentUser.role) ? (
+                <div className="flex flex-col gap-2">
+                  <button
+                    className="pill-btn pill-btn-black w-full justify-center !py-2 cursor-pointer"
+                    disabled={busy}
+                    onClick={() => void act('approveLeave', { id: activeReq.id }, 'Request approved.')}
+                  >
+                    <CheckCircle2 size={14} /> Approve Request
+                  </button>
+                  <button
+                    className="pill-btn w-full justify-center !py-2 text-rose-600 border-rose-200 hover:bg-rose-50 cursor-pointer"
+                    disabled={busy}
+                    onClick={() => void act('refuseLeave', { id: activeReq.id }, 'Request refused.')}
+                  >
+                    <XCircle size={14} /> Refuse
+                  </button>
+                </div>
+              ) : (
+                <div className="p-3 rounded-xl bg-amber-50 text-xs text-amber-800 border border-amber-200 text-center">
+                  Pending review by HR Manager.
+                </div>
+              )
             ) : (
               <div className="p-3 rounded-xl bg-slate-50 text-xs text-slate-500 border border-slate-100 text-center">
                 This request has been finalized ({activeReq.status}).
@@ -1171,7 +1562,7 @@ export default function Home() {
       );
     }
   } else if (['payruns', 'run', 'payslips', 'structures', 'rules'].includes(view)) {
-    pageTitle = view === 'run' ? run?.name || 'Payrun Workflow' : 'Payroll Management';
+    pageTitle = view === 'run' ? run?.name || 'Payrun Workflow' : currentUser.role === 'Employee' ? 'My Payslips' : 'Payroll Management';
     if (view === 'run') {
       backAction = () => navigate('payruns');
     }
@@ -1242,7 +1633,7 @@ export default function Home() {
 
     const activeRun = s.payruns.find((r) => r.id === activeId) || s.payruns[0];
 
-    leftSlot = (
+    leftSlot = currentUser.role !== 'Employee' ? (
       <MasterList
         title="Payruns"
         count={s.payruns.length}
@@ -1275,7 +1666,7 @@ export default function Home() {
           );
         })}
       </MasterList>
-    );
+    ) : null;
 
     if (view === 'run' && run) {
       centerContent = (
@@ -1322,14 +1713,16 @@ export default function Home() {
               </button>
               <button
                 className="pill-btn !py-1.5 cursor-pointer"
-                disabled={busy || run.status !== 'Computed'}
+                disabled={busy || run.status !== 'Computed' || currentUser.role === 'HR Payroll User'}
+                title={currentUser.role === 'HR Payroll User' ? 'Requires HR Payroll Manager authorization' : ''}
                 onClick={() => void act('validate', { id: run.id }, 'Payrun validated.')}
               >
                 <Check size={13} /> Validate Run
               </button>
               <button
                 className="pill-btn !py-1.5 cursor-pointer"
-                disabled={busy || run.status !== 'Validated'}
+                disabled={busy || run.status !== 'Validated' || currentUser.role === 'HR Payroll User'}
+                title={currentUser.role === 'HR Payroll User' ? 'Requires HR Payroll Manager authorization' : ''}
                 onClick={() => void act('markPaid', { id: run.id }, 'Payrun marked paid.')}
               >
                 Mark Paid
@@ -1484,7 +1877,7 @@ export default function Home() {
       );
     }
 
-    if (activeRun) {
+    if (activeRun && currentUser.role !== 'Employee') {
       const net = activeRun.slips.reduce((n: number, p: Row) => n + p.net, 0);
       const gross = activeRun.slips.reduce((n: number, p: Row) => n + p.gross, 0);
       const deduct = activeRun.slips.reduce((n: number, p: Row) => n + p.deductions, 0);
@@ -1543,6 +1936,233 @@ export default function Home() {
         </DetailPanel>
       );
     }
+  } else if (view === 'users') {
+    pageTitle = 'System Users & RBAC Administration';
+    headerActions = (
+      <button
+        className="pill-btn pill-btn-black"
+        onClick={() => {
+          setUserFormData({
+            id: '',
+            name: '',
+            email: '',
+            roleId: 'employee',
+            employeeId: '',
+            password: '',
+            active: true,
+          });
+          setModal({ kind: 'userForm' });
+        }}
+      >
+        <Plus size={14} /> New User Account
+      </button>
+    );
+
+    const filteredUsers = systemUsers.filter((u) =>
+      !query ||
+      [u.name, u.email, u.roleName, u.roleId].some((x) =>
+        String(x || '').toLowerCase().includes(query.toLowerCase())
+      )
+    );
+
+    const activeUser = systemUsers.find((u) => u.id === activeId) || filteredUsers[0];
+
+    leftSlot = (
+      <MasterList
+        title="Accounts"
+        count={filteredUsers.length}
+        search={query}
+        onSearchChange={setQuery}
+        searchPlaceholder="Filter accounts…"
+      >
+        {filteredUsers.map((u) => {
+          const isSel = u.id === activeUser?.id;
+          return (
+            <MasterCard
+              key={u.id}
+              avatar={initials(u.name)}
+              title={u.name}
+              subtitle={u.email}
+              badge={u.roleName || u.roleId}
+              meta={u.active ? 'Active' : 'Inactive'}
+              active={isSel}
+              onClick={() => setActiveId(u.id)}
+            />
+          );
+        })}
+      </MasterList>
+    );
+
+    centerContent = (
+      <div className="space-y-4">
+        {activeUser && (
+          <div className="workora-card space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-2xl bg-[#f5efe6] border border-[#e5ded4] flex items-center justify-center font-bold text-sm text-[#8a7a6d]">
+                  {initials(activeUser.name)}
+                </div>
+                <div>
+                  <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                    {activeUser.name}
+                    <span className={`text-[10px] px-2 py-0.5 rounded-full border font-bold ${ROLE_STYLES[activeUser.roleName || ''] || 'bg-slate-100 text-slate-700'}`}>
+                      {activeUser.roleName || activeUser.roleId}
+                    </span>
+                  </h2>
+                  <p className="text-xs text-slate-500">{activeUser.email}</p>
+                </div>
+              </div>
+              <button
+                className="pill-btn !py-1.5 cursor-pointer"
+                onClick={() => {
+                  setUserFormData({
+                    id: activeUser.id,
+                    name: activeUser.name,
+                    email: activeUser.email,
+                    roleId: activeUser.roleId,
+                    employeeId: activeUser.employeeId || '',
+                    password: '',
+                    active: activeUser.active ?? true,
+                  });
+                  setModal({ kind: 'userForm' });
+                }}
+              >
+                Edit Account
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
+                <span className="text-[11px] text-slate-400">Assigned Role</span>
+                <span className="text-xs font-bold text-slate-900 block mt-0.5">
+                  {activeUser.roleName || activeUser.roleId}
+                </span>
+              </div>
+              <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
+                <span className="text-[11px] text-slate-400">Linked Staff Member</span>
+                <span className="text-xs font-bold text-slate-900 block mt-0.5">
+                  {activeUser.employeeId ? empName(activeUser.employeeId) : 'System Admin (None)'}
+                </span>
+              </div>
+              <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
+                <span className="text-[11px] text-slate-400">Account Status</span>
+                <span className="text-xs font-bold text-slate-900 block mt-0.5">
+                  {activeUser.active ? 'Active' : 'Deactivated'}
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <DataTable
+          rows={filteredUsers}
+          columns={[
+            {
+              title: 'Account User',
+              render: (u) => (
+                <div className="flex items-center gap-2.5">
+                  <Avatar name={u.name} />
+                  <div>
+                    <span className="font-semibold text-slate-900 block">{u.name}</span>
+                    <span className="text-[11px] text-slate-400">{u.email}</span>
+                  </div>
+                </div>
+              ),
+            },
+            {
+              title: 'Role',
+              render: (u) => (
+                <span className={`px-2 py-0.5 rounded text-[11px] font-bold border ${ROLE_STYLES[u.roleName || ''] || 'bg-slate-100 text-slate-700'}`}>
+                  {u.roleName || u.roleId}
+                </span>
+              ),
+            },
+            {
+              title: 'Linked Employee',
+              render: (u) => (u.employeeId ? empName(u.employeeId) : <span className="text-slate-400">—</span>),
+            },
+            {
+              title: 'Status',
+              render: (u) => <Badge value={u.active ? 'Active' : 'Archived'} />,
+            },
+            {
+              title: 'Actions',
+              render: (u) => (
+                <button
+                  className="text-xs font-semibold text-[#c99a2e] hover:underline cursor-pointer"
+                  onClick={() => {
+                    setUserFormData({
+                      id: u.id,
+                      name: u.name,
+                      email: u.email,
+                      roleId: u.roleId,
+                      employeeId: u.employeeId || '',
+                      password: '',
+                      active: u.active ?? true,
+                    });
+                    setModal({ kind: 'userForm' });
+                  }}
+                >
+                  Edit →
+                </button>
+              ),
+            },
+          ]}
+        />
+      </div>
+    );
+
+    if (activeUser) {
+      rightSlot = (
+        <DetailPanel
+          avatar={initials(activeUser.name)}
+          title={activeUser.name}
+          subtitle={activeUser.roleName || activeUser.roleId}
+          badge={activeUser.active ? 'Active' : 'Inactive'}
+        >
+          <DetailSection title="ACCOUNT PERMISSIONS">
+            <DetailRow label="Role Level" value={activeUser.roleName || activeUser.roleId} />
+            <DetailRow label="Access Scope" value={activeUser.roleId === 'admin' ? 'Universal Control' : activeUser.roleId === 'employee' ? 'Self-service Portal' : 'Department Operations'} />
+            <DetailRow label="Linked Profile" value={activeUser.employeeId ? empName(activeUser.employeeId) : 'None'} />
+          </DetailSection>
+
+          <DetailSection title="ROLE RESPONSIBILITIES">
+            <p className="text-xs text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-100 leading-relaxed">
+              {activeUser.roleId === 'admin'
+                ? 'Full system governance, security settings, user provisioning, role assignments, and all HR/Payroll modules.'
+                : activeUser.roleId === 'payroll_manager'
+                ? 'Authorized for payroll run creation, salary structures, rule authoring, validation, and final disbursement.'
+                : activeUser.roleId === 'payroll_user'
+                ? 'Authorized for contract review, calculating payslips, and computing draft payruns.'
+                : activeUser.roleId === 'hr_manager'
+                ? 'Authorized for employee profile creation, contract administration, attendance oversight, and approving time-off.'
+                : 'Self-service access to check-in attendance, view personal time off requests, and view generated monthly payslips.'}
+            </p>
+          </DetailSection>
+
+          <DetailSection title="ADMIN ACTIONS">
+            <button
+              className="doc-chip hover:bg-[#ede7de] transition-colors cursor-pointer"
+              onClick={() => {
+                setUserFormData({
+                  id: activeUser.id,
+                  name: activeUser.name,
+                  email: activeUser.email,
+                  roleId: activeUser.roleId,
+                  employeeId: activeUser.employeeId || '',
+                  password: '',
+                  active: activeUser.active ?? true,
+                });
+                setModal({ kind: 'userForm' });
+              }}
+            >
+              <Key className="size-3.5 text-[#c99a2e]" />
+              <span className="doc-chip-name">Change Password or Role</span>
+            </button>
+          </DetailSection>
+        </DetailPanel>
+      );
+    }
   }
 
   if (!mounted || !s) {
@@ -1578,6 +2198,8 @@ export default function Home() {
         leftPanel={leftSlot}
         rightPanel={rightSlot}
         signedIn={signedIn}
+        currentUser={currentUser}
+        onLogout={handleLogout}
         onClockClick={() => setModal({ kind: 'clock' })}
         onAboutClick={() => setModal({ kind: 'about' })}
         onNotificationClick={() => setMessage('Workspace synchronized with live database.')}
@@ -1629,7 +2251,97 @@ export default function Home() {
 
           {error && <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-700 mb-3">{error}</div>}
 
-          {modal?.kind === 'form' && s && (
+                      {modal?.kind === 'userForm' && (
+              <form onSubmit={handleSaveUser} className="space-y-4 pt-2">
+                <Field label="Full Name">
+                  <Input
+                    required
+                    value={userFormData.name}
+                    onChange={(e) => setUserFormData({ ...userFormData, name: e.target.value })}
+                    placeholder="e.g. Maya Lin"
+                    className="h-9 rounded-xl"
+                  />
+                </Field>
+
+                <Field label="Work Email">
+                  <Input
+                    type="email"
+                    required
+                    value={userFormData.email}
+                    onChange={(e) => setUserFormData({ ...userFormData, email: e.target.value })}
+                    placeholder="e.g. maya@oxp.example"
+                    className="h-9 rounded-xl"
+                  />
+                </Field>
+
+                <Field label="System Role">
+                  <select
+                    className="h-9 w-full rounded-xl border border-slate-200 px-3 text-xs bg-white outline-none"
+                    value={userFormData.roleId}
+                    onChange={(e) => setUserFormData({ ...userFormData, roleId: e.target.value })}
+                  >
+                    <option value="admin">Admin</option>
+                    <option value="payroll_manager">HR Payroll Manager</option>
+                    <option value="payroll_user">HR Payroll User</option>
+                    <option value="hr_manager">HR Manager</option>
+                    <option value="employee">Employee</option>
+                  </select>
+                </Field>
+
+                <Field label="Linked Employee Profile">
+                  <select
+                    className="h-9 w-full rounded-xl border border-slate-200 px-3 text-xs bg-white outline-none"
+                    value={userFormData.employeeId}
+                    onChange={(e) => setUserFormData({ ...userFormData, employeeId: e.target.value })}
+                  >
+                    <option value="">None (System / Admin Only)</option>
+                    {s?.employees.map((e) => (
+                      <option key={e.id} value={e.id}>
+                        {e.name} ({e.department} - {e.position})
+                      </option>
+                    ))}
+                  </select>
+                </Field>
+
+                <Field label={userFormData.id ? 'Password (leave blank to keep current)' : 'Account Password'}>
+                  <Input
+                    type="password"
+                    required={!userFormData.id}
+                    value={userFormData.password}
+                    onChange={(e) => setUserFormData({ ...userFormData, password: e.target.value })}
+                    placeholder={userFormData.id ? '••••••••' : 'Enter password'}
+                    className="h-9 rounded-xl"
+                  />
+                </Field>
+
+                <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-slate-700">
+                  <Checkbox
+                    checked={userFormData.active}
+                    onCheckedChange={(v) => setUserFormData({ ...userFormData, active: !!v })}
+                  />
+                  Active account permitted to authenticate
+                </label>
+
+                <div className="flex justify-end gap-2 pt-3 border-t border-slate-100">
+                  <button
+                    type="button"
+                    className="pill-btn !py-1.5 cursor-pointer"
+                    onClick={() => setModal(null)}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={busy}
+                    className="pill-btn pill-btn-black !py-1.5 cursor-pointer"
+                  >
+                    {busy ? 'Saving…' : 'Save User'}
+                  </button>
+                </div>
+              </form>
+            )}
+
+            {modal?.kind === 'form' && s && (
             <RecordForm
               key={modal.collection + modal.record!.id}
               collection={modal.collection!}

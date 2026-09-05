@@ -29,7 +29,7 @@ The files were treated as product references. The user's request defines deliver
 | Flexible salary calculation | Fixed amounts, percentages of WAGE/earlier codes, restricted arithmetic formulas. No arbitrary code execution. |
 | Payrun lifecycle | Draft → Computed → Validated → Paid, with recomputation restrictions and immutable finalized salary snapshots. |
 | Payslip detail and output | Salary component breakdown, gross/deduction/net totals, browser print/Save PDF and CSV exports. |
-| Persistence | Server-owned local SQLite/D1-compatible storage, revision conflict detection and bounded internal action history. |
+| Persistence | Normalized local PostgreSQL tables, revision conflict detection and bounded internal action history. |
 
 ## Explicitly deferred
 
@@ -39,7 +39,7 @@ The files were treated as product references. The user's request defines deliver
 4. Partial-month contract changes, proration, overtime and unpaid-leave payroll integration.
 5. Multiple shifts, overnight attendance, leave holidays and business-day duration policies.
 6. Richer rule categories and attendance variables; Python snippets are not executed.
-7. Multi-company support, historical employee/department snapshots and normalized relational tables.
+7. Multi-company support and historical employee/department snapshots.
 8. Automated tests, browser QA, production build, migration generation and deployment, left to the team as requested.
 
 ## Suggested team verification

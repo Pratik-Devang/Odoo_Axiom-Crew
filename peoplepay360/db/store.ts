@@ -1,6 +1,6 @@
 import { seed, type Workspace } from '@/lib/domain';
 import { getPgPool } from './index';
-import type { PoolClient, Pool } from 'pg';
+import type { PoolClient } from 'pg';
 
 /**
  * Read the entire workspace from normalized PostgreSQL relational tables.
@@ -446,74 +446,49 @@ async function syncRelational(client: PoolClient, data: Workspace) {
 }
 
 export async function readWorkspace(): Promise<{ data: Workspace; revision: number }> {
-  if (process.env.DATABASE_URL) {
-    const pool = getPgPool();
-    const res = await pool.query<{ data: string | object; revision: number }>(
-      'SELECT data, revision FROM workspace WHERE id = $1',
-      ['demo']
-    );
-
-    let row = res.rows[0];
-    if (!row || !row.data || row.data === '{}') {
-      const initial = seed();
-      await pool.query(
-        'INSERT INTO workspace (id, data, revision) VALUES ($1, $2, 0) ON CONFLICT (id) DO UPDATE SET data = $2, revision = 0',
-        ['demo', JSON.stringify(initial)]
-      );
-      const client = await pool.connect();
-      try {
-        await syncRelational(client, initial);
-      } finally {
-        client.release();
-      }
-      return { data: initial, revision: 0 };
-    }
-
-    const parsedData = typeof row.data === 'string' ? JSON.parse(row.data) : row.data;
-    return { data: parsedData as Workspace, revision: Number(row.revision) };
-  }
-
-  // Fallback to Cloudflare D1
+  const pool = getPgPool();
+  const client = await pool.connect();
   try {
-    const { env } = await import('cloudflare:workers');
-    const db = env?.DB;
-    if (db) {
-      let row = await db
-        .prepare('SELECT data, revision FROM workspace WHERE id = ?')
-        .bind('demo')
-        .first<{ data: string; revision: number }>();
+      let workspaceRow = await client.query<{ revision: number }>(
+        'SELECT revision FROM workspace WHERE id = $1',
+        ['demo']
+      );
 
-      if (!row) {
-        await db
-          .prepare('INSERT OR IGNORE INTO workspace (id, data, revision) VALUES (?, ?, 0)')
-          .bind('demo', JSON.stringify(seed()))
-          .run();
-        row = await db
-          .prepare('SELECT data, revision FROM workspace WHERE id = ?')
-          .bind('demo')
-          .first<{ data: string; revision: number }>();
+      if (!workspaceRow.rows[0]) {
+        const employeeCount = await client.query<{ count: string }>('SELECT COUNT(*)::text AS count FROM employees');
+
+        if (Number(employeeCount.rows[0]?.count || 0) === 0) {
+          await syncRelational(client, seed());
+        }
+
+        const current = await readRelational(client);
+        await client.query(
+          'INSERT INTO workspace (id, data, revision) VALUES ($1, $2, 0) ON CONFLICT (id) DO NOTHING',
+          ['demo', JSON.stringify(current)]
+        );
+        workspaceRow = await client.query<{ revision: number }>(
+          'SELECT revision FROM workspace WHERE id = $1',
+          ['demo']
+        );
       }
 
-      if (!row) throw new Error('Workspace could not be loaded.');
-      return { data: JSON.parse(row.data), revision: row.revision };
-    }
-  } catch {
-    // Cloudflare binding not available
+      // Relational tables are the source of truth. This makes changes made in
+      // pgAdmin visible on the next reload instead of serving stale JSON.
+      const data = await readRelational(client);
+    return { data, revision: Number(workspaceRow.rows[0]?.revision || 0) };
+  } finally {
+    client.release();
   }
 
-  throw new Error(
-    'No database configured. Please configure DATABASE_URL in .env.local to connect to PostgreSQL.'
-  );
 }
 
 export async function writeWorkspace(data: unknown, revision: number) {
   const workspaceData = data as Workspace;
   const serialized = typeof data === 'string' ? data : JSON.stringify(data);
 
-  if (process.env.DATABASE_URL) {
-    const pool = getPgPool();
-    const client = await pool.connect();
-    try {
+  const pool = getPgPool();
+  const client = await pool.connect();
+  try {
       await client.query('BEGIN');
 
       // Optimistic concurrency update
@@ -531,24 +506,12 @@ export async function writeWorkspace(data: unknown, revision: number) {
       await syncRelational(client, workspaceData);
 
       await client.query('COMMIT');
-      return { meta: { changes: 1 } };
-    } catch (err) {
-      await client.query('ROLLBACK');
-      throw err;
-    } finally {
-      client.release();
-    }
+    return { meta: { changes: 1 } };
+  } catch (err) {
+    await client.query('ROLLBACK');
+    throw err;
+  } finally {
+    client.release();
   }
 
-  // Fallback to Cloudflare D1
-  const { env } = await import('cloudflare:workers');
-  if (!env?.DB) {
-    throw new Error('No database configured.');
-  }
-
-  return env.DB.prepare(
-    'UPDATE workspace SET data = ?, revision = revision + 1 WHERE id = ? AND revision = ?'
-  )
-    .bind(serialized, 'demo', revision)
-    .run();
 }
