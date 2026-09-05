@@ -13,6 +13,7 @@
         "format": "oxfmt",
         "db:generate": "drizzle-kit generate",
         "db:setup": "node db/run-migration.js",
+        "db:seed": "node db/seed-company.js",
         "typecheck": "tsc --noEmit"
     },
     "dependencies": {
