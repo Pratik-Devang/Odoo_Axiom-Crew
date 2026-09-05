@@ -446,13 +446,9 @@ async function syncRelational(client: PoolClient, data: Workspace) {
 }
 
 export async function readWorkspace(): Promise<{ data: Workspace; revision: number }> {
-  if (process.env.DATABASE_URL) {
-    const pool = getPgPool();
-    const client = await pool.connect();
-    try {
-      await client.query('BEGIN');
-      await client.query("SELECT pg_advisory_xact_lock(hashtext('peoplepay360-workspace-bootstrap'))");
-
+  const pool = getPgPool();
+  const client = await pool.connect();
+  try {
       let workspaceRow = await client.query<{ revision: number }>(
         'SELECT revision FROM workspace WHERE id = $1',
         ['demo']
@@ -479,29 +475,20 @@ export async function readWorkspace(): Promise<{ data: Workspace; revision: numb
       // Relational tables are the source of truth. This makes changes made in
       // pgAdmin visible on the next reload instead of serving stale JSON.
       const data = await readRelational(client);
-      await client.query('COMMIT');
-      return { data, revision: Number(workspaceRow.rows[0]?.revision || 0) };
-    } catch (error) {
-      await client.query('ROLLBACK');
-      throw error;
-    } finally {
-      client.release();
-    }
+    return { data, revision: Number(workspaceRow.rows[0]?.revision || 0) };
+  } finally {
+    client.release();
   }
 
-  throw new Error(
-    'No database configured. Please configure DATABASE_URL in .env.local to connect to PostgreSQL.'
-  );
 }
 
 export async function writeWorkspace(data: unknown, revision: number) {
   const workspaceData = data as Workspace;
   const serialized = typeof data === 'string' ? data : JSON.stringify(data);
 
-  if (process.env.DATABASE_URL) {
-    const pool = getPgPool();
-    const client = await pool.connect();
-    try {
+  const pool = getPgPool();
+  const client = await pool.connect();
+  try {
       await client.query('BEGIN');
 
       // Optimistic concurrency update
@@ -519,16 +506,12 @@ export async function writeWorkspace(data: unknown, revision: number) {
       await syncRelational(client, workspaceData);
 
       await client.query('COMMIT');
-      return { meta: { changes: 1 } };
-    } catch (err) {
-      await client.query('ROLLBACK');
-      throw err;
-    } finally {
-      client.release();
-    }
+    return { meta: { changes: 1 } };
+  } catch (err) {
+    await client.query('ROLLBACK');
+    throw err;
+  } finally {
+    client.release();
   }
 
-  throw new Error(
-    'No database configured. Please configure DATABASE_URL in .env.local to connect to PostgreSQL.'
-  );
 }

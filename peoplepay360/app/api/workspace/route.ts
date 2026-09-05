@@ -1,5 +1,6 @@
 import {readWorkspace,writeWorkspace} from '@/db/store';
 import {mutate} from '@/lib/actions';
+export const runtime = 'nodejs';
 export async function GET(){try{return Response.json(await readWorkspace(),{headers:{'Cache-Control':'no-store'}});}catch(error){console.error('[Database Error]:',error);return Response.json({error:error instanceof Error?error.message:'The workspace database is unavailable. Please retry.'},{status:503});}}
 export async function POST(request:Request){
  const origin=request.headers.get('origin');if(origin&&origin!==new URL(request.url).origin)return Response.json({error:'Cross-origin changes are not allowed.'},{status:403});
