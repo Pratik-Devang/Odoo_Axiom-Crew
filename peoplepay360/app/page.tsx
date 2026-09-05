@@ -489,7 +489,7 @@ export default function Home() {
   const runSlipColumns = [
     { title: 'Employee', render: cellEmployee },
     { title: 'Recorded days', render: (p: Row) => p.workedDays },
-    { title: 'Payable days', render: (p: Row) => p.payableDays ?? p.scheduledDays ?? '—' },
+    { title: 'Payable days', render: (p: Row) => p.scheduledDays > 0 ? p.payableDays : 'Recompute' },
     { title: 'Unpaid leave', render: (p: Row) => p.unpaidLeaveDays || 0 },
     { title: 'Basic', render: (p: Row) => money(p.basic) },
     { title: 'Gross', render: (p: Row) => money(p.gross) },

@@ -37,7 +37,14 @@ async function readRelational(client: PoolClient): Promise<Workspace> {
     `SELECT p.id, p.name, p.period, COALESCE(p.structure_id, '') AS "structureId", p.status, COALESCE((SELECT array_agg(employee_id) FROM payrun_employees WHERE payrun_id = p.id), ARRAY[]::text[]) AS "employeeIds" FROM payruns p ORDER BY p.period`
   );
   const payslipsRes = await client.query(
-    'SELECT id, payrun_id AS "payrunId", employee_id AS "employeeId", period, COALESCE(structure_id, \'\') AS "structureId", COALESCE(contract_id, \'\') AS "contractId", basic::float AS basic, gross::float AS gross, deductions::float AS deductions, net::float AS net, worked_days AS "workedDays", scheduled_days::float AS "scheduledDays", unpaid_leave_days::float AS "unpaidLeaveDays", payable_days::float AS "payableDays", lines FROM payslips ORDER BY id'
+    `SELECT DISTINCT ON (payrun_id, employee_id)
+       id, payrun_id AS "payrunId", employee_id AS "employeeId", period,
+       COALESCE(structure_id, '') AS "structureId", COALESCE(contract_id, '') AS "contractId",
+       basic::float AS basic, gross::float AS gross, deductions::float AS deductions,
+       net::float AS net, worked_days AS "workedDays", scheduled_days::float AS "scheduledDays",
+       unpaid_leave_days::float AS "unpaidLeaveDays", payable_days::float AS "payableDays", lines
+     FROM payslips
+     ORDER BY payrun_id, employee_id, created_at DESC, id DESC`
   );
   const auditRes = await client.query(
     'SELECT id, action, to_char(at, \'YYYY-MM-DD"T"HH24:MI:SS"Z"\') AS at, actor FROM audit_logs ORDER BY at DESC LIMIT 100'

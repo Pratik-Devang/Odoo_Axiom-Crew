@@ -255,7 +255,9 @@ DECLARE
 BEGIN
     SELECT data::jsonb INTO w_json FROM workspace WHERE id = 'demo' LIMIT 1;
 
-    IF w_json IS NOT NULL THEN
+    -- Import the legacy JSON only when the normalized database is empty.
+    -- Re-importing it on every migration can resurrect obsolete payslip UUIDs.
+    IF w_json IS NOT NULL AND NOT EXISTS (SELECT 1 FROM employees) THEN
         -- 1. Schedules
         INSERT INTO schedules (id, name, schedule_type, days, work_rows, start_time, end_time, break_hours, weekly_hours)
         SELECT 
