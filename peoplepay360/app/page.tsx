@@ -228,17 +228,12 @@ export default function Home() {
   const [loginDropdownOpen, setLoginDropdownOpen] = useState(false);
   const [loginSearch, setLoginSearch] = useState('');
 
-<<<<<<< Updated upstream
   // Admin users state & unified view options
   const [systemUsers, setSystemUsers] = useState<any[]>([]);
   const [systemRoles, setSystemRoles] = useState<any[]>([]);
   const [userViewMode, setUserViewMode] = useState<'grid' | 'list'>('list');
   const [userRoleFilter, setUserRoleFilter] = useState<string>('All');
   const [selectedUserDrawer, setSelectedUserDrawer] = useState<any | null>(null);
-=======
-  // Admin users state
-  const [systemUsers, setSystemUsers] = useState<SystemUser[]>([]);
->>>>>>> Stashed changes
   const [userFormData, setUserFormData] = useState({
     id: '',
     name: '',
@@ -2379,7 +2374,6 @@ export default function Home() {
           ))
     );
 
-<<<<<<< Updated upstream
     centerContent = userViewMode === 'grid' ? (
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {filteredUsers.map((u) => (
@@ -2389,41 +2383,6 @@ export default function Home() {
             className="workora-card hover:border-slate-400 hover:shadow-md transition-all cursor-pointer p-4 space-y-3 bg-white rounded-2xl border border-[#e5ded4]"
           >
             <div className="flex items-center justify-between">
-=======
-    const activeUser = systemUsers.find((u) => u.id === activeId) || filteredUsers[0];
-
-    leftSlot = (
-      <MasterList
-        title="Accounts"
-        count={filteredUsers.length}
-        search={query}
-        onSearchChange={setQuery}
-        searchPlaceholder="Filter accounts..."
-      >
-        {filteredUsers.map((u) => {
-          const isSel = u.id === activeUser?.id;
-          return (
-            <MasterCard
-              key={u.id}
-              avatar={initials(u.name)}
-              title={u.name}
-              subtitle={u.email}
-              badge={u.roleName || u.roleId}
-              meta={u.active ? 'Active' : 'Inactive'}
-              active={isSel}
-              onClick={() => setActiveId(u.id)}
-            />
-          );
-        })}
-      </MasterList>
-    );
-
-    centerContent = (
-      <div className="space-y-4">
-        {activeUser && (
-          <div className="workora-card space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
->>>>>>> Stashed changes
               <div className="flex items-center gap-3">
                 <Avatar name={u.name} />
                 <div>
@@ -2455,67 +2414,7 @@ export default function Home() {
               <span className="text-xs text-[#c99a2e] font-semibold hover:underline">Inspect →</span>
             </div>
           </div>
-<<<<<<< Updated upstream
         ))}
-=======
-        )}
-
-        <DataTable
-          rows={filteredUsers}
-          columns={[
-            {
-              title: 'Account User',
-              render: (u) => (
-                <div className="flex items-center gap-2.5">
-                  <Avatar name={u.name} />
-                  <div>
-                    <span className="font-semibold text-slate-900 block">{u.name}</span>
-                    <span className="text-[11px] text-slate-400">{u.email}</span>
-                  </div>
-                </div>
-              ),
-            },
-            {
-              title: 'Role',
-              render: (u) => (
-                <span className={`px-2 py-0.5 rounded text-[11px] font-bold border ${ROLE_STYLES[u.roleName || ''] || 'bg-slate-100 text-slate-700'}`}>
-                  {u.roleName || u.roleId}
-                </span>
-              ),
-            },
-            {
-              title: 'Linked Employee',
-              render: (u) => (u.employeeId ? empName(u.employeeId) : <span className="text-slate-400">-</span>),
-            },
-            {
-              title: 'Status',
-              render: (u) => <Badge value={u.active ? 'Active' : 'Archived'} />,
-            },
-            {
-              title: 'Actions',
-              render: (u) => (
-                <button
-                  className="text-xs font-semibold text-[#c99a2e] hover:underline cursor-pointer"
-                  onClick={() => {
-                    setUserFormData({
-                      id: u.id,
-                      name: u.name,
-                      email: u.email,
-                      roleId: u.roleId,
-                      employeeId: u.employeeId || '',
-                      password: '',
-                      active: u.active ?? true,
-                    });
-                    setModal({ kind: 'userForm' });
-                  }}
-                >
-                  Edit -&gt;
-                </button>
-              ),
-            },
-          ]}
-        />
->>>>>>> Stashed changes
       </div>
     ) : (
       <DataTable
@@ -2661,7 +2560,6 @@ export default function Home() {
         {centerContent}
       </PageShell>
 
-<<<<<<< Updated upstream
       {/* ─── Slide-Over Right Drawer Overlay for Users ─── */}
       {selectedUserDrawer && (
         <div className="fixed inset-0 z-50 overflow-hidden">
@@ -2860,9 +2758,6 @@ export default function Home() {
       )}
 
       {/* ─── Modals and Dialogs ─── */}
-=======
-      {/* --- Modals and Dialogs --- */}
->>>>>>> Stashed changes
       {modal && (
         <Dialog
           open={true}
@@ -2978,23 +2873,14 @@ export default function Home() {
 
                 <Field label="Location / Office">
                   <Input
-<<<<<<< Updated upstream
                     value={userFormData.location}
                     onChange={(e) => setUserFormData({ ...userFormData, location: e.target.value })}
                     placeholder="e.g. Mumbai"
-=======
-                    type="password"
-                    required={!userFormData.id}
-                    value={userFormData.password}
-                    onChange={(e) => setUserFormData({ ...userFormData, password: e.target.value })}
-                    placeholder={userFormData.id ? '********' : 'Enter password'}
->>>>>>> Stashed changes
                     className="h-9 rounded-xl"
                   />
                 </Field>
               </div>
 
-<<<<<<< Updated upstream
               <Field label={userFormData.id ? 'Password (leave blank to keep current)' : 'Account Password'}>
                 <Input
                   type="password"
@@ -3032,35 +2918,6 @@ export default function Home() {
               </div>
             </form>
           )}
-=======
-                <label htmlFor="user-active" className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-slate-700">
-                  <Checkbox
-                    id="user-active"
-                    checked={userFormData.active}
-                    onCheckedChange={(v) => setUserFormData({ ...userFormData, active: !!v })}
-                  />
-                  Active account permitted to authenticate
-                </label>
-
-                <div className="flex justify-end gap-2 pt-3 border-t border-slate-100">
-                  <button
-                    type="button"
-                    className="pill-btn !py-1.5 cursor-pointer"
-                    onClick={() => setModal(null)}
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={busy}
-                    className="pill-btn pill-btn-black !py-1.5 cursor-pointer"
-                  >
-                    {busy ? 'Saving...' : 'Save User'}
-                  </button>
-                </div>
-              </form>
-            )}
->>>>>>> Stashed changes
 
             {modal?.kind === 'form' && s && (
             <RecordForm
