@@ -11,7 +11,14 @@ export function scheduleRows(schedule:Row|undefined):Row[]{
  return WEEKDAYS.map(day=>({id:day,day,working:(schedule.days||[]).includes(day),start:schedule.start||'09:00',end:schedule.end||'18:00',breakHours:+schedule.breakHours||0}));
 }
 export function scheduleRowForDate(schedule:Row|undefined,date:string):Row|undefined{return scheduleRows(schedule).find(row=>row.day===WEEKDAYS[new Date(date+'T00:00:00Z').getUTCDay()]&&row.working);}
-export function scheduleDayHours(row:Row|undefined):number{return row?round(Math.max(0,((+row.end.slice(0,2)*60 + +row.end.slice(3))-(+row.start.slice(0,2)*60 + +row.start.slice(3)))/60-(+row.breakHours||0))):0;}
+export function scheduleDayHours(row:Row|undefined):number{
+  if(!row||!row.start||!row.end)return 0;
+  const startMin=+row.start.slice(0,2)*60 + +row.start.slice(3);
+  const endMin=+row.end.slice(0,2)*60 + +row.end.slice(3);
+  let diff=endMin-startMin;
+  if(diff<0)diff+=24*60;
+  return round(Math.max(0,diff/60-(+row.breakHours||0)));
+}
 export function scheduleWeeklyHours(schedule:Row|undefined):number{return round(scheduleRows(schedule).filter(row=>row.working).reduce((total,row)=>total+scheduleDayHours(row),0));}
 export function employeeSchedule(s:Workspace,employeeId:string,date:string):Row|undefined{const contract=s.contracts.filter(c=>c.employeeId===employeeId&&c.start<=date&&(!c.end||c.end>=date)).sort((a,b)=>b.start.localeCompare(a.start))[0],employee=s.employees.find(e=>e.id===employeeId);return s.schedules.find(row=>row.id===(contract?.scheduleId||employee?.scheduleId));}
 export function workingDaysBetween(s:Workspace,employeeId:string,start:string,end:string):number{let count=0,cursor=new Date(start+'T00:00:00Z'),last=new Date(end+'T00:00:00Z');while(cursor<=last){const date=cursor.toISOString().slice(0,10);if(scheduleRowForDate(employeeSchedule(s,employeeId,date),date))count++;cursor.setUTCDate(cursor.getUTCDate()+1);}return count;}

@@ -54,6 +54,7 @@ import {
 } from '@/lib/domain';
 import { Avatar, Badge, DataTable, Field, Picker, niceMonth, downloadCsv } from '@/components/peoplepay-ui';
 import Dashboard from '@/components/payroll-dashboard';
+import WorkingSchedules from '@/components/working-schedules';
 import RecordForm, { defaults, titles } from '@/components/record-form';
 import {
   PageShell,
@@ -192,6 +193,8 @@ export default function Home() {
   const [period, setPeriod] = useState('2026-09');
   const [department, setDepartment] = useState('All');
   const [employeeType, setEmployeeType] = useState('All');
+  const [statusFilter, setStatusFilter] = useState<'All' | 'Active' | 'Inactive'>('All');
+  const [typeFilter, setTypeFilter] = useState<'All' | 'Fixed' | 'Flexible' | 'Shift'>('All');
   const [modal, setModal] = useState<Modal | null>(null);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
@@ -1195,38 +1198,121 @@ export default function Home() {
         </DetailPanel>
       );
     }
-  } else if (view === 'contracts' || view === 'schedules') {
-    pageTitle = view === 'schedules' ? 'Working Schedules' : 'Employment Contracts';
-    headerActions = (
-      <>
+  } else if (view === 'schedules') {
+    pageTitle = activeId ? (activeId === 'new' ? 'New Working Schedule' : 'Schedule Pattern') : 'Working Schedules';
+    headerActions = !activeId ? (
+      <div className="flex items-center gap-2 flex-wrap">
+        {/* Search Box */}
+        <div className="pill-search !py-1 w-56 bg-white border border-[#e5ded4]">
+          <Search size={13} className="text-slate-400 shrink-0" />
+          <input
+            type="text"
+            placeholder="Search schedules..."
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            className="w-full text-xs outline-none bg-transparent"
+          />
+        </div>
+
+        {/* Status Filter */}
+        <div className="flex items-center gap-1.5 text-xs text-slate-600 font-semibold bg-[#faf7f3] border border-[#e5ded4] rounded-xl px-2.5 py-1">
+          <span>Status:</span>
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value as any)}
+            className="font-bold text-slate-900 bg-transparent focus:outline-none cursor-pointer"
+          >
+            <option value="All">All Statuses</option>
+            <option value="Active">Active</option>
+            <option value="Inactive">Inactive</option>
+          </select>
+        </div>
+
+        {/* Type Filter */}
+        <div className="flex items-center gap-1.5 text-xs text-slate-600 font-semibold bg-[#faf7f3] border border-[#e5ded4] rounded-xl px-2.5 py-1">
+          <span>Type:</span>
+          <select
+            value={typeFilter}
+            onChange={(e) => setTypeFilter(e.target.value as any)}
+            className="font-bold text-slate-900 bg-transparent focus:outline-none cursor-pointer"
+          >
+            <option value="All">All Types</option>
+            <option value="Fixed">Fixed</option>
+            <option value="Flexible">Flexible</option>
+            <option value="Shift">Shift</option>
+          </select>
+        </div>
+
+        {/* + New Schedule Button */}
+        <button
+          className="pill-btn pill-btn-black !h-8 !px-3.5 !text-xs cursor-pointer shadow-sm"
+          onClick={() => navigate('schedules', 'new')}
+        >
+          <Plus size={13} />
+          New Schedule
+        </button>
+
         <div className="flex items-center bg-slate-100 p-0.5 rounded-full border border-slate-200">
           <button
-            className={
-              'px-3 py-1 rounded-full text-xs font-medium cursor-pointer ' +
-              (view === 'contracts' ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-500')
-            }
+            className="px-3 py-1 rounded-full text-xs font-medium cursor-pointer text-slate-500 hover:text-slate-900"
             onClick={() => navigate('contracts')}
           >
             Contracts
           </button>
           <button
-            className={
-              'px-3 py-1 rounded-full text-xs font-medium cursor-pointer ' +
-              (view === 'schedules' ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-500')
-            }
+            className="px-3 py-1 rounded-full text-xs font-medium cursor-pointer bg-white text-slate-900 shadow-2xs"
             onClick={() => navigate('schedules')}
           >
             Schedules
           </button>
         </div>
+        
+      </div>
+    ) : null;
+
+    centerContent = (
+      <WorkingSchedules
+        s={s}
+        activeId={activeId}
+        onNavigate={navigate}
+        query={query}
+        statusFilter={statusFilter}
+        typeFilter={typeFilter}
+        onSaveSchedule={async (record) => {
+          await act('save', { collection: 'schedules', record }, 'Working schedule saved.');
+        }}
+        onDeleteSchedule={async (id) => {
+          await act('delete', { collection: 'schedules', id }, 'Working schedule deleted.');
+        }}
+        busy={busy}
+      />
+    );
+  } else if (view === 'contracts') {
+    pageTitle = 'Employment Contracts';
+    headerActions = (
+      <>
         <button className="pill-btn" onClick={exportPayroll}>
           <Download size={14} />
           Export
         </button>
-        <button className="pill-btn pill-btn-black" onClick={() => openForm(view)}>
+        <button className="pill-btn pill-btn-black" onClick={() => openForm('contracts')}>
           <Plus size={14} />
-          {view === 'schedules' ? 'New Schedule' : 'New Contract'}
+          New Contract
         </button>
+        <div className="flex items-center bg-slate-100 p-0.5 rounded-full border border-slate-200">
+          <button
+            className="px-3 py-1 rounded-full text-xs font-medium cursor-pointer bg-white text-slate-900 shadow-2xs"
+            onClick={() => navigate('contracts')}
+          >
+            Contracts
+          </button>
+          <button
+            className="px-3 py-1 rounded-full text-xs font-medium cursor-pointer text-slate-500"
+            onClick={() => navigate('schedules')}
+          >
+            Schedules
+          </button>
+        </div>
       </>
     );
 
@@ -1274,7 +1360,7 @@ export default function Home() {
     centerContent = (
       <div className="workora-table-container">
         <div className="table-tab-strip">
-          <button className="table-tab-item active">{titles[view]} ({s[view as keyof Workspace].length})</button>
+          <button className="table-tab-item active">Contracts ({s.contracts.length})</button>
         </div>
         {view === 'contracts' ? (
           <DataTable
