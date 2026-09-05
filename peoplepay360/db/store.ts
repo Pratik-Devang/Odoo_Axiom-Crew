@@ -1,6 +1,6 @@
 import { seed, type Workspace } from '@/lib/domain';
 import { getPgPool } from './index';
-import type { PoolClient, Pool } from 'pg';
+import type { PoolClient } from 'pg';
 
 /**
  * Read the entire workspace from normalized PostgreSQL relational tables.
@@ -448,29 +448,45 @@ async function syncRelational(client: PoolClient, data: Workspace) {
 export async function readWorkspace(): Promise<{ data: Workspace; revision: number }> {
   if (process.env.DATABASE_URL) {
     const pool = getPgPool();
-    const res = await pool.query<{ data: string | object; revision: number }>(
-      'SELECT data, revision FROM workspace WHERE id = $1',
-      ['demo']
-    );
+    const client = await pool.connect();
+    try {
+      await client.query('BEGIN');
+      await client.query("SELECT pg_advisory_xact_lock(hashtext('peoplepay360-workspace-bootstrap'))");
 
-    let row = res.rows[0];
-    if (!row || !row.data || row.data === '{}') {
-      const initial = seed();
-      await pool.query(
-        'INSERT INTO workspace (id, data, revision) VALUES ($1, $2, 0) ON CONFLICT (id) DO UPDATE SET data = $2, revision = 0',
-        ['demo', JSON.stringify(initial)]
+      let workspaceRow = await client.query<{ revision: number }>(
+        'SELECT revision FROM workspace WHERE id = $1',
+        ['demo']
       );
-      const client = await pool.connect();
-      try {
-        await syncRelational(client, initial);
-      } finally {
-        client.release();
-      }
-      return { data: initial, revision: 0 };
-    }
 
-    const parsedData = typeof row.data === 'string' ? JSON.parse(row.data) : row.data;
-    return { data: parsedData as Workspace, revision: Number(row.revision) };
+      if (!workspaceRow.rows[0]) {
+        const employeeCount = await client.query<{ count: string }>('SELECT COUNT(*)::text AS count FROM employees');
+
+        if (Number(employeeCount.rows[0]?.count || 0) === 0) {
+          await syncRelational(client, seed());
+        }
+
+        const current = await readRelational(client);
+        await client.query(
+          'INSERT INTO workspace (id, data, revision) VALUES ($1, $2, 0) ON CONFLICT (id) DO NOTHING',
+          ['demo', JSON.stringify(current)]
+        );
+        workspaceRow = await client.query<{ revision: number }>(
+          'SELECT revision FROM workspace WHERE id = $1',
+          ['demo']
+        );
+      }
+
+      // Relational tables are the source of truth. This makes changes made in
+      // pgAdmin visible on the next reload instead of serving stale JSON.
+      const data = await readRelational(client);
+      await client.query('COMMIT');
+      return { data, revision: Number(workspaceRow.rows[0]?.revision || 0) };
+    } catch (error) {
+      await client.query('ROLLBACK');
+      throw error;
+    } finally {
+      client.release();
+    }
   }
 
   // Fallback to Cloudflare D1

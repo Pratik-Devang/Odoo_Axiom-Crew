@@ -65,6 +65,23 @@ type Modal = {
   record?: Row;
 };
 
+async function readApiResponse(response: Response): Promise<any> {
+  const text = await response.text();
+  if (!text) return {};
+
+  try {
+    return JSON.parse(text);
+  } catch {
+    const message = text
+      .replace(/^Error:\s*/i, '')
+      .replace(/<[^>]*>/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .slice(0, 240);
+    throw new Error(message || `The server returned an invalid response (${response.status}).`);
+  }
+}
+
 export default function Home() {
   const [s, setS] = useState<Workspace | null>(null);
   const [revision, setRevision] = useState(0);
@@ -88,8 +105,8 @@ export default function Home() {
     try {
       setError('');
       const r = await fetch('/api/workspace', { cache: 'no-store' });
-      const body = (await r.json()) as any;
-      if (!r.ok) throw new Error(body.error);
+      const body = await readApiResponse(r);
+      if (!r.ok) throw new Error(body.error || 'Unable to load the workspace.');
       setS(body.data);
       setRevision(body.revision);
     } catch (e) {
@@ -149,7 +166,7 @@ export default function Home() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action, payload, revision }),
       });
-      const b = (await r.json()) as any;
+      const b = await readApiResponse(r);
       if (!r.ok) throw new Error(b.error || 'Unable to save.');
       setS(b.data);
       setRevision(b.revision);
