@@ -10,11 +10,15 @@ Use Node.js 22.13 or later. From this folder:
 npm.cmd install
 npm.cmd run db:setup
 npm.cmd run dev
+```bash
+npm install
+npm run dev
 ```
 
 Open the local URL printed by the development server (normally http://localhost:3000).
 
 `npm.cmd` avoids PowerShell's script-execution restriction on `npm.ps1`. On macOS/Linux, use `npm` instead. Dependencies are already installed in this checkout; installation is needed for another machine or a fresh clone.
+The application runs directly against your local PostgreSQL database configured via `DATABASE_URL` in `.env.local` without any Cloudflare or Wrangler dependencies.
 
 Create a local PostgreSQL database named `peoplepay360` and set `DATABASE_URL` in `.env.local` before running `db:setup`. The setup command creates the relational schema. The first API read inserts the fictional OXP sample company only when the employee tables are empty. Reopening the app does not reset existing records.
 

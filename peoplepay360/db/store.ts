@@ -479,6 +479,7 @@ export async function readWorkspace(): Promise<{ data: Workspace; revision: numb
   } finally {
     client.release();
   }
+
 }
 
 export async function writeWorkspace(data: unknown, revision: number) {
@@ -512,4 +513,5 @@ export async function writeWorkspace(data: unknown, revision: number) {
   } finally {
     client.release();
   }
+
 }

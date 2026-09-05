@@ -26,3 +26,83 @@ export function seed():Workspace{
 export const hours=(a:Row)=>a.checkIn&&a.checkOut?round(Math.max(0,(+a.checkOut.slice(0,2)*60 + +a.checkOut.slice(3))-(+a.checkIn.slice(0,2)*60 + +a.checkIn.slice(3)))/60):0;
 export function allocationBalance(s:Workspace,a:Row){return a.status==='Approved'?a.amount-s.requests.filter(r=>r.employeeId===a.employeeId&&r.typeId===a.typeId&&r.status==='Approved'&&r.start>=a.start&&r.end<=a.end).reduce((n,r)=>n+r.duration,0):0;}
 export function warnings(s:Workspace,run:Row):string[]{return run.employeeIds.flatMap((id:string)=>{const e=s.employees.find(e=>e.id===id),out:string[]=[];if(!e?.bank)out.push(`${e?.name}: missing bank details`);try{activeContract(s,id,run.period);}catch(err){out.push(`${e?.name}: ${(err as Error).message}`);}if(s.payruns.some(r=>r.id!==run.id&&r.period===run.period&&r.slips.some((p:Row)=>p.employeeId===id)))out.push(`${e?.name}: duplicate payslip in this period`);return out;});}
+
+export type UserRole = 'Admin' | 'HR Payroll Manager' | 'HR Payroll User' | 'HR Manager' | 'Employee';
+
+export interface AppUser {
+  id: string;
+  name: string;
+  email: string;
+  role: UserRole | string;
+  employeeId?: string;
+}
+
+export function canView(role: string | undefined | null, section: string): boolean {
+  if (!role) return false;
+  const r = role.trim();
+  const s = section.replace(/^#/, '');
+
+  if (r === 'Admin') return true;
+
+  if (r === 'HR Payroll Manager') {
+    return [
+      'employees',
+      'contracts',
+      'attendance',
+      'time-off',
+      'payroll/dashboard',
+      'payroll/payruns',
+      'payroll/payslips',
+      'payroll/structures',
+      'payroll/rules',
+      'overview',
+      'payruns',
+      'payslips',
+      'structures',
+      'rules',
+      'requests',
+      'allocations',
+      'leaveTypes',
+      'schedules',
+    ].includes(s);
+  }
+
+  if (r === 'HR Payroll User') {
+    return [
+      'employees',
+      'payroll/dashboard',
+      'payroll/payruns',
+      'payroll/payslips',
+      'overview',
+      'payruns',
+      'payslips',
+    ].includes(s);
+  }
+
+  if (r === 'HR Manager') {
+    return [
+      'employees',
+      'contracts',
+      'attendance',
+      'time-off',
+      'requests',
+      'allocations',
+      'leaveTypes',
+      'schedules',
+    ].includes(s);
+  }
+
+  if (r === 'Employee') {
+    return [
+      'attendance',
+      'time-off',
+      'payroll/payslips',
+      'requests',
+      'allocations',
+      'payslips',
+      'profile',
+    ].includes(s);
+  }
+
+  return false;
+}
