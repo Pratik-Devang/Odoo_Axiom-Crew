@@ -2255,17 +2255,60 @@ export default function Home() {
         currentView={view}
         onNavigate={navigate}
         title="PeoplePay360"
-        badgeText="Opening…"
+        badgeText={error ? 'Offline' : 'Opening…'}
         error={error}
         message={message}
         onReload={() => void load()}
+        currentUser={currentUser}
+        onLogout={handleLogout}
       >
-        <div className="workora-card text-center py-20 bg-white rounded-2xl border border-[#e5ded4] shadow-2xs">
-          <RefreshCw className="size-8 text-slate-400 mx-auto animate-spin mb-3" />
-          <h2 className="text-base font-semibold text-slate-900">Opening your workspace…</h2>
-          <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
-            Loading employees, attendance, and payroll records.
-          </p>
+        <div className="workora-card text-center py-20 bg-white rounded-2xl border border-[#e5ded4] shadow-2xs max-w-lg mx-auto">
+          {error ? (
+            <div className="space-y-4">
+              <div className="w-12 h-12 rounded-2xl bg-rose-50 border border-rose-200 flex items-center justify-center mx-auto text-rose-600">
+                <AlertCircle size={24} />
+              </div>
+              <div>
+                <h2 className="text-base font-bold text-slate-900">Workspace Unavailable</h2>
+                <p className="text-xs text-rose-600 font-medium mt-1">{error}</p>
+                <p className="text-xs text-slate-500 mt-1">
+                  Please verify that the database is accessible and reload.
+                </p>
+              </div>
+              <div className="flex justify-center gap-3 pt-2">
+                <button
+                  className="pill-btn pill-btn-black !py-2 cursor-pointer"
+                  onClick={() => {
+                    setError('');
+                    void load();
+                  }}
+                >
+                  Retry Connection
+                </button>
+                <button
+                  className="pill-btn !py-2 cursor-pointer"
+                  onClick={() => void handleLogout()}
+                >
+                  Sign Out
+                </button>
+              </div>
+            </div>
+          ) : (
+            <>
+              <RefreshCw className="size-8 text-slate-400 mx-auto animate-spin mb-3" />
+              <h2 className="text-base font-semibold text-slate-900">Opening your workspace…</h2>
+              <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
+                Loading employees, attendance, and payroll records.
+              </p>
+              <Button
+                variant="outline"
+                className="mt-4 rounded-full text-xs"
+                onClick={() => void load()}
+              >
+                Reload
+              </Button>
+            </>
+          )}
         </div>
       </PageShell>
     );

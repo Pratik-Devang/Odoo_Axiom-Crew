@@ -154,11 +154,17 @@ CREATE TABLE IF NOT EXISTS leave_types (
     requires_allocation BOOLEAN NOT NULL DEFAULT true,
     approval_workflow VARCHAR(50) NOT NULL DEFAULT 'HR Approval',
     payroll_impact VARCHAR(50) NOT NULL DEFAULT 'Paid',
+    payroll_work_entry VARCHAR(100),
+    display_color VARCHAR(50) NOT NULL DEFAULT 'Blue',
+    active BOOLEAN NOT NULL DEFAULT true,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
 ALTER TABLE leave_types ADD COLUMN IF NOT EXISTS approval_workflow VARCHAR(50) NOT NULL DEFAULT 'HR Approval';
 ALTER TABLE leave_types ADD COLUMN IF NOT EXISTS payroll_impact VARCHAR(50) NOT NULL DEFAULT 'Paid';
+ALTER TABLE leave_types ADD COLUMN IF NOT EXISTS payroll_work_entry VARCHAR(100);
+ALTER TABLE leave_types ADD COLUMN IF NOT EXISTS display_color VARCHAR(50) NOT NULL DEFAULT 'Blue';
+ALTER TABLE leave_types ADD COLUMN IF NOT EXISTS active BOOLEAN NOT NULL DEFAULT true;
 
 -- 11. LEAVE ALLOCATIONS
 CREATE TABLE IF NOT EXISTS leave_allocations (
@@ -169,8 +175,11 @@ CREATE TABLE IF NOT EXISTS leave_allocations (
     start_date DATE NOT NULL,
     end_date DATE NOT NULL,
     status VARCHAR(50) NOT NULL DEFAULT 'Approved',
+    approver VARCHAR(150),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
+
+ALTER TABLE leave_allocations ADD COLUMN IF NOT EXISTS approver VARCHAR(150);
 
 -- 12. LEAVE REQUESTS
 CREATE TABLE IF NOT EXISTS leave_requests (
@@ -183,8 +192,11 @@ CREATE TABLE IF NOT EXISTS leave_requests (
     reason TEXT,
     status VARCHAR(50) NOT NULL DEFAULT 'Pending',
     approver VARCHAR(150),
+    allocation_id VARCHAR(50) REFERENCES leave_allocations(id) ON DELETE SET NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
+
+ALTER TABLE leave_requests ADD COLUMN IF NOT EXISTS allocation_id VARCHAR(50) REFERENCES leave_allocations(id) ON DELETE SET NULL;
 
 -- 13. PAYRUNS
 CREATE TABLE IF NOT EXISTS payruns (
@@ -193,8 +205,11 @@ CREATE TABLE IF NOT EXISTS payruns (
     period VARCHAR(10) NOT NULL, -- e.g. '2026-09'
     structure_id VARCHAR(50) REFERENCES salary_structures(id) ON DELETE SET NULL,
     status VARCHAR(50) NOT NULL DEFAULT 'Draft', -- 'Draft', 'Computed', 'Validated', 'Paid'
+    paid_at TIMESTAMP WITH TIME ZONE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
+
+ALTER TABLE payruns ADD COLUMN IF NOT EXISTS paid_at TIMESTAMP WITH TIME ZONE;
 
 -- 14. PAYRUN EMPLOYEES (Junction table)
 CREATE TABLE IF NOT EXISTS payrun_employees (
@@ -377,24 +392,30 @@ BEGIN
             status = EXCLUDED.status;
 
         -- 7. Leave Types
-        INSERT INTO leave_types (id, name, unit, requires_allocation, approval_workflow, payroll_impact)
+        INSERT INTO leave_types (id, name, unit, requires_allocation, approval_workflow, payroll_impact, payroll_work_entry, display_color, active)
         SELECT 
             x->>'id',
             x->>'name',
             COALESCE(x->>'unit', 'Days'),
             COALESCE((x->>'requiresAllocation')::boolean, true),
-            COALESCE(x->>'approvalWorkflow', 'HR Approval'),
-            COALESCE(x->>'payrollImpact', 'Paid')
+            COALESCE(x->>'approvalWorkflow', CASE x->>'approval' WHEN 'No Validation' THEN 'No Approval' WHEN 'Manager' THEN 'Manager Approval' ELSE 'HR Approval' END),
+            COALESCE(x->>'payrollImpact', 'Paid'),
+            NULLIF(x->>'payrollWorkEntry', ''),
+            COALESCE(x->>'displayColor', 'Blue'),
+            COALESCE((x->>'active')::boolean, true)
         FROM jsonb_array_elements(w_json->'leaveTypes') AS x
         ON CONFLICT (id) DO UPDATE SET
             name = EXCLUDED.name,
             unit = EXCLUDED.unit,
             requires_allocation = EXCLUDED.requires_allocation,
             approval_workflow = EXCLUDED.approval_workflow,
-            payroll_impact = EXCLUDED.payroll_impact;
+            payroll_impact = EXCLUDED.payroll_impact,
+            payroll_work_entry = EXCLUDED.payroll_work_entry,
+            display_color = EXCLUDED.display_color,
+            active = EXCLUDED.active;
 
         -- 8. Leave Allocations
-        INSERT INTO leave_allocations (id, employee_id, type_id, amount, start_date, end_date, status)
+        INSERT INTO leave_allocations (id, employee_id, type_id, amount, start_date, end_date, status, approver)
         SELECT 
             x->>'id',
             x->>'employeeId',
@@ -402,14 +423,16 @@ BEGIN
             COALESCE((x->>'amount')::numeric, 0),
             (x->>'start')::date,
             (x->>'end')::date,
-            COALESCE(x->>'status', 'Approved')
+            COALESCE(x->>'status', 'Approved'),
+            NULLIF(x->>'approver', '')
         FROM jsonb_array_elements(w_json->'allocations') AS x
         ON CONFLICT (id) DO UPDATE SET
             amount = EXCLUDED.amount,
-            status = EXCLUDED.status;
+            status = EXCLUDED.status,
+            approver = EXCLUDED.approver;
 
         -- 9. Leave Requests
-        INSERT INTO leave_requests (id, employee_id, type_id, start_date, end_date, duration, reason, status, approver)
+        INSERT INTO leave_requests (id, employee_id, type_id, start_date, end_date, duration, reason, status, approver, allocation_id)
         SELECT 
             x->>'id',
             x->>'employeeId',
@@ -419,11 +442,13 @@ BEGIN
             COALESCE((x->>'duration')::numeric, 1),
             x->>'reason',
             COALESCE(x->>'status', 'Pending'),
-            x->>'approver'
+            x->>'approver',
+            NULLIF(x->>'allocationId', '')
         FROM jsonb_array_elements(w_json->'requests') AS x
         ON CONFLICT (id) DO UPDATE SET
             status = EXCLUDED.status,
-            approver = EXCLUDED.approver;
+            approver = EXCLUDED.approver,
+            allocation_id = EXCLUDED.allocation_id;
 
         -- 10. Attendance
         INSERT INTO attendance (id, employee_id, date, check_in, check_out, worked_hours, edited)
@@ -439,15 +464,16 @@ BEGIN
         ON CONFLICT (id) DO NOTHING;
 
         -- 11. Payruns
-        INSERT INTO payruns (id, name, period, structure_id, status)
+        INSERT INTO payruns (id, name, period, structure_id, status, paid_at)
         SELECT 
             x->>'id',
             x->>'name',
             x->>'period',
             x->>'structureId',
-            COALESCE(x->>'status', 'Draft')
+            COALESCE(x->>'status', 'Draft'),
+            NULLIF(x->>'paidAt', '')::timestamptz
         FROM jsonb_array_elements(w_json->'payruns') AS x
-        ON CONFLICT (id) DO UPDATE SET status = EXCLUDED.status;
+        ON CONFLICT (id) DO UPDATE SET status = EXCLUDED.status, paid_at = COALESCE(EXCLUDED.paid_at, payruns.paid_at);
 
         -- 12. Payrun Employees
         INSERT INTO payrun_employees (payrun_id, employee_id)

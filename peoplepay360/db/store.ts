@@ -16,13 +16,13 @@ async function readRelational(client: PoolClient): Promise<Workspace> {
     `SELECT id, employee_id AS "employeeId", to_char(date, 'YYYY-MM-DD') AS "date", COALESCE(check_in, '') AS "checkIn", COALESCE(check_out, '') AS "checkOut", edited FROM attendance ORDER BY date, employee_id`
   );
   const requestsRes = await client.query(
-    `SELECT id, employee_id AS "employeeId", type_id AS "typeId", to_char(start_date, 'YYYY-MM-DD') AS "start", to_char(end_date, 'YYYY-MM-DD') AS "end", duration::float AS duration, COALESCE(reason, '') AS reason, status, COALESCE(approver, '') AS approver FROM leave_requests ORDER BY id`
+    `SELECT id, employee_id AS "employeeId", type_id AS "typeId", to_char(start_date, 'YYYY-MM-DD') AS "start", to_char(end_date, 'YYYY-MM-DD') AS "end", duration::float AS duration, COALESCE(reason, '') AS reason, status, COALESCE(approver, '') AS approver, COALESCE(allocation_id, '') AS "allocationId" FROM leave_requests ORDER BY id`
   );
   const allocationsRes = await client.query(
-    `SELECT id, employee_id AS "employeeId", type_id AS "typeId", amount::float AS amount, to_char(start_date, 'YYYY-MM-DD') AS "start", to_char(end_date, 'YYYY-MM-DD') AS "end", status FROM leave_allocations ORDER BY id`
+    `SELECT id, employee_id AS "employeeId", type_id AS "typeId", amount::float AS amount, to_char(start_date, 'YYYY-MM-DD') AS "start", to_char(end_date, 'YYYY-MM-DD') AS "end", status, COALESCE(approver, '') AS approver FROM leave_allocations ORDER BY id`
   );
   const leaveTypesRes = await client.query(
-    'SELECT id, name, unit, requires_allocation AS "requiresAllocation", approval_workflow AS "approvalWorkflow", payroll_impact AS "payrollImpact" FROM leave_types ORDER BY id'
+    'SELECT id, name, unit, requires_allocation AS "requiresAllocation", approval_workflow AS "approvalWorkflow", payroll_impact AS "payrollImpact", COALESCE(payroll_work_entry, \'\') AS "payrollWorkEntry", COALESCE(display_color, \'Blue\') AS "displayColor", active FROM leave_types ORDER BY id'
   );
   const rulesRes = await client.query(
     "SELECT id, name, code, category, sequence, method, COALESCE(base, '') AS base, COALESCE(value::float, 0) AS value, COALESCE(expression, '') AS expression FROM salary_rules ORDER BY sequence"
@@ -34,7 +34,7 @@ async function readRelational(client: PoolClient): Promise<Workspace> {
     'SELECT id, name, schedule_type AS type, days, work_rows AS "workRows", start_time AS "start", end_time AS "end", break_hours::float AS "breakHours", weekly_hours::float AS "weeklyHours" FROM schedules ORDER BY id'
   );
   const payrunsRes = await client.query(
-    `SELECT p.id, p.name, p.period, COALESCE(p.structure_id, '') AS "structureId", p.status, COALESCE((SELECT array_agg(employee_id) FROM payrun_employees WHERE payrun_id = p.id), ARRAY[]::text[]) AS "employeeIds" FROM payruns p ORDER BY p.period`
+    `SELECT p.id, p.name, p.period, COALESCE(p.structure_id, '') AS "structureId", p.status, COALESCE(to_char(p.paid_at, 'YYYY-MM-DD"T"HH24:MI:SS"Z"'), '') AS "paidAt", COALESCE((SELECT array_agg(employee_id) FROM payrun_employees WHERE payrun_id = p.id), ARRAY[]::text[]) AS "employeeIds" FROM payruns p ORDER BY p.period`
   );
   const payslipsRes = await client.query(
     `SELECT DISTINCT ON (payrun_id, employee_id)
@@ -291,21 +291,27 @@ async function syncRelational(client: PoolClient, data: Workspace) {
   if (data.leaveTypes?.length) {
     await client.query(
       `
-      INSERT INTO leave_types (id, name, unit, requires_allocation, approval_workflow, payroll_impact)
+      INSERT INTO leave_types (id, name, unit, requires_allocation, approval_workflow, payroll_impact, payroll_work_entry, display_color, active)
       SELECT
         x->>'id',
         x->>'name',
         COALESCE(x->>'unit', 'Days'),
         COALESCE((x->>'requiresAllocation')::boolean, true),
         COALESCE(x->>'approvalWorkflow', 'HR Approval'),
-        COALESCE(x->>'payrollImpact', 'Paid')
+        COALESCE(x->>'payrollImpact', 'Paid'),
+        NULLIF(x->>'payrollWorkEntry', ''),
+        COALESCE(x->>'displayColor', 'Blue'),
+        COALESCE((x->>'active')::boolean, true)
       FROM jsonb_array_elements($1::jsonb) AS x
       ON CONFLICT (id) DO UPDATE SET
         name = EXCLUDED.name,
         unit = EXCLUDED.unit,
         requires_allocation = EXCLUDED.requires_allocation,
         approval_workflow = EXCLUDED.approval_workflow,
-        payroll_impact = EXCLUDED.payroll_impact;
+        payroll_impact = EXCLUDED.payroll_impact,
+        payroll_work_entry = EXCLUDED.payroll_work_entry,
+        display_color = EXCLUDED.display_color,
+        active = EXCLUDED.active;
     `,
       [JSON.stringify(data.leaveTypes)]
     );
@@ -315,7 +321,7 @@ async function syncRelational(client: PoolClient, data: Workspace) {
   if (data.allocations?.length) {
     await client.query(
       `
-      INSERT INTO leave_allocations (id, employee_id, type_id, amount, start_date, end_date, status)
+      INSERT INTO leave_allocations (id, employee_id, type_id, amount, start_date, end_date, status, approver)
       SELECT
         x->>'id',
         x->>'employeeId',
@@ -323,7 +329,8 @@ async function syncRelational(client: PoolClient, data: Workspace) {
         (x->>'amount')::numeric,
         (x->>'start')::date,
         (x->>'end')::date,
-        COALESCE(x->>'status', 'Approved')
+        COALESCE(x->>'status', 'Approved'),
+        NULLIF(x->>'approver', '')
       FROM jsonb_array_elements($1::jsonb) AS x
       ON CONFLICT (id) DO UPDATE SET
         employee_id = EXCLUDED.employee_id,
@@ -331,7 +338,8 @@ async function syncRelational(client: PoolClient, data: Workspace) {
         amount = EXCLUDED.amount,
         start_date = EXCLUDED.start_date,
         end_date = EXCLUDED.end_date,
-        status = EXCLUDED.status;
+        status = EXCLUDED.status,
+        approver = EXCLUDED.approver;
     `,
       [JSON.stringify(data.allocations)]
     );
@@ -341,7 +349,7 @@ async function syncRelational(client: PoolClient, data: Workspace) {
   if (data.requests?.length) {
     await client.query(
       `
-      INSERT INTO leave_requests (id, employee_id, type_id, start_date, end_date, duration, reason, status, approver)
+      INSERT INTO leave_requests (id, employee_id, type_id, start_date, end_date, duration, reason, status, approver, allocation_id)
       SELECT
         x->>'id',
         x->>'employeeId',
@@ -351,7 +359,8 @@ async function syncRelational(client: PoolClient, data: Workspace) {
         (x->>'duration')::numeric,
         x->>'reason',
         COALESCE(x->>'status', 'Pending'),
-        x->>'approver'
+        x->>'approver',
+        NULLIF(x->>'allocationId', '')
       FROM jsonb_array_elements($1::jsonb) AS x
       ON CONFLICT (id) DO UPDATE SET
         employee_id = EXCLUDED.employee_id,
@@ -361,7 +370,8 @@ async function syncRelational(client: PoolClient, data: Workspace) {
         duration = EXCLUDED.duration,
         reason = EXCLUDED.reason,
         status = EXCLUDED.status,
-        approver = EXCLUDED.approver;
+        approver = EXCLUDED.approver,
+        allocation_id = EXCLUDED.allocation_id;
     `,
       [JSON.stringify(data.requests)]
     );
@@ -371,19 +381,21 @@ async function syncRelational(client: PoolClient, data: Workspace) {
   if (data.payruns?.length) {
     await client.query(
       `
-      INSERT INTO payruns (id, name, period, structure_id, status)
+      INSERT INTO payruns (id, name, period, structure_id, status, paid_at)
       SELECT
         x->>'id',
         x->>'name',
         x->>'period',
         x->>'structureId',
-        COALESCE(x->>'status', 'Draft')
+        COALESCE(x->>'status', 'Draft'),
+        NULLIF(x->>'paidAt', '')::timestamptz
       FROM jsonb_array_elements($1::jsonb) AS x
       ON CONFLICT (id) DO UPDATE SET
         name = EXCLUDED.name,
         period = EXCLUDED.period,
         structure_id = EXCLUDED.structure_id,
-        status = EXCLUDED.status;
+        status = EXCLUDED.status,
+        paid_at = COALESCE(EXCLUDED.paid_at, payruns.paid_at);
     `,
       [JSON.stringify(data.payruns)]
     );

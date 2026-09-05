@@ -119,6 +119,9 @@ export const leaveTypes = pgTable('leave_types', {
   requiresAllocation: boolean('requires_allocation').notNull().default(true),
   approvalWorkflow: text('approval_workflow').notNull().default('HR Approval'),
   payrollImpact: text('payroll_impact').notNull().default('Paid'),
+  payrollWorkEntry: text('payroll_work_entry'),
+  displayColor: text('display_color').notNull().default('Blue'),
+  active: boolean('active').notNull().default(true),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
 });
 
@@ -131,6 +134,7 @@ export const leaveAllocations = pgTable('leave_allocations', {
   startDate: date('start_date').notNull(),
   endDate: date('end_date').notNull(),
   status: text('status').notNull().default('Approved'),
+  approver: text('approver'),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
 });
 
@@ -145,6 +149,7 @@ export const leaveRequests = pgTable('leave_requests', {
   reason: text('reason'),
   status: text('status').notNull().default('Pending'),
   approver: text('approver'),
+  allocationId: text('allocation_id').references(() => leaveAllocations.id),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
 });
 
@@ -155,6 +160,7 @@ export const payruns = pgTable('payruns', {
   period: text('period').notNull(),
   structureId: text('structure_id').references(() => salaryStructures.id),
   status: text('status').notNull().default('Draft'),
+  paidAt: timestamp('paid_at', { withTimezone: true }),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
 });
 
