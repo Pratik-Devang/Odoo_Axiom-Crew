@@ -311,7 +311,6 @@ export default function Home() {
       setCurrentUser(user);
       setLoginEmail('');
       setLoginPassword('');
-      await load();
       if (user.role === 'Admin') {
         await loadUsers();
       }
@@ -362,7 +361,7 @@ export default function Home() {
   const load = useCallback(async () => {
     try {
       setError('');
-      const r = await fetch('/api/workspace', { cache: 'no-store' });
+      const r = await fetch(`/api/workspace?period=${encodeURIComponent(period)}`, { cache: 'no-store' });
       const body = await readApiResponse(r);
       if (r.status === 401) {
         setCurrentUser(null);
@@ -374,15 +373,18 @@ export default function Home() {
     } catch (e) {
       setError((e as Error).message);
     }
-  }, []);
+  }, [period]);
 
   useEffect(() => {
     setMounted(true);
     void checkAuth();
-    void load();
     const timer = setInterval(() => setClockNow(new Date()), 30000);
     return () => clearInterval(timer);
-  }, [checkAuth, load]);
+  }, [checkAuth]);
+
+  useEffect(() => {
+    if (currentUser) void load();
+  }, [currentUser, load]);
 
   useEffect(() => {
     if (currentUser?.role === 'Admin') {
@@ -468,7 +470,7 @@ export default function Home() {
       const r = await fetch('/api/workspace', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action, payload, revision }),
+        body: JSON.stringify({ action, payload, revision, period }),
       });
       const b = await readApiResponse(r);
       if (r.status === 401) {

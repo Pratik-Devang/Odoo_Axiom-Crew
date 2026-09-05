@@ -1,5 +1,5 @@
 'use client';
-import type {ReactNode} from 'react';
+import {useEffect, useState, type ReactNode} from 'react';
 import {Select,SelectTrigger,SelectValue,SelectContent,SelectItem} from '@/components/ui/select';
 import {Table,TableHeader,TableHead,TableRow,TableBody,TableCell} from '@/components/ui/table';
 import type {Row} from '@/lib/domain';
@@ -69,9 +69,17 @@ export function DataTable({
   empty?: string;
   onSelect?: (row: Row) => void;
 }) {
+  const pageSize = 100;
+  const [page, setPage] = useState(0);
+  const pageCount = Math.max(1, Math.ceil(rows.length / pageSize));
+  const rowsKey = `${rows.length}:${rows[0]?.id || ''}:${rows.at(-1)?.id || ''}`;
+  useEffect(() => setPage(0), [rowsKey]);
+  const visibleRows = rows.slice(page * pageSize, (page + 1) * pageSize);
+
   return (
-    <div className="overflow-x-auto w-full">
-      <Table className="w-full">
+    <div className="w-full">
+      <div className="overflow-x-auto w-full">
+        <Table className="w-full">
         <TableHeader>
           <TableRow className="bg-slate-50/60 hover:bg-slate-50/60 border-b border-slate-100">
             {columns.map((c, i) => (
@@ -82,7 +90,7 @@ export function DataTable({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {rows.map((r) => (
+          {visibleRows.map((r) => (
             <TableRow
               key={r.id}
               onClick={() => onSelect?.(r)}
@@ -109,7 +117,34 @@ export function DataTable({
             </TableRow>
           )}
         </TableBody>
-      </Table>
+        </Table>
+      </div>
+      {rows.length > pageSize && (
+        <div className="flex items-center justify-between gap-3 border-t border-slate-100 px-4 py-3 text-xs text-slate-500">
+          <span>
+            Showing {page * pageSize + 1}–{Math.min((page + 1) * pageSize, rows.length)} of {rows.length}
+          </span>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              className="rounded-lg border border-slate-200 px-3 py-1.5 font-semibold text-slate-700 disabled:cursor-not-allowed disabled:opacity-40"
+              disabled={page === 0}
+              onClick={() => setPage((value) => Math.max(0, value - 1))}
+            >
+              Previous
+            </button>
+            <span className="min-w-16 text-center">{page + 1} / {pageCount}</span>
+            <button
+              type="button"
+              className="rounded-lg border border-slate-200 px-3 py-1.5 font-semibold text-slate-700 disabled:cursor-not-allowed disabled:opacity-40"
+              disabled={page + 1 >= pageCount}
+              onClick={() => setPage((value) => Math.min(pageCount - 1, value + 1))}
+            >
+              Next
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

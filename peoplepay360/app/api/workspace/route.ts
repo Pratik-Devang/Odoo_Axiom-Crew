@@ -3,15 +3,34 @@ import { mutate } from '@/lib/actions';
 import { getActiveAuthUser } from '@/lib/auth';
 import { canMutateWorkspace, visibleWorkspace } from '@/lib/workspace-access';
 import { isAllowedOrigin } from '@/lib/request-origin';
+import type { Workspace } from '@/lib/domain';
 
 export const runtime = 'nodejs';
+
+function requestedPeriod(request: Request) {
+  const period = new URL(request.url).searchParams.get('period') || '';
+  return /^\d{4}-(0[1-9]|1[0-2])$/.test(period) ? period : undefined;
+}
+
+function limitWorkspaceToPeriod(workspace: Workspace, period?: string): Workspace {
+  if (!period) return workspace;
+  return {
+    ...workspace,
+    attendance: workspace.attendance.filter((item) => item.date.startsWith(period)),
+    payruns: workspace.payruns.map((run) => run.period === period ? run : {
+      ...run,
+      slips: run.slips.map((slip: Record<string, unknown>) => ({ ...slip, lines: [] })),
+    }),
+  };
+}
 
 export async function GET(request: Request) {
   try {
     const user = await getActiveAuthUser(request);
     if (!user) return Response.json({ error: 'Authentication required.' }, { status: 401 });
 
-    const current = await readWorkspace();
+    const period = requestedPeriod(request);
+    const current = await readWorkspace({ attendancePeriod: period });
     return Response.json({ ...current, data: visibleWorkspace(current.data, user) }, {
       headers: { 'Cache-Control': 'no-store' },
     });
@@ -45,6 +64,7 @@ export async function POST(request: Request) {
     const body = (await request.json()) as {
       revision: number;
       action: string;
+      period?: string;
       payload?: Record<string, any>;
     };
     const current = await readWorkspace();
@@ -70,7 +90,8 @@ export async function POST(request: Request) {
       );
     }
 
-    return Response.json({ data: visibleWorkspace(next, user), revision: current.revision + 1 });
+    const period = /^\d{4}-(0[1-9]|1[0-2])$/.test(body.period || '') ? body.period : undefined;
+    return Response.json({ data: limitWorkspaceToPeriod(visibleWorkspace(next, user), period), revision: current.revision + 1 });
   } catch (error) {
     return Response.json(
       { error: error instanceof Error ? error.message : 'Unable to save changes.' },
