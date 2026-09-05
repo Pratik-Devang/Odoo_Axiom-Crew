@@ -756,7 +756,7 @@ export default function Home() {
         onSearchChange={setQuery}
         searchPlaceholder="Search employee…"
         filters={
-          <div className="flex items-center gap-2">
+          <div className="grid grid-cols-2 gap-2 w-full">
             <Picker label="Dept" value={department} onChange={setDepartment} options={['All', ...departments]} />
             <Picker
               label="Type"
