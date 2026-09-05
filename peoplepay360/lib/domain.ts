@@ -243,7 +243,10 @@ export function canView(role: string | undefined | null, section: string): boole
   const r = role.trim();
   const s = section.replace(/^#/, '');
 
-  if (r === 'Admin') return true;
+  if (r === 'Admin') {
+    if (['employees', 'employee', 'admin/employees'].includes(s)) return false;
+    return true;
+  }
 
   if (r === 'HR Payroll Manager') {
     return [

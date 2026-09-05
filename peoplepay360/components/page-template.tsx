@@ -181,7 +181,7 @@ export function PageShell({
               {currentUser?.role === 'Employee' ? 'My Payslips' : 'Payroll'}
             </button>
           )}
-          {currentUser && !isOverview && canView(currentUser.role, 'admin/users') && (
+          {currentUser && canView(currentUser.role, 'admin/users') && (
             <button
               className={`nav-pill ${isUsers ? 'active' : ''}`}
               onClick={() => onNavigate('users')}
