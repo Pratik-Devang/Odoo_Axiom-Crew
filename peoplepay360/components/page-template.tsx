@@ -112,6 +112,7 @@ export function PageShell({
           className="workora-brand flex items-center gap-2.5 hover:opacity-90 transition-opacity"
           onClick={(e) => {
             e.preventDefault();
+            onNavigate('overview');
             onNavigate(currentUser?.role === 'Employee' ? 'attendance' : currentUser?.role === 'HR Manager' ? 'employees' : 'overview');
           }}
         >
