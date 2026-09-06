@@ -46,7 +46,6 @@ import {
   employeeSchedule,
 } from '@/lib/domain';
 import { Avatar, Badge, DataTable, Field, Picker, niceMonth, downloadCsv } from '@/components/peoplepay-ui';
-import Dashboard from '@/components/payroll-dashboard';
 import OverviewDashboard from '@/components/overview-dashboard';
 import WorkingSchedules from '@/components/working-schedules';
 import { EmployeeRosterList } from '@/components/dashboard/EmployeeRosterList';
@@ -239,15 +238,9 @@ export default function Home() {
   // Admin users state & unified view options
   const [systemUsers, setSystemUsers] = useState<any[]>([]);
   const [systemRoles, setSystemRoles] = useState<any[]>([]);
-<<<<<<< HEAD
-  const [selectedUserDrawer, setSelectedUserDrawer] = useState<any | null>(null);
-  const [userFormData, setUserFormData] = useState<any>({
-=======
   const [userViewMode, setUserViewMode] = useState<'grid' | 'list'>('list');
   const [userRoleFilter, setUserRoleFilter] = useState<string>('All');
   const [selectedUserDrawer, setSelectedUserDrawer] = useState<any | null>(null);
-  const [userFormData, setUserFormData] = useState({
->>>>>>> 3a023cce13993afb554109e9c016ec7086a445ab
   const [userFormData, setUserFormData] = useState<any>({
     id: '',
     name: '',
@@ -990,7 +983,6 @@ export default function Home() {
     );
 
     centerContent = (
-      <Dashboard
       <OverviewDashboard
         s={s}
         period={period}
