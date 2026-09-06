@@ -93,8 +93,130 @@ export function computeSlip(s:Workspace,id:string,period:string,structureId:stri
 }
 export function seed():Workspace{
  const ps=[['Aarav Mehta','Finance','Payroll Specialist',85000],['Sara Khan','HR','HR Manager',95000],['John Dsouza','Engineering','Frontend Developer',90000],['Neha Patel','HR','Talent Acquisition',65000],['Maya Shah','Sales','Account Executive',72000],['Rohan Patel','Engineering','Backend Developer',105000],['Nisha Rao','Finance','Finance Manager',110000],['Ishaan Kapoor','Support','Customer Success',58000],['Ananya Iyer','Engineering','Product Designer',88000],['Dev Shah','Sales','Sales Manager',98000],['Priya Nair','Support','Support Specialist',52000],['Kabir Sethi','Engineering','Engineering Intern',25000]];
- const defaultRows=WEEKDAYS.map(day=>({id:day,day,working:['Monday','Tuesday','Wednesday','Thursday','Friday'].includes(day),start:'09:00',end:'18:00',breakHours:1}));
- const s:Workspace={employees:ps.map((p,i)=>({id:'e'+i,name:p[0],department:p[1],position:p[2],email:String(p[0]).split(' ')[0].toLowerCase()+'@oxp.example',phone:'+91 90000 '+(10000+i),type:i===11?'Intern':'Full-time',status:'Active',manager:'Sara Khan',location:'Mumbai',scheduleId:'sch1',bank:i===3?'':'DEMO-'+(1000+i)})),contracts:ps.map((p,i)=>({id:'c'+i,employeeId:'e'+i,start:'2026-01-01',end:i===11?'2026-09-30':'',wage:p[3],structureId:i===11?'intern':'regular',scheduleId:'sch1',status:'Running'})),attendance:[],requests:[],allocations:[],leaveTypes:[{id:'paid',name:'Paid Time Off',unit:'Days',requiresAllocation:true,approvalWorkflow:'HR Approval',payrollImpact:'Paid',payrollWorkEntry:'Leave Work Entry',displayColor:'Blue',active:true},{id:'sick',name:'Sick Leave',unit:'Days',requiresAllocation:false,approvalWorkflow:'HR Approval',payrollImpact:'Paid',payrollWorkEntry:'Sick Work Entry',displayColor:'Red',active:true},{id:'comp',name:'Comp Off',unit:'Hours',requiresAllocation:true,approvalWorkflow:'Manager Approval',payrollImpact:'Paid',payrollWorkEntry:'',displayColor:'Green',active:true},{id:'unpaid',name:'Unpaid Leave',unit:'Days',requiresAllocation:false,approvalWorkflow:'HR Approval',payrollImpact:'Unpaid',payrollWorkEntry:'Unpaid Leave Work Entry',displayColor:'Orange',active:true}],rules:[{id:'basic',name:'Basic Salary',code:'BASIC',category:'Basic',sequence:1,method:'Percentage',base:'WAGE',value:100,expression:''},{id:'hra',name:'House Rent Allowance',code:'HRA',category:'Allowance',sequence:10,method:'Percentage',base:'BASIC',value:20,expression:''},{id:'meal',name:'Meal Allowance',code:'MEAL',category:'Allowance',sequence:20,method:'Fixed',base:'WAGE',value:2000,expression:''},{id:'pf',name:'Provident Fund (PF)',code:'PF',category:'Deduction',sequence:30,method:'Percentage',base:'BASIC',value:12,expression:''},{id:'pt',name:'Professional Tax (PT)',code:'PT',category:'Deduction',sequence:35,method:'Fixed',base:'WAGE',value:200,expression:''},{id:'tds',name:'Tax Deducted at Source (TDS)',code:'TDS',category:'Deduction',sequence:40,method:'Percentage',base:'BASIC',value:5,expression:''},{id:'deduct',name:'Standard Deduction',code:'DEDUCT',category:'Deduction',sequence:50,method:'Percentage',base:'BASIC',value:5,expression:''}],structures:[{id:'regular',name:'Regular Salary',ruleIds:['basic','hra','meal','pf','pt','tds'],active:true},{id:'intern',name:'Intern Salary',ruleIds:['basic','meal'],active:true},{id:'statutory',name:'Indian Statutory Structure',ruleIds:['basic','hra','meal','pf','pt','tds'],active:true}],schedules:[{id:'sch1',name:'Standard workweek',type:'Fixed',days:['Monday','Tuesday','Wednesday','Thursday','Friday'],start:'09:00',end:'18:00',breakHours:1,workRows:defaultRows,weeklyHours:40}],payruns:[],audit:[]};
+  const schedulesData = [
+    {
+      id: 'sch1',
+      name: 'Standard Full-Time (40h)',
+      type: 'Fixed',
+      company: 'Axiom Crew Tech Pvt Ltd',
+      timezone: 'Asia/Kolkata (IST)',
+      status: 'Active',
+      days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+      start: '09:00',
+      end: '18:00',
+      breakHours: 1,
+      workRows: [
+        { id: 'Monday', day: 'Monday', working: true, start: '09:00', end: '18:00', breakHours: 1 },
+        { id: 'Tuesday', day: 'Tuesday', working: true, start: '09:00', end: '18:00', breakHours: 1 },
+        { id: 'Wednesday', day: 'Wednesday', working: true, start: '09:00', end: '18:00', breakHours: 1 },
+        { id: 'Thursday', day: 'Thursday', working: true, start: '09:00', end: '18:00', breakHours: 1 },
+        { id: 'Friday', day: 'Friday', working: true, start: '09:00', end: '18:00', breakHours: 1 },
+      ],
+      weeklyHours: 40,
+    },
+    {
+      id: 'sch2',
+      name: 'Night Shift NOC (35h)',
+      type: 'Shift',
+      company: 'Axiom Crew Global Ops',
+      timezone: 'Asia/Kolkata (IST)',
+      status: 'Active',
+      days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+      start: '22:00',
+      end: '06:00',
+      breakHours: 1,
+      workRows: [
+        { id: 'Monday', day: 'Monday', working: true, start: '22:00', end: '06:00', breakHours: 1 },
+        { id: 'Tuesday', day: 'Tuesday', working: true, start: '22:00', end: '06:00', breakHours: 1 },
+        { id: 'Wednesday', day: 'Wednesday', working: true, start: '22:00', end: '06:00', breakHours: 1 },
+        { id: 'Thursday', day: 'Thursday', working: true, start: '22:00', end: '06:00', breakHours: 1 },
+        { id: 'Friday', day: 'Friday', working: true, start: '22:00', end: '06:00', breakHours: 1 },
+      ],
+      weeklyHours: 35,
+    },
+    {
+      id: 'sch3',
+      name: 'Retail & Weekend Shift (32h)',
+      type: 'Shift',
+      company: 'Axiom Crew Retail',
+      timezone: 'Asia/Kolkata (IST)',
+      status: 'Active',
+      days: ['Thursday', 'Friday', 'Saturday', 'Sunday'],
+      start: '10:00',
+      end: '19:00',
+      breakHours: 1,
+      workRows: [
+        { id: 'Thursday', day: 'Thursday', working: true, start: '10:00', end: '19:00', breakHours: 1 },
+        { id: 'Friday', day: 'Friday', working: true, start: '10:00', end: '19:00', breakHours: 1 },
+        { id: 'Saturday', day: 'Saturday', working: true, start: '10:00', end: '19:00', breakHours: 1 },
+        { id: 'Sunday', day: 'Sunday', working: true, start: '10:00', end: '19:00', breakHours: 1 },
+      ],
+      weeklyHours: 32,
+    },
+    {
+      id: 'sch4',
+      name: 'Flexible Hybrid 4-Day (36h)',
+      type: 'Flexible',
+      company: 'Axiom Crew Tech Pvt Ltd',
+      timezone: 'Asia/Kolkata (IST)',
+      status: 'Active',
+      days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday'],
+      start: '08:30',
+      end: '18:00',
+      breakHours: 0.5,
+      workRows: [
+        { id: 'Monday', day: 'Monday', working: true, start: '08:30', end: '18:00', breakHours: 0.5 },
+        { id: 'Tuesday', day: 'Tuesday', working: true, start: '08:30', end: '18:00', breakHours: 0.5 },
+        { id: 'Wednesday', day: 'Wednesday', working: true, start: '08:30', end: '18:00', breakHours: 0.5 },
+        { id: 'Thursday', day: 'Thursday', working: true, start: '08:30', end: '18:00', breakHours: 0.5 },
+      ],
+      weeklyHours: 36,
+    },
+    {
+      id: 'sch5',
+      name: 'Morning Part-Time (20h)',
+      type: 'Fixed',
+      company: 'Axiom Crew Tech Pvt Ltd',
+      timezone: 'Asia/Kolkata (IST)',
+      status: 'Active',
+      days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+      start: '09:00',
+      end: '13:00',
+      breakHours: 0,
+      workRows: [
+        { id: 'Monday', day: 'Monday', working: true, start: '09:00', end: '13:00', breakHours: 0 },
+        { id: 'Tuesday', day: 'Tuesday', working: true, start: '09:00', end: '13:00', breakHours: 0 },
+        { id: 'Wednesday', day: 'Wednesday', working: true, start: '09:00', end: '13:00', breakHours: 0 },
+        { id: 'Thursday', day: 'Thursday', working: true, start: '09:00', end: '13:00', breakHours: 0 },
+        { id: 'Friday', day: 'Friday', working: true, start: '09:00', end: '13:00', breakHours: 0 },
+      ],
+      weeklyHours: 20,
+    },
+    {
+      id: 'sch6',
+      name: 'Seasonal Logistics Standby (18h)',
+      type: 'Flexible',
+      company: 'Axiom Crew Logistics',
+      timezone: 'Asia/Kolkata (IST)',
+      status: 'Inactive',
+      days: ['Friday', 'Saturday', 'Sunday'],
+      start: '12:00',
+      end: '18:30',
+      breakHours: 0.5,
+      workRows: [
+        { id: 'Friday', day: 'Friday', working: true, start: '12:00', end: '18:30', breakHours: 0.5 },
+        { id: 'Saturday', day: 'Saturday', working: true, start: '12:00', end: '18:30', breakHours: 0.5 },
+        { id: 'Sunday', day: 'Sunday', working: true, start: '12:00', end: '18:30', breakHours: 0.5 },
+      ],
+      weeklyHours: 18,
+    },
+  ];
+  const empScheduleMap: Record<number, string> = {
+    0: 'sch1', 1: 'sch1', 2: 'sch4', 3: 'sch1', 4: 'sch3',
+    5: 'sch1', 6: 'sch1', 7: 'sch2', 8: 'sch4', 9: 'sch3',
+    10: 'sch2', 11: 'sch5'
+  };
+  const s:Workspace={employees:ps.map((p,i)=>({id:'e'+i,name:p[0],department:p[1],position:p[2],email:String(p[0]).split(' ')[0].toLowerCase()+'@oxp.example',phone:'+91 90000 '+(10000+i),type:i===11?'Intern':'Full-time',status:'Active',manager:'Sara Khan',location:'Mumbai',scheduleId:empScheduleMap[i]||'sch1',bank:i===3?'':'DEMO-'+(1000+i)})),contracts:ps.map((p,i)=>({id:'c'+i,employeeId:'e'+i,start:'2026-01-01',end:i===11?'2026-09-30':'',wage:p[3],structureId:i===11?'intern':'regular',scheduleId:empScheduleMap[i]||'sch1',status:'Running'})),attendance:[],requests:[],allocations:[],leaveTypes:[{id:'paid',name:'Paid Time Off',unit:'Days',requiresAllocation:true,approvalWorkflow:'HR Approval',payrollImpact:'Paid',payrollWorkEntry:'Leave Work Entry',displayColor:'Blue',active:true},{id:'sick',name:'Sick Leave',unit:'Days',requiresAllocation:false,approvalWorkflow:'HR Approval',payrollImpact:'Paid',payrollWorkEntry:'Sick Work Entry',displayColor:'Red',active:true},{id:'comp',name:'Comp Off',unit:'Hours',requiresAllocation:true,approvalWorkflow:'Manager Approval',payrollImpact:'Paid',payrollWorkEntry:'',displayColor:'Green',active:true},{id:'unpaid',name:'Unpaid Leave',unit:'Days',requiresAllocation:false,approvalWorkflow:'HR Approval',payrollImpact:'Unpaid',payrollWorkEntry:'Unpaid Leave Work Entry',displayColor:'Orange',active:true}],rules:[{id:'basic',name:'Basic Salary',code:'BASIC',category:'Basic',sequence:1,method:'Percentage',base:'WAGE',value:100,expression:''},{id:'hra',name:'House Rent Allowance',code:'HRA',category:'Allowance',sequence:10,method:'Percentage',base:'BASIC',value:20,expression:''},{id:'meal',name:'Meal Allowance',code:'MEAL',category:'Allowance',sequence:20,method:'Fixed',base:'WAGE',value:2000,expression:''},{id:'pf',name:'Provident Fund (PF)',code:'PF',category:'Deduction',sequence:30,method:'Percentage',base:'BASIC',value:12,expression:''},{id:'pt',name:'Professional Tax (PT)',code:'PT',category:'Deduction',sequence:35,method:'Fixed',base:'WAGE',value:200,expression:''},{id:'tds',name:'Tax Deducted at Source (TDS)',code:'TDS',category:'Deduction',sequence:40,method:'Percentage',base:'BASIC',value:5,expression:''},{id:'deduct',name:'Standard Deduction',code:'DEDUCT',category:'Deduction',sequence:50,method:'Percentage',base:'BASIC',value:5,expression:''}],structures:[{id:'regular',name:'Regular Salary',ruleIds:['basic','hra','meal','pf','pt','tds'],active:true},{id:'intern',name:'Intern Salary',ruleIds:['basic','meal'],active:true},{id:'statutory',name:'Indian Statutory Structure',ruleIds:['basic','hra','meal','pf','pt','tds'],active:true}],schedules:schedulesData,payruns:[],audit:[]};
  for(let m=4;m<=10;m++)for(let d=1;d<=(m===9?4:m===10?15:20);d++){const date=`2026-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;if([0,6].includes(new Date(date).getUTCDay()))continue;s.employees.forEach((e,i)=>s.attendance.push({id:`a${m}-${d}-${i}`,employeeId:e.id,date,checkIn:(i+d)%13===0?'':(i+d)%5===0?'09:22':'08:55',checkOut:(i+d)%13===0?'':(i+d)%17===0?'':'18:00',edited:false}));}
  s.employees.forEach(e=>s.allocations.push({id:'al'+e.id,employeeId:e.id,typeId:'paid',amount:20,start:'2026-01-01',end:'2026-12-31',status:'Approved'}));
  s.requests=[{id:'r1',employeeId:'e2',typeId:'paid',start:'2026-09-07',end:'2026-09-09',duration:3,reason:'Family vacation',status:'Pending'},{id:'r2',employeeId:'e4',typeId:'sick',start:'2026-09-03',end:'2026-09-03',duration:1,reason:'Medical appointment',status:'Approved'},{id:'r3',employeeId:'e8',typeId:'paid',start:'2026-09-10',end:'2026-09-11',duration:2,reason:'Personal time',status:'Pending'},{id:'r4',employeeId:'e0',typeId:'paid',start:'2026-09-01',end:'2026-09-02',duration:2,reason:'Family visit',status:'Approved'}];
@@ -121,7 +243,10 @@ export function canView(role: string | undefined | null, section: string): boole
   const r = role.trim();
   const s = section.replace(/^#/, '');
 
-  if (r === 'Admin') return true;
+  if (r === 'Admin') {
+    if (['employees', 'employee', 'admin/employees'].includes(s)) return false;
+    return true;
+  }
 
   if (r === 'HR Payroll Manager') {
     return [
