@@ -990,7 +990,6 @@ export default function Home() {
         department={department}
         setDepartment={setDepartment}
         employeeType={employeeType}
-        setEmployeeType={setEmployeeType}
         navigate={(v, id) => (id && v === 'employees' ? navigate('employee', id) : navigate(v, id))}
       />
     );

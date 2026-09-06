@@ -1,17 +1,16 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import {
   Activity,
   ArrowUpRight,
   Briefcase,
-  ChevronDown,
   ChevronRight,
   Clock3,
   FileText,
-  Search,
   Users,
   Wallet,
+  X,
 } from 'lucide-react';
 import { type Row, type Workspace, activeContract, money } from '@/lib/domain';
 import { buildDashboardSnapshot, employeeNetForPeriod } from '@/lib/dashboard-calculations';
@@ -35,18 +34,15 @@ function Metric({ label, value, sub, tone = 'plain', icon: Icon }: {
   );
 }
 
-export default function OverviewDashboard({ s, period, setPeriod, department, setDepartment, employeeType, setEmployeeType, navigate }: {
+export default function OverviewDashboard({ s, period, setPeriod, department, setDepartment, employeeType, navigate }: {
   s: Workspace;
   period: string;
   setPeriod: (value: string) => void;
   department: string;
   setDepartment: (value: string) => void;
   employeeType: string;
-  setEmployeeType: (value: string) => void;
   navigate: (view: string, id?: string) => void;
 }) {
-  const [query, setQuery] = useState('');
-  const [selectedId, setSelectedId] = useState(s.employees[0]?.id || '');
   const snapshot = useMemo(
     () => buildDashboardSnapshot(s, { period, department, employeeType }),
     [s, period, department, employeeType]
@@ -62,11 +58,7 @@ export default function OverviewDashboard({ s, period, setPeriod, department, se
     ])),
     [s, period, snapshot.activeEmployees, slipsByEmployee]
   );
-  const employees = useMemo(() => snapshot.activeEmployees.filter((employee) =>
-    !query || [employee.name, employee.department, employee.position].some((value) =>
-      String(value).toLowerCase().includes(query.toLowerCase())
-    )), [snapshot.activeEmployees, query]);
-  const selected = s.employees.find((employee) => employee.id === selectedId) || employees[0] || s.employees[0];
+  const selected = snapshot.activeEmployees[0] || s.employees[0];
   const selectedSlip = selected ? slipsByEmployee.get(selected.id) : undefined;
   const selectedPay = selected
     ? payByEmployee.get(selected.id) || employeeNetForPeriod(s, selected.id, period, selectedSlip)
@@ -87,31 +79,6 @@ export default function OverviewDashboard({ s, period, setPeriod, department, se
 
   return (
     <div className="overview-dashboard-grid">
-      <aside className="overview-roster">
-        <div className="roster-controls">
-          <div><b>Team · {employees.length}</b><label className="roster-select">{employeeType}<ChevronDown size={12} /><select aria-label="Employee type" value={employeeType} onChange={(event) => setEmployeeType(event.target.value)}><option>All</option><option>Full-time</option><option>Part-time</option><option>Intern</option><option>Contract</option></select></label></div>
-          <div>
-            <label>{niceMonth(period).replace(' 2026', '')}<input type="month" value={period} onChange={(event) => setPeriod(event.target.value)} /></label>
-            <label className="roster-select">{department}<ChevronDown size={12} /><select aria-label="Department" value={department} onChange={(event) => setDepartment(event.target.value)}><option>All</option>{[...new Set(s.employees.map((employee) => employee.department))].map((value) => <option key={value}>{value}</option>)}</select></label>
-          </div>
-          <label className="roster-search"><Search size={14} /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search employee..." /></label>
-        </div>
-        <div className="roster-list">
-          {employees.map((employee) => {
-            const slip = slipsByEmployee.get(employee.id);
-            const pay = payByEmployee.get(employee.id)?.net || 0;
-            const active = employee.id === selected?.id;
-            return (
-              <button aria-label={`Select ${employee.name}`} className={`roster-card ${active ? 'active' : ''}`} key={employee.id} onClick={() => setSelectedId(employee.id)}>
-                <div><span className="roster-avatar">{initials(employee.name)}</span><span><b>{employee.name}</b><small>{employee.department} · {employee.type}</small></span><em>Active</em></div>
-                <p><span>Net Pay</span><strong>{money(pay)}</strong></p>
-                <i><span style={{ width: `${Math.max(18, Math.min(100, pay / Math.max(snapshot.maxEarnerNet, 1) * 100))}%` }} /></i>
-              </button>
-            );
-          })}
-        </div>
-      </aside>
-
       <main className="overview-canvas">
         <div className="overview-kpis">
           <Metric label="Total net paid" value={money(snapshot.kpis.totalNet)} sub={`${snapshot.kpis.paidSlips} payslips paid`} icon={Wallet} tone="dark" />
@@ -136,18 +103,32 @@ export default function OverviewDashboard({ s, period, setPeriod, department, se
             <div className="mini-bars department-bars">
               {snapshot.departmentShare.slice(0, 6).map((row) => (
                 <button
-                  aria-label={`Filter by ${row.name}, gross salary cost ${money(row.amount)}`}
+                  aria-label={row.name === department
+                    ? `Clear ${row.name} department filter`
+                    : `Filter by ${row.name}, gross salary cost ${money(row.amount)}`}
+                  aria-pressed={row.name === department}
                   className={row.name === department ? 'selected' : ''}
                   key={row.name}
-                  onClick={() => setDepartment(row.name)}
-                  title={`${row.name}: ${money(row.amount)}`}
+                  onClick={() => setDepartment(row.name === department ? 'All' : row.name)}
+                  title={row.name === department
+                    ? `Clear ${row.name} filter`
+                    : `${row.name}: ${money(row.amount)}`}
                 >
                   <span><i style={{ height: `${Math.max(4, row.amount / maxDept * 82)}%` }} /></span>
                   <b>{row.name}</b>
                 </button>
               ))}
             </div>
-            <footer><span>â— Selected department highlighted</span><span>Values in INR (â‚¹)</span></footer>
+            <footer>
+              {department === 'All' ? (
+                <span><i aria-hidden="true" /> Selected department</span>
+              ) : (
+                <button className="dept-clear-filter" onClick={() => setDepartment('All')}>
+                  <X size={10} aria-hidden="true" /> Clear selection
+                </button>
+              )}
+              <span>Values in INR (₹)</span>
+            </footer>
           </section>
           <section className="overview-panel attendance-panel">
             <header><h2><Clock3 size={14} /> Attendance Overview</h2><button onClick={() => navigate('attendance')}>View logs <ArrowUpRight size={12} /></button></header>
