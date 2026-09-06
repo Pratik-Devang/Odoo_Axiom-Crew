@@ -50,6 +50,7 @@ import OverviewDashboard from '@/components/overview-dashboard';
 import WorkingSchedules from '@/components/working-schedules';
 import { EmployeeRosterList } from '@/components/dashboard/EmployeeRosterList';
 import { getEmployeeRosterRows } from '@/lib/dashboard-calculations';
+import { exportDashboardPdf } from '@/lib/export';
 import RecordForm, { defaults, titles } from '@/components/record-form';
 import {
   PageShell,
@@ -661,12 +662,22 @@ export default function Home() {
     {
       title: 'Payslip',
       render: (p: Row) => (
-        <button
-          className="inline-flex items-center gap-1 text-slate-900 hover:underline font-semibold cursor-pointer"
-          onClick={() => setModal({ kind: 'slip', record: p })}
-        >
-          <FileText size={14} /> View
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            className="inline-flex items-center gap-1 text-slate-900 hover:underline font-semibold cursor-pointer"
+            onClick={() => setModal({ kind: 'slip', record: p })}
+          >
+            <FileText size={14} /> View
+          </button>
+          <a
+            className="inline-flex items-center gap-1 text-amber-700 hover:underline font-semibold cursor-pointer text-xs"
+            href={`/api/payslips/${encodeURIComponent(p.id)}/pdf`}
+            download
+            title="Download PDF Payslip"
+          >
+            <Download size={13} /> PDF
+          </a>
+        </div>
       ),
     },
   ];
@@ -689,6 +700,25 @@ export default function Home() {
         p.status,
       ]),
     ]);
+  };
+
+  const exportPdfReport = async () => {
+    if (!s) return;
+    try {
+      setBusy(true);
+      const pdfBytes = await exportDashboardPdf(s, period, department, employeeType);
+      const blob = new Blob([pdfBytes as unknown as BlobPart], { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `peoplepay360-${period}.pdf`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch {
+      setError('Failed to generate PDF export.');
+    } finally {
+      setBusy(false);
+    }
   };
 
   const departments = s ? [...new Set(s.employees.map((e) => e.department))] : [];
@@ -1880,9 +1910,13 @@ export default function Home() {
           value={period}
           onChange={(e) => setPeriod(e.target.value)}
         />
-        <button className="pill-btn" onClick={exportPayroll}>
+        <button className="pill-btn cursor-pointer" onClick={exportPayroll} title="Export CSV Data">
           <Download size={14} />
-          Export
+          Export CSV
+        </button>
+        <button className="pill-btn cursor-pointer" onClick={() => void exportPdfReport()} title="Export PDF Summary Report">
+          <FileText size={14} />
+          Export PDF
         </button>
         {['Admin', 'HR Payroll Manager', 'HR Payroll User'].includes(currentUser.role) && (
           <button
@@ -2056,7 +2090,14 @@ export default function Home() {
                   ])
                 }
               >
-                <Download size={13} /> Export Payslips
+                <Download size={13} /> Export CSV
+              </button>
+              <button
+                className="pill-btn !py-1.5 cursor-pointer"
+                disabled={!run.slips.length}
+                onClick={() => void exportPdfReport()}
+              >
+                <FileText size={13} /> Export PDF Report
               </button>
               {['Admin', 'HR Payroll Manager'].includes(currentUser.role) && (
                 <button
