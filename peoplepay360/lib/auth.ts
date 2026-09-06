@@ -16,7 +16,9 @@ export function roleName(roleId: string, title?: string | null) {
 
 export function getAuthUser(request: Request): JwtPayload | null {
   const authorization = request.headers.get('authorization');
-  const bearer = authorization?.startsWith('Bearer ') ? authorization.slice(7).trim() : '';
+  const bearer = authorization?.startsWith('Bearer ')
+    ? authorization.slice(7).trim()
+    : '';
   const cookieToken = request.headers
     .get('cookie')
     ?.split(';')
@@ -28,7 +30,9 @@ export function getAuthUser(request: Request): JwtPayload | null {
   return token ? verifyJwt(token) : null;
 }
 
-export async function getActiveAuthUser(request: Request): Promise<JwtPayload | null> {
+export async function getActiveAuthUser(
+  request: Request,
+): Promise<JwtPayload | null> {
   const tokenUser = getAuthUser(request);
   if (!tokenUser) return null;
 
@@ -38,10 +42,12 @@ export async function getActiveAuthUser(request: Request): Promise<JwtPayload | 
        FROM users u
        LEFT JOIN roles r ON r.id = u.role_id
        WHERE u.id = $1 AND u.active = true`,
-      [tokenUser.id]
+      [tokenUser.id],
     );
     const user = result.rows[0];
-    if (!user) return tokenUser;
+    // Do not let a previously issued token resurrect a deleted/deactivated user.
+    // The catch below remains the explicit local-demo path when PostgreSQL is down.
+    if (!user) return null;
 
     return {
       id: user.id,
@@ -53,7 +59,17 @@ export async function getActiveAuthUser(request: Request): Promise<JwtPayload | 
       exp: tokenUser.exp,
     };
   } catch (err) {
-    console.warn('[Auth Notice]: Postgres connection unavailable, using verified JWT token payload:', err);
+    if (process.env.NODE_ENV === 'production') {
+      console.error(
+        '[Auth Error]: Unable to verify the active account in PostgreSQL:',
+        err,
+      );
+      return null;
+    }
+    console.warn(
+      '[Auth Notice]: Postgres connection unavailable, using verified JWT token payload in development:',
+      err,
+    );
     return tokenUser;
   }
 }

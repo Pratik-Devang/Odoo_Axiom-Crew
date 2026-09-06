@@ -6,7 +6,7 @@ A code-first HR and payroll prototype based on the PeoplePay360 PDF and the supp
 
 Use Node.js 22.13 or later. From this folder:
 
-```powershell
+````powershell
 npm.cmd install
 npm.cmd run db:setup
 npm.cmd run db:seed
@@ -14,12 +14,12 @@ npm.cmd run dev
 ```bash
 npm install
 npm run dev
-```
+````
 
 Open the local URL printed by the development server (normally http://localhost:3000).
 
 `npm.cmd` avoids PowerShell's script-execution restriction on `npm.ps1`. On macOS/Linux, use `npm` instead. Dependencies are already installed in this checkout; installation is needed for another machine or a fresh clone.
-The application runs directly against your local PostgreSQL database configured via `DATABASE_URL` in `.env.local` without any Cloudflare or Wrangler dependencies. Set a random `JWT_SECRET` containing at least 32 characters.
+The application runs directly against your local PostgreSQL database configured via `DATABASE_URL` in `.env.local` without any Cloudflare or Wrangler dependencies. Set a random `JWT_SECRET` containing at least 32 characters. Built-in demo credentials are used automatically only in development when PostgreSQL is unavailable; setting `ALLOW_DEMO_AUTH=true` enables them explicitly and must not be used in production.
 
 For bulk payslip email, configure `SMTP_HOST`, `SMTP_PORT`, `SMTP_FROM`, and optional `SMTP_USER`, `SMTP_PASS`, and `SMTP_SECURE`. A local MailHog server normally uses port `1025` without authentication.
 
@@ -35,7 +35,7 @@ npm.cmd run lint
 npm.cmd run build
 ```
 
-The completed implementation has **not been built or tested**, per your request. An early dashboard slice was briefly served before that instruction; the development server was stopped. A Drizzle generation attempt made before your instruction failed in the environment (`uv_os_get_passwd`). The local bootstrap SQL is included so you can initialize the prototype directly.
+The codebase is checked with TypeScript, a production build, focused domain workflow tests, API smoke checks, and the PostgreSQL migration runner. The strict lint configuration also reports the remaining UI accessibility and dynamic-record typing backlog. The local bootstrap SQL is included so you can initialize the prototype directly.
 
 ## Demo flows
 
@@ -103,7 +103,7 @@ If two sessions edit concurrently, the later stale request returns a conflict. R
 - Provides local password authentication, admin-managed user accounts and server-enforced role and employee record scopes. The seeded accounts and data are for demonstration and should be replaced before real use.
 - Payslips are generated as PDF files. Bulk delivery requires an SMTP server configured through the environment variables above.
 - Sample salary components are demonstration rules, not statutory tax or contribution logic.
-- Full-month contracts only; no partial-period wage proration.
+- A single contract may cover all or part of a payroll month; wages, overtime, and unpaid leave are prorated to the contract's effective scheduled days. Multiple contracts in one payroll month remain unsupported.
 - Day-based leave counts the employee's scheduled working days. Hourly requests must be on one scheduled working day. Leave types support automatic, manager and HR approval policies plus paid, unpaid and no-payroll-impact treatments. Approved unpaid leave creates a prorated payslip deduction.
 - Public-holiday calendars and role-specific multi-stage approval chains remain to implement.
 - Attendance is one same-day record per employee/date. No overnight shifts or multiple daily sessions. The quick widget represents the demo administrator, Nisha Rao.

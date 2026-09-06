@@ -8,8 +8,7 @@ export async function GET(request: Request) {
     }
 
     return Response.json({ user: payload });
-  } catch (err) {
+  } catch {
     return Response.json({ user: null });
   }
 }
-

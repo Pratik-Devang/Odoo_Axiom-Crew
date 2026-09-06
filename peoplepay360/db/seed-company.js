@@ -124,7 +124,7 @@ function createEmployees() {
         name = `${firstNames[(number * 17 + index * 7) % firstNames.length]} ${lastNames[(number * 23 + index * 11) % lastNames.length]}`;
         position = department.roles[Math.min(department.roles.length - 1, Math.floor((index - 1) * department.roles.length / Math.max(1, department.count - 1)))];
       }
-      let emailBase = slug(name);
+      const emailBase = slug(name);
       let email = name === 'Vikramaditya Rao' ? 'vikram.rao@oxp.example' : `${emailBase}@oxp.example`;
       let suffix = 2;
       while (usedEmails.has(email)) email = `${emailBase}${suffix++}@oxp.example`;
@@ -178,7 +178,7 @@ function timeFromMinutes(minutes) {
 }
 function createAttendance(employees) {
   const rows = [];
-  let day = dateUtc('2026-04-01');
+  const day = dateUtc('2026-04-01');
   const end = dateUtc(SNAPSHOT_DATE);
   while (day <= end) {
     const value = iso(day);
@@ -258,7 +258,7 @@ function reflectApprovedLeaveInAttendance(attendance, requests) {
 
 function workingDays(employee, start, end) {
   let count = 0;
-  let day = dateUtc(start);
+  const day = dateUtc(start);
   const last = dateUtc(end);
   while (day <= last) {
     if (scheduledOn(employee, iso(day))) count += 1;

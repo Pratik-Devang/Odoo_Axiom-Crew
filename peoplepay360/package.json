@@ -11,6 +11,7 @@
         "start": "next start",
         "lint": "oxlint",
         "format": "oxfmt",
+        "test": "tsx --test tests/*.test.ts",
         "db:generate": "drizzle-kit generate",
         "db:setup": "node db/run-migration.js",
         "db:seed": "node db/seed-company.js",
@@ -27,7 +28,7 @@
         "embla-carousel-react": "8.5.2",
         "input-otp": "1.4.2",
         "lucide-react": "1.31.0",
-        "next": "16.0.10",
+        "next": "16.3.4",
         "nodemailer": "^10.0.0",
         "pdf-lib": "^1.17.1",
         "pg": "^8.16.3",
@@ -52,6 +53,7 @@
         "oxlint": "1.76.0",
         "oxlint-tsgolint": "7.0.2001",
         "tailwindcss": "4.2.1",
+        "tsx": "4.23.13",
         "typescript": "5.9.3"
     },
     "type": "module"

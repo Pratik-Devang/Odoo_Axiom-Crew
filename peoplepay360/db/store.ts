@@ -693,43 +693,11 @@ function getMemoryWorkspace(): Workspace {
 export async function readWorkspace(
   options: WorkspaceReadOptions = {},
 ): Promise<{ data: Workspace; revision: number }> {
+  let pool: Pool;
+  let client: PoolClient;
   try {
-    const pool = getPgPool();
-    const client = await pool.connect();
-    try {
-      let workspaceRow = await client.query<{ revision: number }>(
-        'SELECT revision FROM workspace WHERE id = $1',
-        ['demo'],
-      );
-      await ensureSchema(client);
-
-      if (!workspaceRow.rows[0]) {
-        const employeeCount = await client.query<{ count: string }>(
-          'SELECT COUNT(*)::text AS count FROM employees',
-        );
-
-        if (Number(employeeCount.rows[0]?.count || 0) === 0) {
-          await syncRelational(client, seed());
-        }
-
-        const current = await readRelational(pool);
-        await client.query(
-          'INSERT INTO workspace (id, data, revision) VALUES ($1, $2, 0) ON CONFLICT (id) DO NOTHING',
-          ['demo', JSON.stringify(current)],
-        );
-        workspaceRow = await client.query<{ revision: number }>(
-          'SELECT revision FROM workspace WHERE id = $1',
-          ['demo'],
-        );
-      }
-
-      const data = await readRelational(pool, options);
-      if (!options.attendancePeriod) memoryWorkspace = data;
-      memoryRevision = Number(workspaceRow.rows[0]?.revision || 0);
-      return { data, revision: memoryRevision };
-    } finally {
-      client.release();
-    }
+    pool = getPgPool();
+    client = await pool.connect();
   } catch (err) {
     console.warn(
       '[DB Notice]: Postgres unavailable, using demo seed fallback:',
@@ -748,47 +716,85 @@ export async function readWorkspace(
       revision: memoryRevision,
     };
   }
+
+  try {
+    await ensureSchema(client);
+    let workspaceRow = await client.query<{ revision: number }>(
+      'SELECT revision FROM workspace WHERE id = $1',
+      ['demo'],
+    );
+
+    if (!workspaceRow.rows[0]) {
+      const employeeCount = await client.query<{ count: string }>(
+        'SELECT COUNT(*)::text AS count FROM employees',
+      );
+
+      if (Number(employeeCount.rows[0]?.count || 0) === 0) {
+        await syncRelational(client, seed());
+      }
+
+      const current = await readRelational(pool);
+      await client.query(
+        'INSERT INTO workspace (id, data, revision) VALUES ($1, $2, 0) ON CONFLICT (id) DO NOTHING',
+        ['demo', JSON.stringify(current)],
+      );
+      workspaceRow = await client.query<{ revision: number }>(
+        'SELECT revision FROM workspace WHERE id = $1',
+        ['demo'],
+      );
+    }
+
+    const data = await readRelational(pool, options);
+    if (!options.attendancePeriod) memoryWorkspace = data;
+    memoryRevision = Number(workspaceRow.rows[0]?.revision || 0);
+    return { data, revision: memoryRevision };
+  } finally {
+    client.release();
+  }
 }
 
 export async function writeWorkspace(data: unknown, revision: number) {
   const workspaceData = data as Workspace;
   const serialized = typeof data === 'string' ? data : JSON.stringify(data);
 
+  let client: PoolClient;
   try {
     const pool = getPgPool();
-    const client = await pool.connect();
-    try {
-      await client.query('BEGIN');
-
-      const result = await client.query(
-        'UPDATE workspace SET data = $1, revision = revision + 1 WHERE id = $2 AND revision = $3 RETURNING revision',
-        [serialized, 'demo', revision],
-      );
-
-      if ((result.rowCount ?? 0) === 0) {
-        await client.query('ROLLBACK');
-        return { meta: { changes: 0 } };
-      }
-
-      await syncRelational(client, workspaceData);
-      await client.query('COMMIT');
-
-      memoryWorkspace = workspaceData;
-      memoryRevision = revision + 1;
-      return { meta: { changes: 1 } };
-    } catch (err) {
-      await client.query('ROLLBACK');
-      throw err;
-    } finally {
-      client.release();
-    }
+    client = await pool.connect();
   } catch (err) {
     console.warn(
       '[DB Notice]: Postgres unavailable, persisting changes in-memory:',
       err,
     );
-    memoryWorkspace = workspaceData;
+    if (revision !== memoryRevision) return { meta: { changes: 0 } };
+    memoryWorkspace = structuredClone(workspaceData);
     memoryRevision = revision + 1;
     return { meta: { changes: 1 } };
+  }
+
+  try {
+    await client.query('BEGIN');
+
+    const result = await client.query(
+      'UPDATE workspace SET data = $1, revision = revision + 1 WHERE id = $2 AND revision = $3 RETURNING revision',
+      [serialized, 'demo', revision],
+    );
+
+    if ((result.rowCount ?? 0) === 0) {
+      await client.query('ROLLBACK');
+      return { meta: { changes: 0 } };
+    }
+
+    await syncRelational(client, workspaceData);
+    await client.query('COMMIT');
+
+    memoryWorkspace = structuredClone(workspaceData);
+    memoryRevision = revision + 1;
+    return { meta: { changes: 1 } };
+  } catch (err) {
+    await client.query('ROLLBACK');
+    throw err;
+  } finally {
+    client.release();
   }
 }
