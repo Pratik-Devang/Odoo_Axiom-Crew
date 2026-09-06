@@ -24,6 +24,9 @@ import {
   Key,
   Mail,
   ChevronRight,
+  Eye,
+  EyeOff,
+  Lock,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -258,6 +261,7 @@ export default function Home() {
     scheduleId: 'sch1',
     bank: '',
   });
+  const [showUserPassword, setShowUserPassword] = useState(false);
 
   const checkAuth = useCallback(async () => {
     try {
@@ -2895,14 +2899,37 @@ export default function Home() {
               </div>
 
               <Field label={userFormData.id ? 'Password (leave blank to keep current)' : 'Account Password'}>
-                <Input
-                  type="password"
-                  required={!userFormData.id}
-                  value={userFormData.password}
-                  onChange={(e) => setUserFormData({ ...userFormData, password: e.target.value })}
-                  placeholder={userFormData.id ? '••••••••' : 'Enter password'}
-                  className="h-9 rounded-xl"
-                />
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                    <Lock size={15} />
+                  </div>
+                  <Input
+                    type={showUserPassword ? 'text' : 'password'}
+                    required={!userFormData.id}
+                    value={userFormData.password}
+                    onChange={(e) => setUserFormData({ ...userFormData, password: e.target.value })}
+                    placeholder={userFormData.id ? 'Leave blank to keep unchanged' : 'Enter secure password (min 8 characters)'}
+                    autoComplete="new-password"
+                    className="h-10 rounded-xl pl-9 pr-10 font-mono text-xs bg-slate-50/50 focus:bg-white transition-colors"
+                  />
+                  <button
+                    type="button"
+                    tabIndex={-1}
+                    onClick={() => setShowUserPassword(!showUserPassword)}
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
+                    title={showUserPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showUserPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
+                </div>
+                <div className="flex items-center justify-between text-[11px] text-slate-400 mt-1 px-1">
+                  <span>Minimum 8 characters</span>
+                  {userFormData.password ? (
+                    <span className={userFormData.password.length >= 8 ? 'text-emerald-600 font-semibold' : 'text-amber-600 font-semibold'}>
+                      {userFormData.password.length >= 8 ? '✓ Secure password' : `${userFormData.password.length}/8 characters`}
+                    </span>
+                  ) : null}
+                </div>
               </Field>
 
               <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-slate-700">

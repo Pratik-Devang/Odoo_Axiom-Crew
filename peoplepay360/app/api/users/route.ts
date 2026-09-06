@@ -168,7 +168,7 @@ export async function POST(request: Request) {
           `UPDATE users
            SET name = $1, email = $2, role_id = $3, employee_id = $4, active = $5
            WHERE id = $6`,
-          [name.trim(), email.trim().toLowerCase(), roleId, targetEmpId, id]
+          [name.trim(), email.trim().toLowerCase(), roleId, targetEmpId, active, id]
         );
       }
     } else {
