@@ -373,7 +373,11 @@ export function buildDashboardSnapshot(
     s,
     filteredEmployeeIds,
     filters.period,
+<<<<<<< HEAD
     12,
+=======
+    6,
+>>>>>>> f00691d7551c679eb78c2451d43fa3f00da45a1e
     getPay,
   );
   const prevMonthNet = trend[trend.length - 2]?.value || totalNet;
