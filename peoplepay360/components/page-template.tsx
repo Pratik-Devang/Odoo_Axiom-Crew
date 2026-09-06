@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { canView, type AppUser } from '@/lib/domain';
-import { LogOut, Shield, UserCog } from 'lucide-react';
+import { LogOut, Shield, Power, UserCog } from 'lucide-react';
 
 /* ─────────────────────────────────────────────────────────
    1. TYPES
@@ -204,14 +204,21 @@ export function PageShell({
 
         {/* Right Action Utility Buttons */}
         <div className="workora-top-actions items-center gap-2">
-          {(!currentUser || currentUser.employeeId || isOverview) && (
+          {onClockClick && (
             <button
-              className={`circle-btn ${isCheckedIn ? 'clock-active' : ''}`}
-              title={isCheckedIn ? 'Checked in · Live Shift' : 'Attendance check-in'}
-              aria-label="Attendance check-in"
+              className={`circle-btn relative transition-colors cursor-pointer ${
+                isCheckedIn ? 'bg-emerald-50 border-emerald-300 text-emerald-700' : ''
+              }`}
+              title={isCheckedIn ? 'Checked in · Live shift' : 'Attendance Check In / Out'}
+              aria-label="Attendance"
               onClick={onClockClick}
             >
-              <Clock3 size={17} />
+              <Power size={15} />
+              <span
+                className={`absolute top-1.5 right-1.5 size-2 rounded-full ring-2 ring-white transition-colors ${
+                  isCheckedIn ? 'bg-emerald-500 animate-pulse' : 'bg-rose-400'
+                }`}
+              />
             </button>
           )}
           <button

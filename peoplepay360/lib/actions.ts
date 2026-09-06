@@ -1,3 +1,4 @@
+
 import {
   type Workspace,
   type Row,
@@ -614,25 +615,33 @@ export function mutate(
     );
     if (a?.checkOut)
       throw new Error(
-        'Attendance for today is complete. Use Attendance to review it.',
+        'Attendance for today is complete. Use Attendance module to review records.',
       );
+    const sched = employeeSchedule(s, p.employeeId, dateValue);
+    const exp = scheduleRowForDate(sched, dateValue)?.start || '09:00';
     if (a?.checkIn) {
-      requireThat(
-        timeValue > a.checkIn,
-        'Please wait until the next minute to check out.',
-      );
       a.checkOut = timeValue;
+      const inM = +a.checkIn.slice(0, 2) * 60 + +a.checkIn.slice(3);
+      const outM = +timeValue.slice(0, 2) * 60 + +timeValue.slice(3);
+      const diff = Math.max(0, outM - inM);
+      a.workedHours = round(diff / 60);
+      a.status = 'Completed';
     } else if (a) {
       a.checkIn = timeValue;
-    } else
+      a.workedHours = 0;
+      a.status = timeValue > exp ? 'Late' : 'Present';
+    } else {
       s.attendance.push({
         id: uid(),
         employeeId: p.employeeId,
         date: dateValue,
         checkIn: timeValue,
         checkOut: '',
+        workedHours: 0,
+        status: timeValue > exp ? 'Late' : 'Present',
         edited: false,
       });
+    }
   } else throw new Error('Unknown action.');
   s.audit.unshift({ id: uid(), action, at: new Date().toISOString(), actor });
   s.audit = s.audit.slice(0, 100);
