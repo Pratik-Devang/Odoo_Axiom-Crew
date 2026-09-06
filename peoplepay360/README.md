@@ -100,7 +100,7 @@ If two sessions edit concurrently, the later stale request returns a conflict. R
 
 ## Current boundaries
 
-- Provides local password authentication, admin-managed user accounts and server-enforced role and employee record scopes. The seeded accounts and data are for demonstration and should be replaced before real use.
+- Provides local password authentication, admin-managed user accounts and server-enforced role and employee record scopes. Admins assign each employee to one HR manager from the user editor; HR managers can only view and change records for their assigned team. The seeded accounts and data are for demonstration and should be replaced before real use.
 - Payslips are generated as PDF files. Bulk delivery requires an SMTP server configured through the environment variables above.
 - Sample salary components are demonstration rules, not statutory tax or contribution logic.
 - A single contract may cover all or part of a payroll month; wages, overtime, and unpaid leave are prorated to the contract's effective scheduled days. Multiple contracts in one payroll month remain unsupported.

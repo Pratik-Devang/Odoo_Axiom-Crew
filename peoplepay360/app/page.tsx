@@ -107,6 +107,7 @@ type SystemUser = {
   roleName?: string;
   employeeId?: string;
   active?: boolean;
+  assignedEmployeeIds?: string[];
 };
 
 type PayrunCreatePayload = {
@@ -257,6 +258,7 @@ export default function Home() {
     location: 'Mumbai',
     scheduleId: 'sch1',
     bank: '',
+    assignedEmployeeIds: [],
   });
 
   const checkAuth = useCallback(async () => {
@@ -1031,7 +1033,7 @@ export default function Home() {
           <Download size={14} />
           Export
         </button>
-        {['Admin', 'HR Manager'].includes(currentUser.role) && (
+        {currentUser.role === 'Admin' && (
           <button className="pill-btn pill-btn-black" onClick={() => openForm('employees')}>
             <Plus size={14} />
             New Employee
@@ -1609,19 +1611,21 @@ export default function Home() {
             </button>
           </div>
         )}
-        <button
-          className="pill-btn pill-btn-black"
-          onClick={() => {
-            if (currentUser.role === 'Employee') {
-              openForm('requests', defaults('requests', s, currentUser.employeeId));
-            } else {
-              openForm(view);
-            }
-          }}
-        >
-          <Plus size={14} />
-          {view === 'requests' ? 'New Request' : view === 'allocations' ? 'New Allocation' : 'New Policy'}
-        </button>
+        {(view !== 'leaveTypes' || currentUser.role !== 'HR Manager') && (
+          <button
+            className="pill-btn pill-btn-black"
+            onClick={() => {
+              if (currentUser.role === 'Employee') {
+                openForm('requests', defaults('requests', s, currentUser.employeeId));
+              } else {
+                openForm(view);
+              }
+            }}
+          >
+            <Plus size={14} />
+            {view === 'requests' ? 'New Request' : view === 'allocations' ? 'New Allocation' : 'New Policy'}
+          </button>
+        )}
       </>
     );
 
@@ -2304,6 +2308,7 @@ export default function Home() {
               location: 'Mumbai',
               scheduleId: 'sch1',
               bank: '',
+              assignedEmployeeIds: [],
             });
             setModal({ kind: 'userForm' });
           }}
@@ -2729,6 +2734,7 @@ export default function Home() {
                       location: targetUser.location || 'Mumbai',
                       scheduleId: targetUser.scheduleId || 'sch1',
                       bank: targetUser.bank || '',
+                      assignedEmployeeIds: targetUser.assignedEmployeeIds || [],
                     });
                     setModal({ kind: 'userForm' });
                   }}
@@ -2827,7 +2833,11 @@ export default function Home() {
                     return (
                       <label
                         key={roleOption.id}
-                        onClick={() => setUserFormData({ ...userFormData, roleId: roleOption.id })}
+                        onClick={() => setUserFormData({
+                          ...userFormData,
+                          roleId: roleOption.id,
+                          assignedEmployeeIds: roleOption.id === 'hr_manager' ? userFormData.assignedEmployeeIds || [] : [],
+                        })}
                         className={`flex items-start gap-2.5 p-2.5 rounded-xl border cursor-pointer transition-all ${
                           isSelected
                             ? 'bg-amber-50/80 border-[#c99a2e] text-slate-900 shadow-2xs'
@@ -2839,7 +2849,11 @@ export default function Home() {
                           name="userRoleId"
                           value={roleOption.id}
                           checked={isSelected}
-                          onChange={() => setUserFormData({ ...userFormData, roleId: roleOption.id })}
+                          onChange={() => setUserFormData({
+                            ...userFormData,
+                            roleId: roleOption.id,
+                            assignedEmployeeIds: roleOption.id === 'hr_manager' ? userFormData.assignedEmployeeIds || [] : [],
+                          })}
                           className="mt-0.5 accent-[#c99a2e] cursor-pointer"
                         />
                         <div className="flex flex-col text-left">
@@ -2851,6 +2865,50 @@ export default function Home() {
                   })}
                 </div>
               </Field>
+
+              {userFormData.roleId === 'hr_manager' && s && (
+                <Field label="Assigned employees">
+                  <div className="rounded-xl border border-slate-200 bg-slate-50/50 overflow-hidden">
+                    <div className="px-3 py-2 border-b border-slate-200 text-[11px] text-slate-500">
+                      This manager will only see and manage the selected employees. Selecting an employee already assigned elsewhere transfers them to this manager.
+                    </div>
+                    <div className="max-h-52 overflow-y-auto p-2 grid grid-cols-1 sm:grid-cols-2 gap-1">
+                      {s.employees
+                        .filter((employee) => employee.id !== userFormData.employeeId)
+                        .sort((a, b) => a.name.localeCompare(b.name))
+                        .map((employee) => {
+                          const selected = (userFormData.assignedEmployeeIds || []).includes(employee.id);
+                          return (
+                            <label
+                              key={employee.id}
+                              className={`flex items-center gap-2 rounded-lg px-2 py-1.5 cursor-pointer text-xs ${selected ? 'bg-amber-50 text-slate-900' : 'hover:bg-white text-slate-700'}`}
+                            >
+                              <Checkbox
+                                checked={selected}
+                                onCheckedChange={(checked) => {
+                                  const current = userFormData.assignedEmployeeIds || [];
+                                  setUserFormData({
+                                    ...userFormData,
+                                    assignedEmployeeIds: checked
+                                      ? [...current, employee.id]
+                                      : current.filter((id: string) => id !== employee.id),
+                                  });
+                                }}
+                              />
+                              <span className="min-w-0">
+                                <span className="font-semibold block truncate">{employee.name}</span>
+                                <span className="text-[10px] text-slate-400 block truncate">{employee.department} · {employee.position}</span>
+                              </span>
+                            </label>
+                          );
+                        })}
+                    </div>
+                    <div className="px-3 py-2 border-t border-slate-200 text-[11px] font-semibold text-slate-600">
+                      {(userFormData.assignedEmployeeIds || []).length} employee{(userFormData.assignedEmployeeIds || []).length === 1 ? '' : 's'} assigned
+                    </div>
+                  </div>
+                </Field>
+              )}
 
               <div className="grid grid-cols-2 gap-3">
                 <Field label="Department">
