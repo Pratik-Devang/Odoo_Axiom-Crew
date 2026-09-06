@@ -49,12 +49,23 @@ export async function getActiveAuthUser(
     // The catch below remains the explicit local-demo path when PostgreSQL is down.
     if (!user) return null;
 
+    let assignedEmployeeIds: string[] | undefined;
+    if (roleName(user.role_id, user.role_title) === 'HR Manager') {
+      const assignments = await getPgPool().query(
+        `SELECT employee_id FROM manager_employee_assignments
+         WHERE manager_user_id = $1 ORDER BY employee_id`,
+        [user.id],
+      );
+      assignedEmployeeIds = assignments.rows.map((row) => row.employee_id);
+    }
+
     return {
       id: user.id,
       name: user.name,
       email: user.email,
       role: roleName(user.role_id, user.role_title),
       employeeId: user.employee_id || undefined,
+      assignedEmployeeIds,
       iat: tokenUser.iat,
       exp: tokenUser.exp,
     };

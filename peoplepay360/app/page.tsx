@@ -62,6 +62,7 @@ import {
   DocChip,
 } from '@/components/page-template';
 import { StatusBadge } from '@/components/ui/status-badge';
+import ManagerAssignments, { type AssignmentManager } from '@/components/manager-assignments';
 
 function initials(name: string) {
   return (
@@ -107,6 +108,15 @@ type SystemUser = {
   roleName?: string;
   employeeId?: string;
   active?: boolean;
+  department?: string;
+  position?: string;
+  phone?: string;
+  type?: string;
+  manager?: string;
+  location?: string;
+  scheduleId?: string;
+  bank?: string;
+  assignedEmployeeIds?: string[];
 };
 
 type PayrunCreatePayload = {
@@ -236,7 +246,7 @@ export default function Home() {
   const [loginSearch, setLoginSearch] = useState('');
 
   // Admin users state & unified view options
-  const [systemUsers, setSystemUsers] = useState<any[]>([]);
+  const [systemUsers, setSystemUsers] = useState<SystemUser[]>([]);
   const [systemRoles, setSystemRoles] = useState<any[]>([]);
   const [userViewMode, setUserViewMode] = useState<'grid' | 'list'>('list');
   const [userRoleFilter, setUserRoleFilter] = useState<string>('All');
@@ -257,6 +267,7 @@ export default function Home() {
     location: 'Mumbai',
     scheduleId: 'sch1',
     bank: '',
+    assignedEmployeeIds: [],
   });
 
   const checkAuth = useCallback(async () => {
@@ -362,6 +373,29 @@ export default function Home() {
     }
   }
 
+  async function handleSaveAssignments(manager: AssignmentManager, employeeIds: string[]) {
+    setBusy(true);
+    setError('');
+    setMessage('');
+    try {
+      const response = await fetch('/api/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...manager, password: '', assignedEmployeeIds: employeeIds }),
+      });
+      const body = await readApiResponse(response);
+      if (!response.ok) throw new Error(responseError(body, 'Failed to save assignments.'));
+      await loadUsers();
+      setMessage(`${manager.name}'s team assignments were updated.`);
+      return true;
+    } catch (err: unknown) {
+      setError(errorMessage(err, 'Unable to save assignments.'));
+      return false;
+    } finally {
+      setBusy(false);
+    }
+  }
+
   const load = useCallback(async () => {
     try {
       setError('');
@@ -401,6 +435,8 @@ export default function Home() {
       let v = vRaw;
       if (v === 'admin' && id === 'users') {
         v = 'users';
+      } else if (v === 'admin' && id === 'assignments' && currentUser?.role === 'Admin') {
+        v = 'assignments';
       } else if (v.startsWith('payroll/')) {
         v = v.replace('payroll/', '');
         if (v === 'dashboard') v = 'overview';
@@ -409,7 +445,11 @@ export default function Home() {
       } else if ((v === 'employees' || v === 'employee' || v === 'admin/employees') && currentUser?.role === 'Admin') {
         v = 'users';
       }
-      if (v && (titles[v] || v === 'overview' || v === 'employee' || v === 'run' || v === 'users' || v === 'schedules')) {
+      if (
+        v &&
+        (titles[v] || v === 'overview' || v === 'employee' || v === 'run' || v === 'users' || v === 'assignments' || v === 'schedules') &&
+        (v !== 'assignments' || currentUser?.role === 'Admin')
+      ) {
         setView(v);
         setActiveId(decodeURIComponent(id || ''));
         setFilterId('');
@@ -422,6 +462,9 @@ export default function Home() {
 
   function navigate(v: string, id?: string) {
     let resolvedView = v;
+    if (resolvedView === 'assignments' && currentUser?.role !== 'Admin') {
+      resolvedView = defaultRouteForRole(currentUser?.role || '');
+    }
     if ((resolvedView === 'employees' || resolvedView === 'employee' || resolvedView === 'admin/employees') && currentUser?.role === 'Admin') {
       resolvedView = 'users';
     }
@@ -449,7 +492,7 @@ export default function Home() {
     setModal(null);
     setError('');
     setMessage('');
-    const targetHash = resolvedView === 'users' ? 'admin/users' : resolvedView === 'overview' ? 'payroll/dashboard' : resolvedView;
+    const targetHash = resolvedView === 'users' ? 'admin/users' : resolvedView === 'assignments' ? 'admin/assignments' : resolvedView === 'overview' ? 'payroll/dashboard' : resolvedView;
     window.history.replaceState(null, '', '#' + targetHash + (resolvedId ? '/' + encodeURIComponent(resolvedId) : ''));
   }
 
@@ -646,6 +689,11 @@ export default function Home() {
     ]);
   };
 
+<<<<<<< HEAD
+=======
+  const departments = s ? [...new Set(s.employees.map((e) => e.department))] : [];
+
+>>>>>>> a535fb6d791859860561793b0c8675588eaa9cbe
   /* ---------------------------------------------------------
      LOGIN SCREEN (Crextio Design System)
      --------------------------------------------------------- */
@@ -2299,6 +2347,7 @@ export default function Home() {
               location: 'Mumbai',
               scheduleId: 'sch1',
               bank: '',
+              assignedEmployeeIds: [],
             });
             setModal({ kind: 'userForm' });
           }}
@@ -2411,6 +2460,21 @@ export default function Home() {
             ),
           },
         ]}
+      />
+    );
+  } else if (view === 'assignments') {
+    pageTitle = 'Manager Assignments';
+    headerActions = (
+      <button className="pill-btn" onClick={() => navigate('users')}>
+        <Users size={14} /> Manage user accounts
+      </button>
+    );
+    centerContent = (
+      <ManagerAssignments
+        managers={systemUsers.filter((user) => user.roleId === 'hr_manager')}
+        employees={s.employees}
+        busy={busy}
+        onSave={handleSaveAssignments}
       />
     );
   }
@@ -2724,6 +2788,7 @@ export default function Home() {
                       location: targetUser.location || 'Mumbai',
                       scheduleId: targetUser.scheduleId || 'sch1',
                       bank: targetUser.bank || '',
+                      assignedEmployeeIds: targetUser.assignedEmployeeIds || [],
                     });
                     setModal({ kind: 'userForm' });
                   }}

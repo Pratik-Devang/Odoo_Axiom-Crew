@@ -13,6 +13,7 @@ export interface JwtPayload {
   email: string;
   role: string;
   employeeId?: string;
+  assignedEmployeeIds?: string[];
   exp?: number;
   iat?: number;
 }

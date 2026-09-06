@@ -28,11 +28,17 @@ function curvedPath(points: Array<{ x: number; y: number }>) {
     const following = points[Math.min(points.length - 1, index + 2)];
     const minY = Math.min(current.y, next.y);
     const maxY = Math.max(current.y, next.y);
+<<<<<<< HEAD
     const cp1x = current.x + (next.x - previous.x) / 6;
     const cp2x = next.x - (following.x - current.x) / 6;
     const cp1y = clamp(current.y + (next.y - previous.y) / 6, minY, maxY);
     const cp2y = clamp(next.y - (following.y - current.y) / 6, minY, maxY);
     path += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${next.x} ${next.y}`;
+=======
+    const cp1y = Math.min(Math.max(current.y + (next.y - previous.y) / 6, minY), maxY);
+    const cp2y = Math.min(Math.max(next.y - (following.y - current.y) / 6, minY), maxY);
+    path += ` C ${current.x + (next.x - previous.x) / 6} ${cp1y}, ${next.x - (following.x - current.x) / 6} ${cp2y}, ${next.x} ${next.y}`;
+>>>>>>> a535fb6d791859860561793b0c8675588eaa9cbe
   }
   return path;
 }

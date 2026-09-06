@@ -55,6 +55,19 @@ export const users = pgTable('users', {
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
 });
 
+export const managerEmployeeAssignments = pgTable(
+  'manager_employee_assignments',
+  {
+    managerUserId: text('manager_user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+    employeeId: text('employee_id').notNull().references(() => employees.id, { onDelete: 'cascade' }),
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.managerUserId, table.employeeId] }),
+    uniqueIndex('uq_manager_assignment_employee').on(table.employeeId),
+  ],
+);
+
 // 5. Salary Structures
 export const salaryStructures = pgTable('salary_structures', {
   id: text('id').primaryKey(),

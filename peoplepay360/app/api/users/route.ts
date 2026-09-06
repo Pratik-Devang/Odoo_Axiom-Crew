@@ -20,6 +20,7 @@ const DEFAULT_DEMO_USERS = [
     location: 'Mumbai',
     scheduleId: 'sch1',
     bank: 'DEMO-1000',
+    assignedEmployeeIds: [],
   },
   {
     id: 'u_payroll',
@@ -37,6 +38,7 @@ const DEFAULT_DEMO_USERS = [
     location: 'Mumbai',
     scheduleId: 'sch1',
     bank: 'DEMO-1001',
+    assignedEmployeeIds: [],
   },
   {
     id: 'u_user',
@@ -54,6 +56,7 @@ const DEFAULT_DEMO_USERS = [
     location: 'Mumbai',
     scheduleId: 'sch1',
     bank: 'DEMO-1002',
+    assignedEmployeeIds: [],
   },
   {
     id: 'u_hrmanager',
@@ -71,6 +74,7 @@ const DEFAULT_DEMO_USERS = [
     location: 'Mumbai',
     scheduleId: 'sch1',
     bank: 'DEMO-1003',
+    assignedEmployeeIds: ['e2'],
   },
   {
     id: 'u_employee',
@@ -89,6 +93,7 @@ const DEFAULT_DEMO_USERS = [
     location: 'Mumbai',
     scheduleId: 'sch1',
     bank: 'DEMO-1004',
+    assignedEmployeeIds: [],
   },
 ];
 
@@ -136,7 +141,13 @@ export async function GET(request: Request) {
         `SELECT u.id, u.name, u.email, u.role_id AS "roleId", u.employee_id AS "employeeId",
                 u.active, COALESCE(r.name, u.role_id) AS "roleName",
                 e.department, e.position, e.phone, e.type, e.status AS "employeeStatus",
-                e.manager, e.location, e.schedule_id AS "scheduleId", e.bank
+                e.manager, e.location, e.schedule_id AS "scheduleId", e.bank,
+                COALESCE((
+                  SELECT array_agg(mea.employee_id ORDER BY assigned_employee.name)
+                  FROM manager_employee_assignments mea
+                  JOIN employees assigned_employee ON assigned_employee.id = mea.employee_id
+                  WHERE mea.manager_user_id = u.id
+                ), ARRAY[]::text[]) AS "assignedEmployeeIds"
          FROM users u
          LEFT JOIN roles r ON r.id = u.role_id
          LEFT JOIN employees e ON e.id = u.employee_id
@@ -208,6 +219,7 @@ export async function POST(request: Request) {
       location?: string;
       scheduleId?: string;
       bank?: string;
+      assignedEmployeeIds?: string[];
     };
 
     const {
@@ -226,6 +238,7 @@ export async function POST(request: Request) {
       location = 'Mumbai',
       scheduleId = 'sch1',
       bank = '',
+      assignedEmployeeIds = [],
     } = body;
 
     const normalizedEmail = email?.trim().toLowerCase();
@@ -250,6 +263,16 @@ export async function POST(request: Request) {
         { status: 400 },
       );
     }
+    if (
+      !Array.isArray(assignedEmployeeIds) ||
+      assignedEmployeeIds.length > 5000 ||
+      assignedEmployeeIds.some((value) => typeof value !== 'string' || !value)
+    ) {
+      return Response.json(
+        { error: 'Assigned employees must be a valid list.' },
+        { status: 400 },
+      );
+    }
 
     const client = await getPgPool().connect();
     try {
@@ -259,6 +282,22 @@ export async function POST(request: Request) {
         [roleId],
       );
       if (!roleResult.rowCount) throw new Error('Select a valid role.');
+
+      const uniqueAssignedEmployeeIds = [...new Set(assignedEmployeeIds)];
+      if (roleId !== 'hr_manager' && uniqueAssignedEmployeeIds.length) {
+        throw new Error('Employees can only be assigned to an HR Manager account.');
+      }
+      if (uniqueAssignedEmployeeIds.length) {
+        const employeeResult = await client.query(
+          'SELECT id FROM employees WHERE id = ANY($1::text[])',
+          [uniqueAssignedEmployeeIds],
+        );
+        if (employeeResult.rowCount !== uniqueAssignedEmployeeIds.length) {
+          throw new Error('One or more assigned employees no longer exist.');
+        }
+      }
+
+      let targetUserId = id;
 
       if (id) {
         const currentRes = await client.query(
@@ -334,6 +373,7 @@ export async function POST(request: Request) {
         }
       } else {
         const newUserId = `u_${crypto.randomUUID()}`;
+        targetUserId = newUserId;
         const newEmpId = `e_${crypto.randomUUID()}`;
         const initialPassword = hashPassword(password!.trim());
 
@@ -367,6 +407,24 @@ export async function POST(request: Request) {
             initialPassword,
             active,
           ],
+        );
+      }
+
+      await client.query(
+        'DELETE FROM manager_employee_assignments WHERE manager_user_id = $1',
+        [targetUserId],
+      );
+      if (roleId === 'hr_manager' && uniqueAssignedEmployeeIds.length) {
+        // An employee belongs to one manager. Selecting them here transfers
+        // responsibility from any previous manager in the same transaction.
+        await client.query(
+          'DELETE FROM manager_employee_assignments WHERE employee_id = ANY($1::text[])',
+          [uniqueAssignedEmployeeIds],
+        );
+        await client.query(
+          `INSERT INTO manager_employee_assignments (manager_user_id, employee_id)
+           SELECT $1, unnest($2::text[])`,
+          [targetUserId, uniqueAssignedEmployeeIds],
         );
       }
 
