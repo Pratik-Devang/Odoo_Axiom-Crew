@@ -407,7 +407,6 @@ export async function POST(request: Request) {
             initialPassword,
             active,
           ],
->>>>>>> origin/integration
         );
       }
 

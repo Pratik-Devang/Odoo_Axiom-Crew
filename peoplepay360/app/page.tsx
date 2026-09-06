@@ -479,7 +479,6 @@ export default function Home() {
     let resolvedId = id || '';
     let newQuery = '';
 
-    let targetFilterId = '';
     if (resolvedId.startsWith('dept:')) {
       const deptName = resolvedId.replace('dept:', '');
       setDepartment(deptName);
@@ -492,14 +491,11 @@ export default function Home() {
     } else if (resolvedId.startsWith('period:')) {
       setPeriod(resolvedId.replace('period:', ''));
       resolvedId = '';
-    } else if (resolvedView === 'attendance' && resolvedId) {
-      targetFilterId = resolvedId;
-      resolvedId = '';
     }
 
     setView(resolvedView);
     setActiveId(resolvedId);
-    setFilterId(targetFilterId);
+    setFilterId('');
     setQuery(newQuery);
     setModal(null);
     setError('');
@@ -711,11 +707,7 @@ export default function Home() {
     ]);
   };
 
-<<<<<<< HEAD
-=======
   const departments = s ? [...new Set(s.employees.map((e) => e.department))] : [];
-
->>>>>>> a535fb6d791859860561793b0c8675588eaa9cbe
   /* ---------------------------------------------------------
      LOGIN SCREEN (Crextio Design System)
      --------------------------------------------------------- */
@@ -1240,26 +1232,9 @@ export default function Home() {
               meta={`${sched?.start || '09:00'} - ${sched?.end || '18:00'}`}
               onClick={() => navigate('schedules')}
             />
-            <DocChip
-              name="Shift Attendance Logs"
-              meta={`${att.length} shifts this month`}
-              onClick={() => related('attendance', activeEmp.id)}
-            />
           </DetailSection>
 
           <DetailSection title="STATISTICS">
-            <div
-              className="cursor-pointer group"
-              onClick={() => related('attendance', activeEmp.id)}
-              title="Click to view shift attendance records"
-            >
-              <StatBar
-                label="Shift Attendance Rate"
-                value={attRate}
-                displayValue={`${attRate}%`}
-                variant={attRate >= 80 ? 'gold' : 'dark'}
-              />
-            </div>
             <StatBar
               label="Shift Attendance Rate"
               value={attRate}
@@ -1289,13 +1264,6 @@ export default function Home() {
               >
                 <FileText className="size-3.5 text-slate-500" />
                 <span className="doc-chip-name">View Contract Terms</span>
-              </button>
-              <button
-                className="doc-chip hover:bg-[#ede7de] transition-colors cursor-pointer"
-                onClick={() => related('attendance', activeEmp.id)}
-              >
-                <Clock3 className="size-3.5 text-slate-500" />
-                <span className="doc-chip-name">Shift Attendance Records</span>
               </button>
               <button
                 className="doc-chip hover:bg-[#ede7de] transition-colors cursor-pointer"
@@ -1564,7 +1532,6 @@ export default function Home() {
 
     const filteredAttendance = baseAttendance
       .filter((a) => {
-        const matchesEmpFilter = !filterId || a.employeeId === filterId;
         const matchesPeriod = !period || a.date.startsWith(period);
         const emp = employee(a.employeeId);
         const matchesDept = department === 'All' || emp?.department === department;
@@ -1576,32 +1543,15 @@ export default function Home() {
             String(x || '').toLowerCase().includes(query.toLowerCase())
           ) ||
           (query.toLowerCase() === 'over9' && hoursWorked > 9);
-        return matchesEmpFilter && matchesPeriod && matchesDept && matchesQuery;
+        return matchesPeriod && matchesDept && matchesQuery;
       })
       .sort((a, b) => b.date.localeCompare(a.date));
 
     centerContent = (
       <div className="workora-table-container">
-        {filterId && (
-          <div className="mb-3 px-3.5 py-2.5 bg-amber-50/90 border border-amber-200/90 rounded-2xl flex items-center justify-between text-xs">
-            <span className="text-amber-900 font-medium flex items-center gap-1.5">
-              <Clock3 size={14} className="text-[#c99a2e]" />
-              Showing attendance records for <strong className="font-bold text-slate-900">{empName(filterId)}</strong>
-            </span>
-            <button
-              className="text-xs font-bold text-amber-800 hover:text-amber-950 underline cursor-pointer"
-              onClick={() => setFilterId('')}
-            >
-              ✕ Show All Employees
-            </button>
-          </div>
-        )}
         <div className="table-tab-strip flex items-center justify-between">
           <div className="flex items-center gap-6">
             <button className="table-tab-item active">Shift Records ({filteredAttendance.length})</button>
-            <button className="table-tab-item active">
-              {filterId ? `${empName(filterId)} Shifts` : 'Shift Records'} ({filteredAttendance.length})
-            </button>
           </div>
         </div>
         <DataTable
@@ -1629,35 +1579,6 @@ export default function Home() {
       </div>
     );
 
-    const attendanceWidgetCard = (
-      <AttendanceWidget
-        userName={clockUserName}
-        currentClock={currentClock}
-        signedIn={signedIn}
-        clockNow={clockNow}
-        todayRecords={todayRecords}
-        onCheckIn={() => {
-          if (clockEmployeeId) {
-            void act(
-              'clock',
-              { employeeId: clockEmployeeId },
-              'Checked in successfully.'
-            );
-          }
-        }}
-        onCheckOut={() => {
-          if (clockEmployeeId) {
-            void act(
-              'clock',
-              { employeeId: clockEmployeeId },
-              'Checked out successfully.'
-            );
-          }
-        }}
-        onHeaderIconClick={() => setModal({ kind: 'clock' })}
-      />
-    );
-
     if (activeEmp) {
       const att = s.attendance.filter((a) => a.employeeId === activeEmp.id && a.date.startsWith(period));
       const present = att.filter((a) => a.checkIn).length;
@@ -1667,56 +1588,46 @@ export default function Home() {
       const sched = s.schedules.find((sc) => sc.id === activeEmp.scheduleId);
 
       rightSlot = (
-        <div className="space-y-4">
-          {attendanceWidgetCard}
+        <DetailPanel
+          avatar={initials(activeEmp.name)}
+          title={activeEmp.name}
+          subtitle={`Schedule: ${sched?.name || 'Standard 40h'}`}
+          badge={rate >= 80 ? 'Present' : 'Irregular'}
+        >
+          <DetailSection title="ATTENDANCE SUMMARY">
+            <DetailRow label="Recorded Days" value={`${att.length} shifts`} />
+            <DetailRow label="Completed Check-outs" value={`${complete} of ${present}`} />
+            <DetailRow label="Missing Check-outs" value={`${missing} days`} />
+            <DetailRow label="Schedule Type" value={sched?.type || 'Fixed'} />
+            <DetailRow label="Weekly Hours" value={`${scheduleWeeklyHours(sched).toFixed(1)} hours`} />
+          </DetailSection>
 
-          <DetailPanel
-            avatar={initials(activeEmp.name)}
-            title={activeEmp.name}
-            subtitle={`Schedule: ${sched?.name || 'Standard 40h'}`}
-            badge={rate >= 80 ? 'Present' : 'Irregular'}
-          >
-            <DetailSection title="ATTENDANCE SUMMARY">
-              <DetailRow label="Recorded Days" value={`${att.length} shifts`} />
-              <DetailRow label="Completed Check-outs" value={`${complete} of ${present}`} />
-              <DetailRow label="Missing Check-outs" value={`${missing} days`} />
-              <DetailRow label="Schedule Type" value={sched?.type || 'Fixed'} />
-              <DetailRow label="Weekly Hours" value={`${scheduleWeeklyHours(sched).toFixed(1)} hours`} />
-            </DetailSection>
+          <DetailSection title="STATISTICS">
+            <StatBar
+              label="Monthly Present Rate"
+              value={rate}
+              displayValue={`${rate}%`}
+              variant={rate >= 80 ? 'gold' : 'dark'}
+            />
+          </DetailSection>
 
-            <DetailSection title="STATISTICS">
-              <StatBar
-                label="Monthly Present Rate"
-                value={rate}
-                displayValue={`${rate}%`}
-                variant={rate >= 80 ? 'gold' : 'dark'}
-              />
-            </DetailSection>
-
-            <DetailSection title="QUICK ACTIONS">
-              <button
-                className="doc-chip hover:bg-[#ede7de] transition-colors cursor-pointer"
-                onClick={() => openForm('attendance', { ...defaults('attendance', s, activeEmp.id), date: todayIso })}
-              >
-                <Clock3 className="size-3.5 text-[#c99a2e]" />
-                <span className="doc-chip-name">Add Attendance Punch</span>
-              </button>
-              <button
-                className="doc-chip hover:bg-[#ede7de] transition-colors cursor-pointer"
-                onClick={() => related('requests', activeEmp.id)}
-              >
-                <CalendarDays className="size-3.5 text-slate-500" />
-                <span className="doc-chip-name">Review Leave Balance</span>
-              </button>
-            </DetailSection>
-          </DetailPanel>
-        </div>
-      );
-    } else {
-      rightSlot = (
-        <div className="space-y-4">
-          {attendanceWidgetCard}
-        </div>
+          <DetailSection title="QUICK ACTIONS">
+            <button
+              className="doc-chip hover:bg-[#ede7de] transition-colors cursor-pointer"
+              onClick={() => openForm('attendance', { ...defaults('attendance', s, activeEmp.id), date: todayIso })}
+            >
+              <Clock3 className="size-3.5 text-[#c99a2e]" />
+              <span className="doc-chip-name">Add Attendance Punch</span>
+            </button>
+            <button
+              className="doc-chip hover:bg-[#ede7de] transition-colors cursor-pointer"
+              onClick={() => related('requests', activeEmp.id)}
+            >
+              <CalendarDays className="size-3.5 text-slate-500" />
+              <span className="doc-chip-name">Review Leave Balance</span>
+            </button>
+          </DetailSection>
+        </DetailPanel>
       );
     }
   } else if (['requests', 'allocations', 'leaveTypes'].includes(view)) {
@@ -2847,25 +2758,6 @@ export default function Home() {
                       displayValue="16 days"
                       variant="green"
                     />
-                    <button
-                      type="button"
-                      className="w-full text-xs font-semibold py-2 px-3 rounded-xl border border-[#e5ded4] bg-[#faf8f5] hover:bg-[#ede7de] text-slate-700 flex items-center justify-between cursor-pointer transition-colors mt-2"
-                      onClick={() => {
-                        const targetEmpId = selectedUserDrawer.employeeId || s.employees.find(e => e.email.toLowerCase() === selectedUserDrawer.email.toLowerCase())?.id;
-                        setSelectedUserDrawer(null);
-                        if (targetEmpId) {
-                          related('attendance', targetEmpId);
-                        } else {
-                          navigate('attendance');
-                        }
-                      }}
-                    >
-                      <span className="flex items-center gap-1.5">
-                        <Clock3 size={13} className="text-[#c99a2e]" />
-                        View Employee Shift Records
-                      </span>
-                      <ChevronRight size={13} className="text-slate-400" />
-                    </button>
                   </div>
                 </details>
 
@@ -2961,7 +2853,7 @@ export default function Home() {
             }
           }}
         >
-        <DialogContent className={modal?.kind === 'clock' ? 'max-w-md !p-6 rounded-3xl bg-white border border-[#e5ded4] shadow-2xl' : 'workora-modal'}>
+        <DialogContent className={modal?.kind === 'clock' ? 'max-w-xs sm:max-w-sm !p-5 rounded-2xl bg-white border border-[#e5ded4] shadow-xl' : 'workora-modal'}>
           {modal?.kind !== 'clock' ? (
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <div>
@@ -3342,49 +3234,36 @@ export default function Home() {
           )}
 
           {modal?.kind === 'clock' && s && (
-            <div className="p-0">
-              <AttendanceWidget
-                userName={clockUserName}
-                currentClock={currentClock}
-                signedIn={signedIn}
-                clockNow={clockNow}
-                todayRecords={todayRecords}
-                busy={busy}
-                isPopup={true}
-                className="border-0 shadow-none p-1 sm:p-2"
-                onCheckIn={() => {
-                  if (clockEmployeeId) {
-                    void act(
-                      'clock',
-                      { employeeId: clockEmployeeId },
-                      'Checked in successfully.'
-                    );
-                  }
-                }}
-                onCheckOut={() => {
-                  if (clockEmployeeId) {
-                    void act(
-                      'clock',
-                      { employeeId: clockEmployeeId },
-                      'Checked out successfully.'
-                    );
-                  }
-                }}
-                onViewRecords={() => {
-                  setModal(null);
-                  navigate('attendance');
-                }}
-                onHeaderIconClick={() => {
-                  if (clockEmployeeId) {
-                    if (signedIn) {
-                      void act('clock', { employeeId: clockEmployeeId }, 'Checked out successfully.');
-                    } else {
-                      void act('clock', { employeeId: clockEmployeeId }, 'Checked in successfully.');
-                    }
-                  }
-                }}
-              />
-            </div>
+            <AttendanceWidget
+              userName={clockUserName}
+              currentClock={currentClock}
+              signedIn={signedIn}
+              clockNow={clockNow}
+              todayRecords={todayRecords}
+              busy={busy}
+              onCheckIn={() => {
+                if (clockEmployeeId) {
+                  void act(
+                    'clock',
+                    { employeeId: clockEmployeeId },
+                    'Checked in successfully.'
+                  );
+                }
+              }}
+              onCheckOut={() => {
+                if (clockEmployeeId) {
+                  void act(
+                    'clock',
+                    { employeeId: clockEmployeeId },
+                    'Checked out successfully.'
+                  );
+                }
+              }}
+              onViewRecords={() => {
+                setModal(null);
+                navigate('attendance');
+              }}
+            />
           )}
 
           {modal?.kind === 'about' && (

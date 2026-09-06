@@ -206,23 +206,17 @@ export function PageShell({
         <div className="workora-top-actions items-center gap-2">
           {onClockClick && (
             <button
-              className={`circle-btn relative transition-all cursor-pointer ${
-                isCheckedIn
-                  ? 'clock-active !bg-emerald-50 !border-emerald-300 !text-emerald-700 hover:!bg-emerald-100 shadow-2xs'
-                  : '!bg-rose-50/80 !border-rose-200 !text-rose-600 hover:!bg-rose-100 hover:!border-rose-300 shadow-2xs'
+              className={`circle-btn relative transition-colors cursor-pointer ${
+                isCheckedIn ? 'bg-emerald-50 border-emerald-300 text-emerald-700' : ''
               }`}
-              title={
-                isCheckedIn
-                  ? 'Active shift in progress · Click to open Attendance Widget'
-                  : 'No active session · Click to open Attendance Widget'
-              }
-              aria-label="Attendance quick widget"
+              title={isCheckedIn ? 'Checked in · Live shift' : 'Attendance Check In / Out'}
+              aria-label="Attendance"
               onClick={onClockClick}
             >
-              <Power size={15} className="stroke-[2.5]" />
+              <Power size={15} />
               <span
-                className={`absolute -top-0.5 -right-0.5 size-2.5 rounded-full border-2 border-white transition-colors ${
-                  isCheckedIn ? 'bg-emerald-500 ring-1 ring-emerald-400 animate-pulse' : 'bg-rose-500 ring-1 ring-rose-400'
+                className={`absolute top-1.5 right-1.5 size-2 rounded-full ring-2 ring-white transition-colors ${
+                  isCheckedIn ? 'bg-emerald-500 animate-pulse' : 'bg-rose-400'
                 }`}
               />
             </button>
