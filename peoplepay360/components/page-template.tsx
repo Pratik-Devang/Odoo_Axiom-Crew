@@ -18,12 +18,8 @@ import {
 } from 'lucide-react';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { canView, type AppUser } from '@/lib/domain';
-<<<<<<< HEAD
 import Link from 'next/link';
-import { LogOut, Shield, UserCog, KeyRound } from 'lucide-react';
-=======
-import { LogOut, Shield, Power, UserCog } from 'lucide-react';
->>>>>>> 3f342e940546d8bcc43507f326bc198f6fe96171
+import { LogOut, Shield, Power, UserCog, KeyRound } from 'lucide-react';
 
 /* ─────────────────────────────────────────────────────────
    1. TYPES

@@ -1,13 +1,9 @@
 'use client';
 
 import Image from 'next/image';
-<<<<<<< HEAD
 import Link from 'next/link';
-import { useCallback, useEffect, useState } from 'react';
-import { AuthBrandedPanel } from '@/components/auth/AuthBrandedPanel';
-=======
 import { useCallback, useEffect, useMemo, useState } from 'react';
->>>>>>> 3f342e940546d8bcc43507f326bc198f6fe96171
+import { AuthBrandedPanel } from '@/components/auth/AuthBrandedPanel';
 import {
   Plus,
   ChevronDown,
@@ -655,8 +651,6 @@ export default function Home() {
     ]);
   };
 
-<<<<<<< HEAD
-=======
   const exportPdfReport = async () => {
     if (!s) return;
     try {
@@ -680,9 +674,6 @@ export default function Home() {
       setBusy(false);
     }
   };
-
-  const departments = s ? [...new Set(s.employees.map((e) => e.department))] : [];
->>>>>>> 3f342e940546d8bcc43507f326bc198f6fe96171
 
   /* ---------------------------------------------------------
      LOGIN SCREEN (Crextio Design System)
@@ -799,10 +790,7 @@ export default function Home() {
 
             <div className="mt-8 pt-6 border-t border-[#f0ece5] text-center">
               <p className="text-xs text-slate-500">
-                Don&apos;t have an account?{' '}
-                <Link href="/signup" className="font-semibold text-[#c99a2e] hover:underline">
-                  Sign Up
-                </Link>
+                Need account access? Contact your system Administrator.
               </p>
             </div>
           </div>
