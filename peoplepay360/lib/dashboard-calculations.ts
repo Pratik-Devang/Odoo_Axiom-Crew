@@ -167,6 +167,8 @@ export function getWorkforceHealth(
   }).length;
   const absent = Math.max(attendance.length - present.length, 0);
   const overtime = attendance.filter((a) => hours(a) > 9).length;
+  const missingCheckout = present.filter((a) => !a.checkOut).length;
+  const manualEntries = attendance.filter((a) => Boolean(a.edited)).length;
   const healthRate = attendance.length
     ? Math.round((complete.length / attendance.length) * 100)
     : null;
@@ -188,6 +190,8 @@ export function getWorkforceHealth(
     lateCount: late,
     absentCount: absent,
     overtimeCount: overtime,
+    missingCheckoutCount: missingCheckout,
+    manualEntryCount: manualEntries,
     healthRate,
     approvedTimeOffDays,
     pendingRequests,

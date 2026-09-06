@@ -1331,8 +1331,8 @@ tr:hover td {
 
 .overview-dashboard-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 270px;
-  grid-template-areas: 'canvas profile';
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas: 'canvas';
   gap: 14px;
   align-items: stretch;
   width: 100%;
@@ -1340,7 +1340,6 @@ tr:hover td {
 }
 
 .overview-roster,
-.overview-profile,
 .overview-panel,
 .overview-metric {
   background: #fff;
@@ -1348,17 +1347,7 @@ tr:hover td {
   box-shadow: 0 1px 3px rgba(28, 24, 20, .035);
 }
 
-.overview-roster,
-.overview-profile { border-radius: 17px; overflow: hidden; }
-.overview-profile h3 {
-  margin: 0 3px 8px;
-  color: #b4a99f;
-  font-size: 10px;
-  line-height: 1;
-  text-transform: uppercase;
-  letter-spacing: .75px;
-  font-weight: 800;
-}
+.overview-roster { border-radius: 17px; overflow: hidden; }
 .roster-search {
   height: 34px;
   border-radius: 18px;
@@ -1393,11 +1382,9 @@ tr:hover td {
 .roster-card p { margin: 6px 0 3px; display: flex; justify-content: space-between; color: #aaa096; font-size: 8.5px; }
 .roster-card p strong { color: #5d534b; font-size: 9px; }
 .roster-card > i,
-.dept-panel i,
-.profile-stat i { display: block; height: 3px; border-radius: 3px; background: #eee8df; overflow: hidden; }
+.dept-panel i { display: block; height: 3px; border-radius: 3px; background: #eee8df; overflow: hidden; }
 .roster-card > i span,
-.dept-panel i span,
-.profile-stat i span { display: block; height: 100%; border-radius: inherit; background: #edb83f; }
+.dept-panel i span { display: block; height: 100%; border-radius: inherit; background: #edb83f; }
 .roster-card.active > i span { background: #1b1b1b; }
 
 .overview-canvas { grid-area: canvas; min-width: 0; display: flex; flex-direction: column; gap: 14px; }
@@ -1521,26 +1508,40 @@ tr:hover td {
 .department-bars { flex: 1; height: auto; min-height: 190px; padding: 30px 16px 16px; }
 .department-bars button > span { width: 32px; }
 .department-bars button b { max-width: 64px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.attendance-panel header button { font-size: 9px; color: #776b60; display: flex; align-items: center; gap: 3px; }
-.attendance-stats { flex: 1; padding: 18px 12px 10px; display: grid; grid-template-columns: repeat(4, 1fr); align-items: center; gap: 6px; }
-.attendance-stats button { min-height: 55px; border: 1px solid #e5ded4; border-bottom: 3px solid #36c886; background: #fbf9f6; border-radius: 10px; }
-.attendance-stats button.gold { border-bottom-color: #edb83f; }.attendance-stats button.red { border-bottom-color: #f17474; }.attendance-stats button.blue { border-bottom-color: #5d96f1; }
-.attendance-stats b { display: block; font-size: 14px; }.attendance-stats span { display: block; font-size: 8px; color: #a89d93; }
-
-.overview-profile { grid-area: profile; min-width: 0; overflow-y: auto; max-height: 720px; }
-.overview-profile > header { text-align: center; padding: 0 13px 12px; border-bottom: 1px solid #e7e2db; }
-.profile-avatar { width: 58px; height: 58px; margin: -8px auto 9px; border-radius: 50%; background: #1b1b1b; color: white; box-shadow: 0 0 0 3px #ebe6de; display: grid; place-items: center; font-weight: 800; font-size: 16px; }
-.overview-profile header h2 { margin: 0; font-size: 12px; }.overview-profile header p { margin: 1px 0 6px; color: #8d8278; font-size: 9px; }
-.overview-profile header > div { display: flex; justify-content: center; gap: 6px; }.overview-profile header > div span { background: #f2f4f6; border-radius: 10px; padding: 2px 6px; color: #536174; font-size: 8px; }.overview-profile header > div span:first-child { color: #147b62; }
-.overview-profile nav { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-top: 9px; }.overview-profile nav button { height: 26px; border-radius: 9px; background: #fbf9f6; border: 1px solid #e5ded4; color: #6e6258; font-size: 9px; }.overview-profile nav button:first-child { color: white; background: #1d1d1d; border-color: #1d1d1d; }
-.overview-profile section { padding: 14px; border-bottom: 1px solid #e7e2db; }.overview-profile section h3 { margin-left: 0; }
-.overview-profile dl { margin: 0; display: grid; grid-template-columns: 1fr auto; gap: 8px; font-size: 8.5px; }.overview-profile dt { color: #a79b91; }.overview-profile dd { margin: 0; color: #191919; font-weight: 700; text-align: right; }
-.contract-chip,.profile-action { width: 100%; height: 28px; margin-top: 11px; display: flex; align-items: center; gap: 6px; border: 1px solid #e3ddd4; border-radius: 8px; background: #f8f4ec; padding: 0 9px; font-size: 8.5px; font-weight: 700; color: #302b27; }
-.profile-stat { margin-top: 9px; }.profile-stat p { display: flex; justify-content: space-between; margin: 0 0 4px; color: #a79c92; font-size: 8.5px; }.profile-stat p b { color: #1d1d1d; }.profile-stat.green i span { background: #20c66d; }
-.profile-action { justify-content: space-between; margin-top: 6px; }
+.attendance-panel header button { color: #776b60; display: inline-flex; align-items: center; gap: 4px; font-size: 9px; white-space: nowrap; }
+.attendance-panel header button:hover { color: #171717; }
+.attendance-stats {
+  flex: 1;
+  padding: 18px 12px 10px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-content: center;
+  gap: 8px;
+}
+.attendance-stat {
+  width: 100%;
+  min-width: 0;
+  min-height: 70px;
+  padding: 10px 8px 8px;
+  border: 1px solid #e5ded4;
+  border-bottom: 3px solid #36c886;
+  background: #fbf9f6;
+  border-radius: 10px;
+  text-align: center;
+  transition: border-color .15s ease, background-color .15s ease, transform .15s ease;
+}
+.attendance-stat:hover { background: #fff; transform: translateY(-1px); }
+.attendance-stat.gold { border-bottom-color: #edb83f; }
+.attendance-stat.red { border-bottom-color: #f17474; }
+.attendance-stat.blue { border-bottom-color: #5d96f1; }
+.attendance-stat b { display: block; color: #1f2937; font-size: 18px; line-height: 1.15; }
+.attendance-stat span { display: block; margin-top: 3px; color: #8e8379; font-size: 9px; }
+.attendance-panel footer { gap: 12px; }
+.attendance-panel footer span { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
+.attendance-footer-dot { width: 6px; height: 6px; border-radius: 50%; background: #a7b0be; }
+.attendance-footer-dot.warning { background: #edb83f; }
 
 @media (max-width: 1350px) {
-  .overview-dashboard-grid { grid-template-columns: minmax(0, 1fr) 245px; }
   .overview-bottom-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     grid-template-areas: 'department attendance' 'attention attention';
@@ -1549,13 +1550,12 @@ tr:hover td {
 }
 @media (max-width: 1100px) {
   .overview-dashboard-grid {
-    grid-template-columns: minmax(0, 1fr) 245px;
-    grid-template-areas: 'canvas profile';
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: 'canvas';
   }
 }
 @media (max-width: 760px) {
   .overview-dashboard-grid { display: block; width: auto; }
-  .overview-profile { display: none; }
   .overview-middle-grid, .overview-bottom-grid { grid-template-columns: 1fr; }
   .overview-bottom-grid { grid-template-areas: 'department' 'attendance' 'attention'; }
   .department-bars { min-height: 220px; }

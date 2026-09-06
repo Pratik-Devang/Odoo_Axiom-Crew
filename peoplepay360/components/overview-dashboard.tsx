@@ -12,14 +12,10 @@ import {
   Wallet,
   X,
 } from 'lucide-react';
-import { type Row, type Workspace, activeContract, money } from '@/lib/domain';
-import { buildDashboardSnapshot, employeeNetForPeriod } from '@/lib/dashboard-calculations';
+import { type Workspace, money } from '@/lib/domain';
+import { buildDashboardSnapshot } from '@/lib/dashboard-calculations';
 import { niceMonth } from '@/components/peoplepay-ui';
 import { MonthlySalaryTrendCard } from '@/components/dashboard/MonthlySalaryTrendCard';
-
-function initials(name: string) {
-  return name.split(' ').map((word) => word[0]).slice(0, 2).join('').toUpperCase();
-}
 
 function Metric({ label, value, sub, tone = 'plain', icon: Icon }: {
   label: string; value: string; sub: string; tone?: 'plain' | 'dark' | 'gold'; icon: typeof Wallet;
@@ -47,28 +43,6 @@ export default function OverviewDashboard({ s, period, setPeriod, department, se
     () => buildDashboardSnapshot(s, { period, department, employeeType }),
     [s, period, department, employeeType]
   );
-  const slipsByEmployee = useMemo(
-    () => new Map(snapshot.slips.map((slip) => [slip.employeeId, slip])),
-    [snapshot.slips]
-  );
-  const payByEmployee = useMemo(
-    () => new Map(snapshot.activeEmployees.map((employee) => [
-      employee.id,
-      employeeNetForPeriod(s, employee.id, period, slipsByEmployee.get(employee.id)),
-    ])),
-    [s, period, snapshot.activeEmployees, slipsByEmployee]
-  );
-  const selected = snapshot.activeEmployees[0] || s.employees[0];
-  const selectedSlip = selected ? slipsByEmployee.get(selected.id) : undefined;
-  const selectedPay = selected
-    ? payByEmployee.get(selected.id) || employeeNetForPeriod(s, selected.id, period, selectedSlip)
-    : { net: 0, gross: 0, hasSlip: false };
-  let contract: Row | undefined;
-  try { contract = selected ? activeContract(s, selected.id, period) : undefined; } catch { contract = undefined; }
-  const schedule = s.schedules.find((item) => item.id === (contract?.scheduleId || selected?.scheduleId));
-  const requests = s.requests.filter((item) => item.employeeId === selected?.id && item.status === 'Approved');
-  const attendance = s.attendance.filter((item) => item.employeeId === selected?.id && item.date.startsWith(period));
-  const attendanceRate = attendance.length ? Math.round(attendance.filter((item) => item.checkIn).length / attendance.length * 100) : 100;
   const attention = [
     { tag: 'Action', text: '1 payrun awaiting completion', sub: `${niceMonth(period)} · Review and process payroll` },
     { tag: 'Review', text: `${snapshot.workforceHealth.pendingRequests} time-off requests to review`, sub: 'Review leave approvals to keep operations smooth' },
@@ -76,6 +50,12 @@ export default function OverviewDashboard({ s, period, setPeriod, department, se
     { tag: 'Notice', text: '1 contract expiring this month', sub: 'Review upcoming employment term changes' },
   ];
   const maxDept = Math.max(...snapshot.departmentShare.map((row) => row.amount), 1);
+  const attendanceStats = [
+    { label: 'Present', value: snapshot.workforceHealth.presentCount, tone: 'green' },
+    { label: 'Late', value: snapshot.workforceHealth.lateCount, tone: 'gold' },
+    { label: 'Absent', value: snapshot.workforceHealth.absentCount, tone: 'red' },
+    { label: 'Over 9h', value: snapshot.workforceHealth.overtimeCount, tone: 'blue' },
+  ];
 
   return (
     <div className="overview-dashboard-grid">
@@ -131,11 +111,30 @@ export default function OverviewDashboard({ s, period, setPeriod, department, se
             </footer>
           </section>
           <section className="overview-panel attendance-panel">
-            <header><h2><Clock3 size={14} /> Attendance Overview</h2><button onClick={() => navigate('attendance')}>View logs <ArrowUpRight size={12} /></button></header>
-            <div className="attendance-stats">
-              {[['Present', snapshot.workforceHealth.presentCount, 'green'], ['Late', snapshot.workforceHealth.lateCount, 'gold'], ['Absent', snapshot.workforceHealth.absentCount, 'red'], ['Over 9h', snapshot.workforceHealth.overtimeCount, 'blue']].map(([label, value, color]) => <button className={String(color)} key={String(label)} onClick={() => navigate('attendance')}><b>{value}</b><span>{label}</span></button>)}
+            <header>
+              <h2><Clock3 size={14} /> Attendance Overview</h2>
+              <button type="button" onClick={() => navigate('attendance')}>
+                View logs <ArrowUpRight size={12} />
+              </button>
+            </header>
+            <div className="attendance-stats" aria-label={`Attendance summary for ${niceMonth(period)}`}>
+              {attendanceStats.map(({ label, value, tone }) => (
+                <button
+                  aria-label={`${value} ${label.toLowerCase()} attendance records. View logs`}
+                  className={`attendance-stat ${tone}`}
+                  key={label}
+                  onClick={() => navigate('attendance')}
+                  type="button"
+                >
+                  <b>{value.toLocaleString()}</b>
+                  <span>{label}</span>
+                </button>
+              ))}
             </div>
-            <footer><span>● 0 missing check-outs</span><span>● 0 manual entries</span></footer>
+            <footer>
+              <span><i className="attendance-footer-dot warning" aria-hidden="true" />{snapshot.workforceHealth.missingCheckoutCount.toLocaleString()} missing check-outs</span>
+              <span><i className="attendance-footer-dot neutral" aria-hidden="true" />{snapshot.workforceHealth.manualEntryCount.toLocaleString()} manual entries</span>
+            </footer>
           </section>
           <section className="overview-panel attention-panel">
             <header><h2><Activity size={14} /> Needs Attention</h2><span>{attention.length} items</span></header>
@@ -146,13 +145,6 @@ export default function OverviewDashboard({ s, period, setPeriod, department, se
         </div>
       </main>
 
-      <aside className="overview-profile">
-        <header><span className="profile-avatar">{initials(selected?.name || 'Employee')}</span><h2>{selected?.name}</h2><p>{selected?.department}</p><div><span>● Active</span><span>{selected?.type}</span></div><nav><button onClick={() => selected && navigate('employee', selected.id)}>View Profile</button><button onClick={() => navigate('attendance')}>Attendance</button></nav></header>
-        <section><h3>Basic information</h3><dl><dt>Manager</dt><dd>{selected?.manager || 'Sara Khan'}</dd><dt>Location</dt><dd>{selected?.location || 'Mumbai'}</dd><dt>Schedule</dt><dd>{schedule?.name || 'Standard workweek'}</dd><dt>Bank</dt><dd>{selected?.bank ? '✓ Registered' : 'Missing'}</dd></dl></section>
-        <section><h3>Contract</h3><dl><dt>Start</dt><dd>{contract?.start || '—'}</dd><dt>End</dt><dd>{contract?.end || 'Open-ended'}</dd><dt>Wage</dt><dd>{money(contract?.wage || 0)}/mo</dd><dt>Structure</dt><dd>{s.structures.find((item) => item.id === contract?.structureId)?.name || 'Regular Salary'}</dd></dl><button className="contract-chip"><FileText size={13} /> Contract · {contract?.start || 'Current'}</button></section>
-        <section><h3>Statistics · {niceMonth(period)}</h3><div className="profile-stat"><p><span>Net Pay this period</span><b>{money(selectedPay.net)}</b></p><i><span style={{ width: '78%' }} /></i></div><div className="profile-stat green"><p><span>Attendance rate</span><b>{attendanceRate}%</b></p><i><span style={{ width: `${attendanceRate}%` }} /></i></div><div className="profile-stat"><p><span>Leave used</span><b>{requests.reduce((sum, item) => sum + (+item.duration || 0), 0)} days</b></p><i><span style={{ width: '24%' }} /></i></div></section>
-        <section><h3>Quick actions</h3><button className="profile-action" onClick={() => navigate('contracts')}>View Contracts <ChevronRight size={13} /></button><button className="profile-action" onClick={() => navigate('requests')}>Time Off Requests <ChevronRight size={13} /></button></section>
-      </aside>
     </div>
   );
 }
