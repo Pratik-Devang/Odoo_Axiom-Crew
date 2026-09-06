@@ -18,12 +18,12 @@ import {
 } from 'lucide-react';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { canView, type AppUser } from '@/lib/domain';
-import { LogOut, Shield, Power } from 'lucide-react';
+import { LogOut, Shield, Power, UserCog } from 'lucide-react';
 
 /* ─────────────────────────────────────────────────────────
    1. TYPES
    ───────────────────────────────────────────────────────── */
-export type ViewTab = 'overview' | 'employees' | 'contracts' | 'attendance' | 'requests' | 'payruns' | 'users';
+export type ViewTab = 'overview' | 'employees' | 'contracts' | 'attendance' | 'requests' | 'payruns' | 'users' | 'assignments';
 
 export interface PageShellProps {
   currentView: string;
@@ -76,6 +76,7 @@ export function PageShell({
   const isTimeOff = ['requests', 'allocations', 'leaveTypes'].includes(currentView);
   const isPayroll = ['payruns', 'run', 'payslips', 'structures', 'rules'].includes(currentView);
   const isUsers = currentView === 'users' || currentView === 'admin/users';
+  const isAssignments = currentView === 'assignments' || currentView === 'admin/assignments';
 
   const hasLeft = Boolean(leftPanel);
   const hasRight = Boolean(rightPanel);
@@ -104,7 +105,7 @@ export function PageShell({
   const isCheckedIn = mounted && signedIn;
 
   return (
-    <div className="workora-shell">
+    <div className={`workora-shell ${isOverview ? 'overview-shell' : ''}`}>
       {/* ─── Universal Pill Navigation Bar ─── */}
       <header className="workora-topbar">
         <a
@@ -188,6 +189,15 @@ export function PageShell({
             >
               <Shield size={15} />
               Users
+            </button>
+          )}
+          {currentUser && canView(currentUser.role, 'admin/assignments') && (
+            <button
+              className={`nav-pill ${isAssignments ? 'active' : ''}`}
+              onClick={() => onNavigate('assignments')}
+            >
+              <UserCog size={15} />
+              Assignments
             </button>
           )}
         </nav>

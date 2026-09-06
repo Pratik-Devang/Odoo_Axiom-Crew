@@ -323,6 +323,7 @@ export interface NetSalaryTrendChartProps {
   timelineMonths: string[];
   timelineIndex: number;
   onPeriodChange: (period: string) => void;
+  showTimeline?: boolean;
 }
 
 export function NetSalaryTrendChart({
@@ -331,16 +332,19 @@ export function NetSalaryTrendChart({
   timelineMonths,
   timelineIndex,
   onPeriodChange,
+  showTimeline = true,
 }: NetSalaryTrendChartProps) {
   return (
     <>
       <SmoothLineTrendChart points={points} current={period} onPoint={onPeriodChange} />
-      <TimelineSlider
-        months={timelineMonths}
-        period={period}
-        value={timelineIndex}
-        onChange={(idx) => onPeriodChange(timelineMonths[idx] ?? period)}
-      />
+      {showTimeline && (
+        <TimelineSlider
+          months={timelineMonths}
+          period={period}
+          value={timelineIndex}
+          onChange={(idx) => onPeriodChange(timelineMonths[idx] ?? period)}
+        />
+      )}
     </>
   );
 }

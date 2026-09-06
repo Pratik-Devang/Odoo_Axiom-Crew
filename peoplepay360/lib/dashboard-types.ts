@@ -25,6 +25,8 @@ export interface WorkforceHealthMetrics {
   lateCount: number;
   absentCount: number;
   overtimeCount: number;
+  missingCheckoutCount: number;
+  manualEntryCount: number;
   healthRate: number | null;
   approvedTimeOffDays: number;
   pendingRequests: number;

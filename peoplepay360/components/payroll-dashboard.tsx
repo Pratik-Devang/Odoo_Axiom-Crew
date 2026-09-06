@@ -1,447 +1,212 @@
 'use client';
 
-import React, { useState } from 'react';
+import { useState, type ElementType, type ReactNode } from 'react';
 import {
-  Users,
-  ArrowUpRight,
-  Wallet,
-  FileText,
-  Activity,
-  TrendingUp,
-  Clock3,
-  Building2,
-  Download,
-  FileSpreadsheet,
-  FileDown,
-  ChevronDown,
+  Activity, AlertTriangle, Building2, CheckCircle2, ChevronDown, Clock3, Download,
+  FileDown, FileSpreadsheet, FileText, Layers3, TrendingUp, Users, Wallet,
 } from 'lucide-react';
-import {
-  type Workspace,
-  money,
-} from '@/lib/domain';
-import { niceMonth } from './peoplepay-ui';
+import { allocationBalance, monthEnd, type Row, type Workspace } from '@/lib/domain';
+import { buildDashboardSnapshot } from '@/lib/dashboard-calculations';
 import { exportDashboardCsv, exportDashboardPdf } from '@/lib/export';
 import { NetSalaryTrendChart } from '@/components/dashboard/NetSalaryTrendChart';
-import { buildDashboardSnapshot } from '@/lib/dashboard-calculations';
 
-/* ─── KPI Metric Card ─── */
-function KpiCard({
-  label,
-  value,
-  sub,
-  delta,
-  icon: Icon,
-  accent,
-  onClick,
-}: {
-  label: string;
-  value: string;
-  sub?: string;
-  delta?: string;
-  icon: React.ElementType;
-  accent?: boolean;
-  onClick?: () => void;
+function compactMoney(value: number) {
+  if (value >= 10_000_000) return `₹${(value / 10_000_000).toFixed(1)}Cr`;
+  if (value >= 100_000) return `₹${(value / 100_000).toFixed(1)}L`;
+  if (value >= 1_000) return `₹${Math.round(value / 1_000)}k`;
+  return `₹${Math.round(value)}`;
+}
+
+function Panel({ title, source, icon: Icon, children }: {
+  title: string;
+  source: string;
+  icon: ElementType;
+  children: ReactNode;
 }) {
   return (
-    <button
-      onClick={onClick}
-      className={`rounded-2xl border p-4 text-left flex flex-col justify-between gap-3 cursor-pointer
-        transition-all hover:shadow-md hover:scale-[1.01] active:scale-100
-        ${
-          accent
-            ? 'bg-[#1a1a1a] border-[#1a1a1a] text-white shadow-sm'
-            : 'bg-white border-[#e5ded4] hover:border-[#c4b8aa] shadow-2xs'
-        }`}
-    >
-      <div className="flex items-center justify-between w-full">
-        <span
-          className={`text-[11px] font-bold uppercase tracking-wider ${
-            accent ? 'text-amber-400' : 'text-[#7a6f65]'
-          }`}
-        >
-          {label}
-        </span>
-        <div
-          className={`w-8 h-8 rounded-xl flex items-center justify-center ${
-            accent ? 'bg-white/10' : 'bg-[#faf7f3] border border-[#e5ded4]'
-          }`}
-        >
-          <Icon size={15} className={accent ? 'text-amber-400' : 'text-[#5a5047]'} />
-        </div>
+    <section className="min-w-0 rounded-2xl border border-[#e5ded4] bg-white p-4 shadow-2xs">
+      <div className="mb-4">
+        <h2 className="flex items-center gap-2 text-sm font-extrabold text-slate-900">
+          <Icon size={15} className="shrink-0 text-[#c48a12]" />
+          {title}
+        </h2>
+        <p className="mt-0.5 text-[10px] font-medium text-slate-400">Source: {source}</p>
       </div>
+      {children}
+    </section>
+  );
+}
 
-      <div>
-        <span
-          className={`text-2xl font-extrabold tracking-tight leading-none block ${
-            accent ? 'text-white' : 'text-[#1a1a1a]'
-          }`}
-        >
-          {value}
-        </span>
-        {(sub || delta) && (
-          <div className="flex items-center gap-2 flex-wrap mt-2">
-            {delta && (
-              <span
-                className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                  delta.startsWith('+')
-                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                    : delta.startsWith('-')
-                    ? 'bg-rose-50 text-rose-600 border border-rose-200'
-                    : 'bg-[#fdf3d7] text-[#c99a2e] border border-[#e9b84a]'
-                }`}
-              >
-                {delta}
-              </span>
-            )}
-            {sub && (
-              <span className={`text-[11px] font-medium ${accent ? 'text-slate-300' : 'text-[#8c7f75]'}`}>
-                {sub}
-              </span>
-            )}
-          </div>
-        )}
+function KpiCard({ label, value, note, tone = 'neutral', icon: Icon, onClick }: {
+  label: string;
+  value: string;
+  note: string;
+  tone?: 'neutral' | 'positive' | 'warning';
+  icon: ElementType;
+  onClick: () => void;
+}) {
+  const noteTone = tone === 'positive' ? 'text-emerald-700' : tone === 'warning' ? 'text-amber-700' : 'text-slate-500';
+  return (
+    <button type="button" onClick={onClick} className="group min-h-28 rounded-2xl border border-[#e5ded4] bg-white p-4 text-left shadow-2xs transition hover:-translate-y-0.5 hover:border-[#cdbfae] hover:shadow-md">
+      <div className="flex items-start justify-between gap-2">
+        <span className="text-[10px] font-bold uppercase tracking-[0.08em] text-[#7a6f65]">{label}</span>
+        <span className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-[#faf7f3] text-slate-500 group-hover:bg-amber-50 group-hover:text-amber-700"><Icon size={14} /></span>
       </div>
+      <strong className="mt-3 block text-[22px] font-black leading-none tracking-tight text-slate-950">{value}</strong>
+      <span className={`mt-2 block text-[10px] font-semibold ${noteTone}`}>{note}</span>
     </button>
   );
 }
 
-
-/* ─── Main Dashboard Component ─── */
-export default function Dashboard({
-  s,
-  period,
-  setPeriod,
-  department,
-  setDepartment,
-  employeeType,
-  setEmployeeType,
-  navigate,
-}: {
+export default function Dashboard({ s, period, setPeriod, department, setDepartment, employeeType, setEmployeeType, navigate }: {
   s: Workspace;
   period: string;
-  setPeriod: (s: string) => void;
+  setPeriod: (value: string) => void;
   department: string;
-  setDepartment: (s: string) => void;
+  setDepartment: (value: string) => void;
   employeeType: string;
-  setEmployeeType: (s: string) => void;
+  setEmployeeType: (value: string) => void;
   navigate: (view: string, id?: string) => void;
 }) {
   const [exportMenuOpen, setExportMenuOpen] = useState(false);
   const [exporting, setExporting] = useState(false);
+  const snapshot = buildDashboardSnapshot(s, { period, department, employeeType });
+  const { kpis, workforceHealth, departmentShare, trend, timelineMonths, timelineIndex } = snapshot;
+  const selectedIds = snapshot.filteredEmployeeIds;
+  const periodStart = `${period}-01`;
+  const periodEnd = monthEnd(period);
+  const selectedRuns = s.payruns.filter((run) => run.period === period);
+
+  const statusRows = ['Paid', 'Validated', 'Computed', 'Draft'].map((status) => ({
+    status,
+    count: selectedRuns.filter((run) => run.status === status).flatMap((run) => run.slips).filter((slip: Row) => selectedIds.has(slip.employeeId)).length,
+  }));
+  const totalStatus = Math.max(1, statusRows.reduce((sum, item) => sum + item.count, 0));
+  const statusColors: Record<string, string> = { Paid: 'bg-emerald-500', Validated: 'bg-sky-500', Computed: 'bg-amber-500', Draft: 'bg-slate-400' };
+
+  const missingBank = snapshot.activeEmployees.filter((employee) => !employee.bank).length;
+  const expiringContracts = s.contracts.filter((contract) => selectedIds.has(contract.employeeId) && contract.end && contract.end >= periodStart && contract.end <= periodEnd).length;
+  const draftRuns = selectedRuns.filter((run) => run.status === 'Draft').length;
+  const incompleteShifts = s.attendance.filter((row) => selectedIds.has(row.employeeId) && row.checkIn && !row.checkOut).length;
+  const alerts = [
+    missingBank ? { text: `${missingBank} employees missing bank details`, danger: true } : null,
+    incompleteShifts ? { text: `${incompleteShifts} attendance records missing check-out`, danger: true } : null,
+    draftRuns ? { text: `${draftRuns} payroll run${draftRuns === 1 ? '' : 's'} still in draft`, danger: false } : null,
+    expiringContracts ? { text: `${expiringContracts} contracts expiring this month`, danger: false } : null,
+  ].filter(Boolean) as { text: string; danger: boolean }[];
+
+  const timeOffRows = s.leaveTypes.filter((type) => type.active !== false).map((type) => {
+    const requests = s.requests.filter((request) => selectedIds.has(request.employeeId) && request.typeId === type.id && request.start <= periodEnd && request.end >= periodStart);
+    const approved = requests.filter((request) => request.status === 'Approved').reduce((sum, request) => sum + Number(request.duration || 0), 0);
+    const pending = requests.filter((request) => request.status === 'Pending').length;
+    const allocations = s.allocations.filter((allocation) => selectedIds.has(allocation.employeeId) && allocation.typeId === type.id && allocation.status === 'Approved' && allocation.start <= periodEnd && allocation.end >= periodStart);
+    const remaining = allocations.reduce((sum, allocation) => sum + Math.max(0, allocationBalance(s, allocation)), 0);
+    return { id: type.id, name: type.name, approved, pending, remaining: type.requiresAllocation ? remaining : null };
+  }).filter((row) => row.approved || row.pending || row.remaining).slice(0, 4);
+
+  const topDepartments = departmentShare.slice(0, 5);
+  const maxDepartmentCost = Math.max(1, ...topDepartments.map((row) => row.amount));
+  const attendanceBars = [
+    { label: 'Present', value: workforceHealth.presentCount, color: 'bg-emerald-500' },
+    { label: 'Late', value: workforceHealth.lateCount, color: 'bg-amber-500' },
+    { label: 'Absent', value: workforceHealth.absentCount, color: 'bg-rose-500' },
+    { label: 'Overtime', value: workforceHealth.overtimeCount, color: 'bg-sky-500' },
+  ];
+  const maxAttendance = Math.max(1, ...attendanceBars.map((row) => row.value));
 
   const triggerDownload = (blob: Blob, filename: string) => {
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = filename;
+    anchor.click();
     URL.revokeObjectURL(url);
   };
-
   const handleExportPdf = async () => {
     setExporting(true);
     try {
-      const b = await exportDashboardPdf(s, period, department, employeeType);
-      triggerDownload(new Blob([b as unknown as BlobPart], { type: 'application/pdf' }), `peoplepay360-${period}.pdf`);
-    } catch (e) {
-      console.error(e);
+      const bytes = await exportDashboardPdf(s, period, department, employeeType);
+      triggerDownload(new Blob([bytes as unknown as BlobPart], { type: 'application/pdf' }), `peoplepay360-${period}.pdf`);
     } finally {
       setExporting(false);
       setExportMenuOpen(false);
     }
   };
-
-  const handleExportCsv = (mode: 'summary' | 'detail') => {
-    setExporting(true);
-    try {
-      triggerDownload(exportDashboardCsv(s, period, department, employeeType, mode), `peoplepay360-${mode}-${period}.csv`);
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setExporting(false);
-      setExportMenuOpen(false);
-    }
+  const handleExportCsv = () => {
+    triggerDownload(exportDashboardCsv(s, period, department, employeeType, 'detail'), `peoplepay360-detail-${period}.csv`);
+    setExportMenuOpen(false);
   };
-
-  /* ── Unified Filtered Dashboard Snapshot ── */
-  const snapshot = buildDashboardSnapshot(s, { period, department, employeeType });
-  const { kpis, workforceHealth, departmentShare, totalDepartmentAmount, trend, timelineMonths, timelineIndex } = snapshot;
 
   return (
-    <div className="flex flex-col gap-5 w-full max-w-5xl mx-auto pb-10">
-      {/* ═══════ HEADER CONTROLS BAR ═══════ */}
-      <div className="flex items-center justify-between gap-3 flex-wrap bg-white border border-[#e5ded4] rounded-2xl px-5 py-3.5 shadow-2xs">
+    <div className="mx-auto flex w-full max-w-none flex-col gap-4 pb-8">
+      <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h1 className="text-lg font-black text-slate-900 tracking-tight leading-none">
-            Payroll & Operations Dashboard
-          </h1>
-          <p className="text-xs text-slate-500 mt-1">
-            Real-time analytics for compensation, attendance health, and department overhead.
-          </p>
+          <h1 className="text-xl font-black tracking-tight text-slate-950">Payroll Dashboard</h1>
+          <p className="mt-1 max-w-3xl text-xs leading-relaxed text-slate-500">Understand payments, staffing impact, leave patterns, and attendance quality for the selected period.</p>
         </div>
-
-        <div className="flex items-center gap-2.5 flex-wrap ml-auto">
-          <div className="flex items-center gap-1.5 text-xs text-slate-600 font-semibold bg-[#faf7f3] border border-[#e5ded4] rounded-xl px-2.5 py-1">
-            <span>Period:</span>
-            <input
-              type="month"
-              value={period}
-              onChange={(e) => setPeriod(e.target.value)}
-              className="font-bold text-slate-900 bg-transparent focus:outline-none cursor-pointer"
-            />
-          </div>
-
-          <div className="flex items-center gap-1.5 text-xs text-slate-600 font-semibold bg-[#faf7f3] border border-[#e5ded4] rounded-xl px-2.5 py-1">
-            <span>Dept:</span>
-            <select
-              value={department}
-              onChange={(e) => setDepartment(e.target.value)}
-              className="font-bold text-slate-900 bg-transparent focus:outline-none cursor-pointer"
-            >
-              {['All', ...snapshot.departments].map((d) => (
-                <option key={d}>{d}</option>
-              ))}
-            </select>
-          </div>
-
-          <div className="relative">
-            <button
-              className="inline-flex items-center gap-1.5 h-8 px-3.5 rounded-xl border border-[#e5ded4] bg-white hover:bg-slate-50 text-xs font-bold text-slate-800 transition-colors shadow-2xs cursor-pointer"
-              onClick={() => setExportMenuOpen(!exportMenuOpen)}
-              disabled={exporting}
-            >
-              <Download size={13} className="text-slate-600" />
-              {exporting ? 'Exporting…' : 'Export'}
-              <ChevronDown size={12} className="text-slate-400" />
-            </button>
-            {exportMenuOpen && (
-              <div className="absolute right-0 mt-2 w-56 bg-white border border-[#e5ded4] rounded-2xl shadow-xl z-30 p-1.5 text-xs animate-in fade-in zoom-in-95 duration-100">
-                <button
-                  className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-left font-semibold hover:bg-slate-50 transition-colors cursor-pointer"
-                  onClick={handleExportPdf}
-                >
-                  <FileDown size={15} className="text-amber-600" />
-                  <div>
-                    <div className="font-bold text-slate-900">Summary PDF Report</div>
-                    <div className="text-[10px] text-slate-400 font-normal">Executive charts & KPIs</div>
-                  </div>
-                </button>
-                <button
-                  className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-left font-semibold hover:bg-slate-50 transition-colors cursor-pointer"
-                  onClick={() => handleExportCsv('detail')}
-                >
-                  <FileSpreadsheet size={15} className="text-emerald-600" />
-                  <div>
-                    <div className="font-bold text-slate-900">Detailed Payroll CSV</div>
-                    <div className="text-[10px] text-slate-400 font-normal">Per-employee line items</div>
-                  </div>
-                </button>
-              </div>
-            )}
-          </div>
+        <div className="relative">
+          <button type="button" onClick={() => setExportMenuOpen((open) => !open)} disabled={exporting} className="pill-btn"><Download size={14} /> {exporting ? 'Exporting…' : 'Export'} <ChevronDown size={12} /></button>
+          {exportMenuOpen && (
+            <div className="absolute right-0 z-30 mt-2 w-52 rounded-xl border border-[#e5ded4] bg-white p-1.5 text-xs shadow-xl">
+              <button type="button" onClick={() => void handleExportPdf()} className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left font-semibold hover:bg-slate-50"><FileDown size={14} /> Summary PDF</button>
+              <button type="button" onClick={handleExportCsv} className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left font-semibold hover:bg-slate-50"><FileSpreadsheet size={14} /> Detailed CSV</button>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* ═══════ 4 HIGH-IMPACT METRIC CARDS ═══════ */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <KpiCard
-          label="Total Net Payroll"
-          value={money(kpis.totalNet)}
-          delta={kpis.hasActualPayroll ? kpis.deltaLabel : 'Not yet run for this period'}
-          sub={`${kpis.activeEmployeeCount} active employees${kpis.hasActualPayroll ? '' : ' (Est.)'}`}
-          icon={Wallet}
-          accent
-          onClick={() => navigate('payslips')}
-        />
-        <KpiCard
-          label="Payslips Generated"
-          value={String(kpis.hasActualPayroll ? kpis.slipCount : 0)}
-          delta={
-            kpis.hasActualPayroll
-              ? kpis.paidSlips > 0
-                ? `${kpis.paidSlips} Paid`
-                : 'Ready for Run'
-              : 'Not yet run'
-          }
-          sub={`For ${niceMonth(period)}`}
-          icon={FileText}
-          onClick={() => navigate('payruns')}
-        />
-        <KpiCard
-          label="Avg Salary / Employee"
-          value={money(kpis.avgNet)}
-          sub={kpis.hasActualPayroll ? 'Monthly net take-home' : 'Estimated net take-home'}
-          icon={Users}
-          onClick={() => navigate('employees')}
-        />
-        <KpiCard
-          label="Attendance Health"
-          value={workforceHealth.healthRate !== null ? `${workforceHealth.healthRate}%` : '—'}
-          delta={
-            workforceHealth.healthRate !== null
-              ? workforceHealth.lateCount > 0
-                ? `${workforceHealth.lateCount} late arrivals`
-                : 'On track'
-              : 'No records'
-          }
-          sub={`${workforceHealth.approvedTimeOffDays} approved leave days`}
-          icon={Activity}
-          onClick={() => navigate('attendance')}
-        />
+      <div className="grid grid-cols-2 gap-3 rounded-2xl border border-[#e5ded4] bg-[#faf8f5] p-3 md:grid-cols-4">
+        <label className="space-y-1 text-[10px] font-bold uppercase tracking-wide text-slate-500"><span>Period</span><input type="month" value={period} onChange={(event) => setPeriod(event.target.value)} className="h-9 w-full rounded-lg border border-[#ded6ca] bg-white px-3 text-xs font-semibold normal-case text-slate-800 outline-none focus:border-amber-400" /></label>
+        <label className="space-y-1 text-[10px] font-bold uppercase tracking-wide text-slate-500"><span>Department</span><select value={department} onChange={(event) => setDepartment(event.target.value)} className="h-9 w-full rounded-lg border border-[#ded6ca] bg-white px-3 text-xs font-semibold normal-case text-slate-800 outline-none focus:border-amber-400">{['All', ...snapshot.departments].map((value) => <option key={value} value={value}>{value === 'All' ? 'All Departments' : value}</option>)}</select></label>
+        <label className="space-y-1 text-[10px] font-bold uppercase tracking-wide text-slate-500"><span>Employee Type</span><select value={employeeType} onChange={(event) => setEmployeeType(event.target.value)} className="h-9 w-full rounded-lg border border-[#ded6ca] bg-white px-3 text-xs font-semibold normal-case text-slate-800 outline-none focus:border-amber-400">{['All', 'Full-time', 'Contract', 'Intern'].map((value) => <option key={value} value={value}>{value === 'All' ? 'All Types' : value}</option>)}</select></label>
+        <label className="space-y-1 text-[10px] font-bold uppercase tracking-wide text-slate-500"><span>Company</span><input value="OXP Pvt Ltd" readOnly className="h-9 w-full rounded-lg border border-[#ded6ca] bg-white px-3 text-xs font-semibold normal-case text-slate-500 outline-none" /></label>
       </div>
 
-      {/* ═══════ MAIN FEATURE: MONTHLY SALARY TREND GRAPH ═══════ */}
-      <div className="bg-white border border-[#e5ded4] rounded-2xl p-5 shadow-2xs space-y-3">
-        <div className="flex items-center justify-between pb-2 border-b border-slate-100">
-          <div>
-            <h2 className="text-sm font-extrabold text-slate-900 flex items-center gap-2">
-              <TrendingUp size={16} className="text-amber-600" />
-              Net Salary Trend
-            </h2>
-            <p className="text-xs text-slate-500">
-              6-month window · use slider to change period
-            </p>
-          </div>
-          <button
-            onClick={() => navigate('payruns')}
-            className="text-xs font-bold text-amber-700 hover:text-amber-800 flex items-center gap-1 cursor-pointer"
-          >
-            Manage Payruns <ArrowUpRight size={13} />
-          </button>
-        </div>
-
-        <NetSalaryTrendChart
-          points={trend}
-          period={period}
-          timelineMonths={timelineMonths}
-          timelineIndex={timelineIndex}
-          onPeriodChange={setPeriod}
-        />
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+        <KpiCard label="Total Net Salary Paid" value={compactMoney(kpis.totalNet)} note={kpis.deltaLabel} tone={kpis.deltaLabel.startsWith('+') ? 'positive' : 'neutral'} icon={Wallet} onClick={() => navigate('payslips')} />
+        <KpiCard label="Payslips Generated" value={String(kpis.slipCount)} note={kpis.hasActualPayroll ? `${kpis.paidSlips} paid · ${Math.max(0, kpis.slipCount - kpis.paidSlips)} pending` : 'No completed payrun'} tone="positive" icon={FileText} onClick={() => navigate('payruns')} />
+        <KpiCard label="Avg Salary / Employee" value={compactMoney(kpis.avgNet)} note={`${kpis.activeEmployeeCount} active employees`} icon={Users} onClick={() => navigate('employees')} />
+        <KpiCard label="Approved Time Off Days" value={`${workforceHealth.approvedTimeOffDays} Days`} note="Across selected period" tone="positive" icon={CheckCircle2} onClick={() => navigate('requests')} />
+        <KpiCard label="Attendance Health" value={workforceHealth.healthRate === null ? '—' : `${workforceHealth.healthRate}%`} note="Present / reviewed records" tone={workforceHealth.healthRate !== null && workforceHealth.healthRate >= 90 ? 'positive' : 'warning'} icon={Activity} onClick={() => navigate('attendance')} />
       </div>
 
-      {/* ═══════ 2-COLUMN OPERATIONAL BREAKDOWNS ═══════ */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-        {/* Department Compensation Distribution */}
-        <div className="bg-white border border-[#e5ded4] rounded-2xl p-5 shadow-2xs flex flex-col justify-between">
-          <div>
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-              <h2 className="text-sm font-extrabold text-slate-900 flex items-center gap-2">
-                <Building2 size={16} className="text-slate-700" />
-                Department Payroll Share
-              </h2>
-              <span className="text-xs font-bold text-slate-400">
-                {departmentShare.length} Departments
-              </span>
-            </div>
-            <div className="space-y-3.5 pt-4">
-              {departmentShare.map((d) => {
-                const pct = Math.round((d.amount / totalDepartmentAmount) * 100);
-                return (
-                  <div
-                    key={d.name}
-                    className="group cursor-pointer"
-                    onClick={() => {
-                      setDepartment(d.name);
-                    }}
-                  >
-                    <div className="flex items-center justify-between text-xs mb-1.5">
-                      <span className="font-bold text-slate-800 group-hover:text-amber-700 transition-colors flex items-center gap-2">
-                        {d.name}
-                        <span className="text-[10px] font-semibold text-slate-400 bg-slate-100 px-1.5 py-0.2 rounded-full">
-                          {d.count} staff
-                        </span>
-                      </span>
-                      <div className="flex items-center gap-2">
-                        <span className="font-extrabold text-slate-900">{money(d.amount)}</span>
-                        <span className="text-[10px] font-bold text-slate-400 w-8 text-right">{pct}%</span>
-                      </div>
-                    </div>
-                    <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-amber-500 group-hover:bg-amber-600 rounded-full transition-all duration-300"
-                        style={{ width: `${Math.max(4, pct)}%` }}
-                      />
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-[1.1fr_0.95fr_1.15fr]">
+        <Panel title="Salary Cost by Department" source="Payslips + Employee Department" icon={Building2}>
+          <div className="flex h-44 items-end gap-3 border-b border-l border-slate-200 px-3 pt-3">
+            {topDepartments.map((row) => <button key={row.name} type="button" onClick={() => setDepartment(row.name)} className="group flex h-full min-w-0 flex-1 flex-col items-center justify-end gap-1"><span className="text-[9px] font-bold text-amber-700">{compactMoney(row.amount)}</span><span className="w-full max-w-12 rounded-t-lg bg-slate-800 transition-colors group-hover:bg-amber-500" style={{ height: `${Math.max(14, row.amount / maxDepartmentCost * 118)}px` }} /><span className="max-w-full truncate pb-2 text-[9px] font-semibold text-slate-500">{row.name}</span></button>)}
           </div>
+        </Panel>
 
-          <div className="pt-4 mt-4 border-t border-slate-100 flex items-center justify-between text-xs">
-            <span className="text-slate-500 font-medium">Click any department to filter dashboard.</span>
-            {department !== 'All' && (
-              <button
-                onClick={() => setDepartment('All')}
-                className="font-bold text-amber-700 hover:underline cursor-pointer"
-              >
-                Reset Filter
-              </button>
-            )}
+        <Panel title="Monthly Net Salary Trend" source="Historical Payslips / Payruns" icon={TrendingUp}>
+          <NetSalaryTrendChart points={trend} period={period} timelineMonths={timelineMonths} timelineIndex={timelineIndex} onPeriodChange={setPeriod} showTimeline={false} />
+        </Panel>
+
+        <Panel title="Payslip Status & Payroll Alerts" source="Payrun + Payslip Validation" icon={AlertTriangle}>
+          <div className="grid gap-5 sm:grid-cols-[1.2fr_1fr]">
+            <div><p className="mb-2 text-[10px] font-bold uppercase tracking-wide text-slate-500">Status split</p><div className="flex h-5 overflow-hidden rounded-md bg-slate-100">{statusRows.filter((row) => row.count > 0).map((row) => <span key={row.status} className={statusColors[row.status]} style={{ width: `${row.count / totalStatus * 100}%` }} title={`${row.status}: ${row.count}`} />)}</div><div className="mt-3 grid grid-cols-2 gap-x-3 gap-y-2">{statusRows.map((row) => <div key={row.status} className="flex items-center justify-between gap-2 text-[10px] font-semibold text-slate-600"><span className="flex items-center gap-1.5"><i className={`size-2 rounded-sm ${statusColors[row.status]}`} />{row.status}</span><strong className="text-slate-900">{row.count}</strong></div>)}</div></div>
+            <div><p className="mb-2 text-[10px] font-bold uppercase tracking-wide text-slate-500">Current alerts</p><ul className="space-y-2 text-[10px] font-semibold leading-relaxed">{alerts.length ? alerts.map((alert) => <li key={alert.text} className={alert.danger ? 'text-rose-600' : 'text-slate-600'}>• {alert.text}</li>) : <li className="text-emerald-700">• No payroll alerts for this period</li>}</ul></div>
           </div>
-        </div>
+        </Panel>
+      </div>
 
-        {/* Attendance & Leave Health */}
-        <div className="bg-white border border-[#e5ded4] rounded-2xl p-5 shadow-2xs flex flex-col justify-between">
-          <div>
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-              <h2 className="text-sm font-extrabold text-slate-900 flex items-center gap-2">
-                <Clock3 size={16} className="text-slate-700" />
-                Workforce Health & Attendance
-              </h2>
-              <button
-                onClick={() => navigate('attendance')}
-                className="text-xs font-bold text-amber-700 hover:underline flex items-center gap-1 cursor-pointer"
-              >
-                View Attendance <ArrowUpRight size={13} />
-              </button>
-            </div>
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-[0.9fr_1.05fr_0.95fr_0.95fr]">
+        <Panel title="Attendance Overview" source="Attendance" icon={Clock3}>
+          <div className="flex h-36 items-end gap-4 border-b border-l border-slate-200 px-3 pt-2">{attendanceBars.map((row) => <button key={row.label} type="button" onClick={() => navigate('attendance', `stat:${row.label.toLowerCase()}`)} className="flex h-full min-w-0 flex-1 flex-col items-center justify-end gap-1"><span className="text-[9px] font-black text-slate-700">{row.value}</span><span className={`w-full max-w-10 rounded-t-md ${row.color}`} style={{ height: `${Math.max(row.value ? 8 : 2, row.value / maxAttendance * 88)}px` }} /><span className="pb-2 text-[9px] font-semibold text-slate-500">{row.label}</span></button>)}</div>
+          <p className="mt-3 text-[10px] leading-relaxed text-slate-500">Missing check-outs: <strong className="text-slate-800">{incompleteShifts}</strong> · Attendance coverage: <strong className="text-slate-800">{workforceHealth.healthRate ?? 0}%</strong></p>
+        </Panel>
 
-            <div className="grid grid-cols-2 gap-3 pt-4 mb-4">
-              <div className="p-3 rounded-xl bg-[#faf7f3] border border-[#e5ded4]">
-                <span className="text-[10px] uppercase font-bold text-slate-400 block">Punched In</span>
-                <span className="text-lg font-black text-emerald-700">{workforceHealth.presentCount} Records</span>
-                <span className="text-[10px] text-slate-500 block mt-0.5">{workforceHealth.completeCount} completed shifts</span>
-              </div>
+        <Panel title="Time Off Overview" source="Time Off Requests + Allocations" icon={FileText}>
+          <div className="overflow-x-auto"><table className="w-full text-left text-[10px]"><thead><tr className="border-b border-slate-200 text-slate-400"><th className="pb-2 font-bold">Type</th><th className="pb-2 font-bold">Approved</th><th className="pb-2 font-bold">Pending</th><th className="pb-2 font-bold">Balance</th></tr></thead><tbody>{timeOffRows.map((row) => <tr key={row.id} className="border-b border-slate-100 last:border-0"><td className="py-2 font-bold text-slate-800">{row.name}</td><td className="py-2 text-slate-600">{row.approved}</td><td className="py-2 text-slate-600">{row.pending}</td><td className="py-2 text-slate-600">{row.remaining === null ? 'N/A' : row.remaining}</td></tr>)}</tbody></table></div>
+        </Panel>
 
-              <div className="p-3 rounded-xl bg-[#faf7f3] border border-[#e5ded4]">
-                <span className="text-[10px] uppercase font-bold text-slate-400 block">Approved Time Off</span>
-                <span className="text-lg font-black text-amber-700">{workforceHealth.approvedTimeOffDays} Days</span>
-                <span className="text-[10px] text-slate-500 block mt-0.5">{workforceHealth.pendingRequests} pending requests</span>
-              </div>
-            </div>
+        <Panel title="Department Overview" source="Employees + Contracts + Payslip Totals" icon={Building2}>
+          <div className="overflow-x-auto"><table className="w-full text-left text-[10px]"><thead><tr className="border-b border-slate-200 text-slate-400"><th className="pb-2 font-bold">Department</th><th className="pb-2 font-bold">Headcount</th><th className="pb-2 text-right font-bold">Monthly Salary</th></tr></thead><tbody>{topDepartments.map((row) => <tr key={row.name} className="border-b border-slate-100 last:border-0"><td className="py-2 font-bold text-slate-800">{row.name}</td><td className="py-2 text-slate-600">{row.count}</td><td className="py-2 text-right font-bold text-slate-800">{compactMoney(row.amount)}</td></tr>)}</tbody></table></div>
+        </Panel>
 
-            <div className="space-y-2">
-              <div className="flex items-center justify-between text-xs py-1.5 border-b border-slate-50">
-                <span className="font-semibold text-slate-700 flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500" /> On-Time Presence
-                </span>
-                <span className="font-extrabold text-slate-900">
-                  {Math.max(0, workforceHealth.presentCount - workforceHealth.lateCount)} shifts
-                </span>
-              </div>
-              <div className="flex items-center justify-between text-xs py-1.5 border-b border-slate-50">
-                <span className="font-semibold text-slate-700 flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-amber-500" /> Late Check-Ins
-                </span>
-                <span className="font-extrabold text-amber-700">{workforceHealth.lateCount} shifts</span>
-              </div>
-              <div className="flex items-center justify-between text-xs py-1.5">
-                <span className="font-semibold text-slate-700 flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-rose-500" /> Unrecorded / Absent
-                </span>
-                <span className="font-extrabold text-rose-600">{workforceHealth.absentCount} records</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="pt-4 mt-4 border-t border-slate-100 flex items-center justify-between text-xs">
-            <span className="text-slate-500 font-medium">Overtime Records:</span>
-            <span className="font-bold text-slate-800">{workforceHealth.overtimeCount} shifts &gt; 9 hrs</span>
-          </div>
-        </div>
+        <Panel title="Models to Aggregate" source="Connected operational records" icon={Layers3}>
+          <p className="mb-3 text-[10px] leading-relaxed text-slate-500">The relationships powering this dashboard:</p>
+          <ul className="space-y-2 text-[10px] font-semibold leading-relaxed text-slate-700"><li>• Employees → department, ownership, grouping</li><li>• Contracts → wage, schedule, active employees</li><li>• Payruns / Payslips → totals, paid vs pending</li><li>• Attendance → presence, lateness, overtime</li><li>• Time Off → allocations, requests, balances</li></ul>
+        </Panel>
       </div>
     </div>
   );
