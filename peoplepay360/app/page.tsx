@@ -55,7 +55,6 @@ import OverviewDashboard from '@/components/overview-dashboard';
 import WorkingSchedules from '@/components/working-schedules';
 import { EmployeeRosterList } from '@/components/dashboard/EmployeeRosterList';
 import { getEmployeeRosterRows } from '@/lib/dashboard-calculations';
-import { exportDashboardPdf } from '@/lib/export';
 import RecordForm, { defaults, titles } from '@/components/record-form';
 import {
   PageShell,
@@ -722,16 +721,21 @@ export default function Home() {
     if (!s) return;
     try {
       setBusy(true);
-      const pdfBytes = await exportDashboardPdf(s, period, department, employeeType);
-      const blob = new Blob([pdfBytes as unknown as BlobPart], { type: 'application/pdf' });
+      const params = new URLSearchParams({ period, department, employeeType });
+      const res = await fetch(`/api/dashboard/pdf?${params.toString()}`);
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error((body as { error?: string }).error || 'Server error generating PDF.');
+      }
+      const blob = await res.blob();
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
       a.download = `peoplepay360-${period}.pdf`;
       a.click();
       URL.revokeObjectURL(url);
-    } catch {
-      setError('Failed to generate PDF export.');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to generate PDF export.');
     } finally {
       setBusy(false);
     }
