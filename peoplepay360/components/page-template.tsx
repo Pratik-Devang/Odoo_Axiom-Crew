@@ -18,7 +18,12 @@ import {
 } from 'lucide-react';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { canView, type AppUser } from '@/lib/domain';
+<<<<<<< HEAD
+import Link from 'next/link';
+import { LogOut, Shield, UserCog, KeyRound } from 'lucide-react';
+=======
 import { LogOut, Shield, Power, UserCog } from 'lucide-react';
+>>>>>>> 3f342e940546d8bcc43507f326bc198f6fe96171
 
 /* ─────────────────────────────────────────────────────────
    1. TYPES
@@ -254,6 +259,14 @@ export function PageShell({
               >
                 {currentUser.name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase()}
               </div>
+              <Link
+                href="/change-password"
+                className="circle-btn hover:text-amber-600 hover:bg-amber-50 cursor-pointer"
+                title="Change Password"
+                aria-label="Change Password"
+              >
+                <KeyRound size={16} />
+              </Link>
               {onLogout && (
                 <button
                   className="circle-btn hover:text-rose-600 hover:bg-rose-50 cursor-pointer"
