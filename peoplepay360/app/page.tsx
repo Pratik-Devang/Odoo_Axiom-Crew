@@ -1,7 +1,9 @@
 'use client';
 
 import Image from 'next/image';
+import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
+import { AuthBrandedPanel } from '@/components/auth/AuthBrandedPanel';
 import {
   Plus,
   ChevronDown,
@@ -134,72 +136,6 @@ function responseError(body: ApiBody, fallback: string) {
 }
 
 
-const DEMO_ACCOUNTS = [
-  { role: 'Admin', email: 'admin@oxp.example', password: 'admin123', desc: 'Full workspace & user management' },
-  { role: 'HR Payroll Manager', email: 'nisha@oxp.example', password: 'payrollmgr123', desc: 'Author rules, payrun wizard, validate & mark paid' },
-  { role: 'HR Payroll User', email: 'payroll.user@oxp.example', password: 'payroll123', desc: 'Review payruns, compute payslip calculations' },
-  { role: 'HR Manager', email: 'sara@oxp.example', password: 'hrmanager123', desc: 'Employee profiles, contracts & leave approvals' },
-  { role: 'Employee', email: 'john@oxp.example', password: 'employee123', desc: 'Self-service attendance, requests & payslips' },
-];
-
-const EMPLOYEE_QUICK_LOGINS = [
-  { name: 'Aarav Mehta', position: 'Senior Payroll Manager', department: 'Finance', email: 'aarav.mehta@oxp.example' },
-  { name: 'Abhishek Roy', position: 'Business Development Representative', department: 'Sales', email: 'abhishek.roy@oxp.example' },
-  { name: 'Aditya Sen', position: 'Senior Backend Engineer', department: 'Engineering', email: 'aditya.sen@oxp.example' },
-  { name: 'Ananya Deshmukh', position: 'HR Business Partner', department: 'HR', email: 'ananya.deshmukh@oxp.example' },
-  { name: 'Ananya Iyer', position: 'Head of Product Design', department: 'Product', email: 'ananya.iyer@oxp.example' },
-  { name: 'Anik Dutta', position: 'Cloud Infrastructure Intern', department: 'Engineering', email: 'anik.dutta@oxp.example' },
-  { name: 'Arun Bhatia', position: 'Staff Backend Architect', department: 'Engineering', email: 'arun.bhatia@oxp.example' },
-  { name: 'Bhavna Parekh', position: 'Client Solutions Consultant', department: 'Sales', email: 'bhavna.parekh@oxp.example' },
-  { name: 'Chetan Bhagat', position: 'Technical Support Specialist', department: 'Support', email: 'chetan.bhagat@oxp.example' },
-  { name: 'Deepak Chopra', position: 'Senior DevOps / SRE', department: 'Engineering', email: 'deepak.chopra@oxp.example' },
-  { name: 'Dev Shah', position: 'Head of Enterprise Sales', department: 'Sales', email: 'dev.shah@oxp.example' },
-  { name: 'Divya Sundaram', position: 'Frontend Engineer', department: 'Engineering', email: 'divya.sundaram@oxp.example' },
-  { name: 'Gautam Singhania', position: 'HR Operations Specialist', department: 'HR', email: 'gautam.singhania@oxp.example' },
-  { name: 'Ishaan Kapoor', position: 'Support Operations Manager', department: 'Support', email: 'ishaan.kapoor@oxp.example' },
-  { name: 'John Dsouza', position: 'Frontend Lead Developer', department: 'Engineering', email: 'john.dsouza@oxp.example' },
-  { name: 'Kabir Sethi', position: 'Software Engineering Intern', department: 'Engineering', email: 'kabir.sethi@oxp.example' },
-  { name: 'Karthik Raja', position: 'Full Stack Engineer', department: 'Engineering', email: 'karthik.raja@oxp.example' },
-  { name: 'Kavita Joshi', position: 'Recruiting Coordinator', department: 'HR', email: 'kavita.joshi@oxp.example' },
-  { name: 'Kunal Kapoor', position: 'Regional Sales Manager (North)', department: 'Sales', email: 'kunal.kapoor@oxp.example' },
-  { name: 'Manish Tiwari', position: 'Payroll Specialist', department: 'Finance', email: 'manish.tiwari@oxp.example' },
-  { name: 'Maya Shah', position: 'Senior Account Executive', department: 'Sales', email: 'maya.shah@oxp.example' },
-  { name: 'Meera Nambiar', position: 'Compensation & Benefits Analyst', department: 'Finance', email: 'meera.nambiar@oxp.example' },
-  { name: 'Monika Sehgal', position: 'Client Care Associate', department: 'Support', email: 'monika.sehgal@oxp.example' },
-  { name: 'Natasha Thomas', position: 'Visual Designer', department: 'Product', email: 'natasha.thomas@oxp.example' },
-  { name: 'Naveen Kumar', position: 'QA Automation Engineer', department: 'Engineering', email: 'naveen.kumar@oxp.example' },
-  { name: 'Neha Patel', position: 'Talent Acquisition Lead', department: 'HR', email: 'neha.patel@oxp.example' },
-  { name: 'Nikhil Mathur', position: 'Helpdesk Analyst', department: 'Support', email: 'nikhil.mathur@oxp.example' },
-  { name: 'Nisha Rao', position: 'Director of Finance & Accounts', department: 'Finance', email: 'nisha.rao@oxp.example' },
-  { name: 'Pallavi Rao', position: 'Junior Frontend Developer', department: 'Engineering', email: 'pallavi.rao@oxp.example' },
-  { name: 'Pooja Bhatt', position: 'Customer Success Associate', department: 'Support', email: 'pooja.bhatt@oxp.example' },
-  { name: 'Pooja Hegde', position: 'Principal QA Engineer', department: 'Engineering', email: 'pooja.hegde@oxp.example' },
-  { name: 'Prashant Verma', position: 'Principal Product Manager', department: 'Product', email: 'prashant.verma@oxp.example' },
-  { name: 'Priya Nair', position: 'Customer Success Team Lead', department: 'Support', email: 'priya.nair@oxp.example' },
-  { name: 'Rahul Bose', position: 'Junior Backend Developer', department: 'Engineering', email: 'rahul.bose@oxp.example' },
-  { name: 'Rajesh Varma', position: 'Chief Executive Officer', department: 'Management', email: 'rajesh.varma@oxp.example' },
-  { name: 'Ritu Kulkarni', position: 'Senior Staff Accountant', department: 'Finance', email: 'ritu.kulkarni@oxp.example' },
-  { name: 'Rohan Patel', position: 'Engineering Director', department: 'Engineering', email: 'rohan.patel@oxp.example' },
-  { name: 'Sameer Qureshi', position: 'Sales Operations Coordinator', department: 'Sales', email: 'sameer.qureshi@oxp.example' },
-  { name: 'Sanya Mirza', position: 'Senior UX Researcher', department: 'Product', email: 'sanya.mirza@oxp.example' },
-  { name: 'Sara Khan', position: 'Head of People & Culture', department: 'HR', email: 'sara.khan@oxp.example' },
-  { name: 'Shreya Ghosh', position: 'Database Reliability Engineer', department: 'Engineering', email: 'shreya.ghosh@oxp.example' },
-  { name: 'Shruti Bhatt', position: 'UI/UX Mobile Developer', department: 'Engineering', email: 'shruti.bhatt@oxp.example' },
-  { name: 'Siddharth Roy', position: 'Accounts Payable Associate', department: 'Finance', email: 'siddharth.roy@oxp.example' },
-  { name: 'Sneha Chawla', position: 'Cloud Security Specialist', department: 'Engineering', email: 'sneha.chawla@oxp.example' },
-  { name: 'Sunita Menon', position: 'Chief Operating Officer', department: 'Management', email: 'sunita.menon@oxp.example' },
-  { name: 'Tanvi Agarwal', position: 'People Operations Intern', department: 'HR', email: 'tanvi.agarwal@oxp.example' },
-  { name: 'Tarun Saxena', position: 'Product Analyst', department: 'Product', email: 'tarun.saxena@oxp.example' },
-  { name: 'Varun Reddy', position: 'Data Platform Engineer', department: 'Engineering', email: 'varun.reddy@oxp.example' },
-  { name: 'Vikramaditya Rao', position: 'VP of Technology & Operations', department: 'Management', email: 'vikram.rao@oxp.example' },
-  { name: 'Zoya Khan', position: 'Inbound Sales Associate', department: 'Sales', email: 'zoya.khan@oxp.example' }
-]
-  .filter(e => !['Rajesh Varma', 'Nisha Rao', 'Sara Khan', 'John Dsouza'].includes(e.name))
-  .map(e => ({ ...e, password: 'welcome123' }));
-
-
-const DEFAULT_LOGIN = DEMO_ACCOUNTS[0];
-
 const ROLE_STYLES: Record<string, string> = {
   Admin: 'bg-rose-50 text-rose-700 border-rose-200',
   'HR Payroll Manager': 'bg-amber-50 text-amber-800 border-amber-200',
@@ -240,12 +176,10 @@ export default function Home() {
   // Authentication & RBAC states
   const [currentUser, setCurrentUser] = useState<AppUser | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
-  const [loginEmail, setLoginEmail] = useState(DEFAULT_LOGIN.email);
-  const [loginPassword, setLoginPassword] = useState(DEFAULT_LOGIN.password);
+  const [loginEmail, setLoginEmail] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
   const [loginError, setLoginError] = useState('');
   const [loginBusy, setLoginBusy] = useState(false);
-  const [loginDropdownOpen, setLoginDropdownOpen] = useState(false);
-  const [loginSearch, setLoginSearch] = useState('');
 
   // Admin users state & unified view options
   const [systemUsers, setSystemUsers] = useState<SystemUser[]>([]);
@@ -347,8 +281,8 @@ export default function Home() {
     setCurrentUser(null);
     setS(null);
     setRevision(0);
-    setLoginEmail(DEFAULT_LOGIN.email);
-    setLoginPassword(DEFAULT_LOGIN.password);
+    setLoginEmail('');
+    setLoginPassword('');
     setView('overview');
     window.location.hash = '';
   }
@@ -691,11 +625,7 @@ export default function Home() {
     ]);
   };
 
-<<<<<<< HEAD
-=======
-  const departments = s ? [...new Set(s.employees.map((e) => e.department))] : [];
 
->>>>>>> b2e933d140d9954ec17356a6a08445f27081f4d0
   /* ---------------------------------------------------------
      LOGIN SCREEN (Crextio Design System)
      --------------------------------------------------------- */
@@ -711,208 +641,111 @@ export default function Home() {
 
   if (!currentUser) {
     return (
-      <div className="min-h-screen bg-[#fcfbf9] flex flex-col justify-center items-center px-4 py-12">
-        <div className="w-full max-w-md bg-white rounded-3xl border border-[#e5ded4] shadow-sm p-8 space-y-6">
-          <div className="text-center space-y-2">
-            <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-amber-50 border border-amber-200/60 shadow-2xs mb-1">
-              <Image src="/favicon.png" alt="PeoplePay360" width={40} height={40} className="rounded-xl object-contain" />
-            </div>
-            <h1 className="text-xl font-extrabold tracking-tight text-slate-900">
-              peoplepay<span className="text-[#e6a817]">360</span>
-            </h1>
-            <p className="text-xs text-[#8a7a6d]">Sign in to access your role-based workspace</p>
-          </div>
+      <div className="min-h-screen bg-[#fcfbf9] flex items-center justify-center p-4 sm:p-6 lg:p-8">
+        <div className="w-full max-w-6xl min-h-[640px] bg-white rounded-3xl border border-[#e5ded4] shadow-xl overflow-hidden flex flex-col md:flex-row">
+          {/* Left Column: Corporate Branding Panel */}
+          <AuthBrandedPanel tagline="Manage your workforce, effortlessly" />
 
-          {loginError && (
-            <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-700 flex items-center gap-2">
-              <AlertCircle size={15} className="shrink-0" />
-              <span>{loginError}</span>
-            </div>
-          )}
-
-          {/* -- Employee Quick-Login Picker ----------------------- */}
-          <div className="relative">
-            <button
-              type="button"
-              onClick={() => { setLoginDropdownOpen(o => !o); setLoginSearch(''); }}
-              className="w-full flex items-center justify-between px-3 py-2 rounded-xl border border-[#e5ded4] bg-[#faf8f5] hover:border-slate-400 hover:bg-white transition-all text-left cursor-pointer"
-            >
-              <span className="flex items-center gap-2 text-xs text-slate-600 font-medium">
-                <Users size={13} className="text-[#c99a2e]" />
-                Quick Employee Login
+          {/* Right Column: Sign In Form Panel */}
+          <div className="w-full md:w-1/2 lg:w-5/12 p-8 sm:p-12 flex flex-col justify-center bg-white">
+            {/* Mobile Logo Branding */}
+            <div className="md:hidden flex items-center gap-2 mb-6">
+              <Image src="/favicon.png" alt="PeoplePay360" width={28} height={28} className="rounded-lg" />
+              <span className="text-base font-extrabold tracking-tight text-slate-900">
+                peoplepay<span className="text-[#e6a817]">360</span>
               </span>
-              <ChevronDown size={13} className={`text-slate-400 transition-transform duration-200 ${loginDropdownOpen ? 'rotate-180' : ''}`} />
-            </button>
-
-            {loginDropdownOpen && (() => {
-              const q = loginSearch.toLowerCase();
-              const filtered = EMPLOYEE_QUICK_LOGINS.filter(e =>
-                !q || e.name.toLowerCase().includes(q) || e.position.toLowerCase().includes(q) || e.department.toLowerCase().includes(q)
-              );
-              const grouped = Array.from(new Set(filtered.map(e => e.department))).sort().map(dept => ({
-                dept,
-                employees: filtered.filter(e => e.department === dept),
-              }));
-              const DEPT_COLORS: Record<string, string> = {
-                Executive: 'bg-purple-50 text-purple-700',
-                Management: 'bg-purple-50 text-purple-700',
-                Engineering: 'bg-blue-50 text-blue-700',
-                Finance: 'bg-emerald-50 text-emerald-700',
-                HR: 'bg-rose-50 text-rose-700',
-                Marketing: 'bg-orange-50 text-orange-700',
-                Product: 'bg-indigo-50 text-indigo-700',
-                Sales: 'bg-amber-50 text-amber-800',
-                Support: 'bg-teal-50 text-teal-700',
-              };
-              return (
-                <div className="absolute z-50 top-full mt-1.5 left-0 right-0 bg-white border border-[#e5ded4] rounded-2xl shadow-lg overflow-hidden">
-                  {/* Search bar */}
-                  <div className="flex items-center gap-2 px-3 py-2 border-b border-[#f0ece5] bg-[#faf8f5]">
-                    <Search size={12} className="text-slate-400 shrink-0" />
-                    <input
-                      type="text"
-                      value={loginSearch}
-                      onChange={e => setLoginSearch(e.target.value)}
-                      placeholder="Search name, position or department..."
-                      className="w-full text-xs outline-none bg-transparent text-slate-700 placeholder:text-slate-400"
-                    />
-                    {loginSearch && (
-                      <button type="button" onClick={() => setLoginSearch('')} className="text-slate-400 hover:text-slate-600">
-                        <XCircle size={12} />
-                      </button>
-                    )}
-                  </div>
-
-                  {/* Results */}
-                  <div className="max-h-64 overflow-y-auto">
-                    {grouped.length === 0 ? (
-                      <div className="text-center text-xs text-slate-400 py-6">No matching employees</div>
-                    ) : (
-                      grouped.map(({ dept, employees: emps }) => (
-                        <div key={dept}>
-                          <div className={`px-3 py-1 text-[9px] font-bold uppercase tracking-widest ${DEPT_COLORS[dept] || 'bg-slate-50 text-slate-600'}`}>
-                            {dept}
-                          </div>
-                          {emps.map(emp => (
-                            <button
-                              key={emp.email}
-                              type="button"
-                              onClick={() => {
-                                setLoginEmail(emp.email);
-                                setLoginPassword(emp.password);
-                                setLoginDropdownOpen(false);
-                                setLoginSearch('');
-                              }}
-                              className="w-full flex items-center justify-between px-3 py-2 hover:bg-[#faf8f5] transition-colors text-left group"
-                            >
-                              <div className="flex items-center gap-2.5 min-w-0">
-                                <div className="w-6 h-6 rounded-lg bg-slate-100 flex items-center justify-center text-[9px] font-bold text-slate-600 group-hover:bg-slate-800 group-hover:text-white transition-colors shrink-0">
-                                  {emp.name.split(' ').map((n: string) => n[0]).slice(0, 2).join('')}
-                                </div>
-                                <div className="min-w-0">
-                                  <div className="text-xs font-semibold text-slate-800 leading-tight truncate">{emp.name}</div>
-                                  <div className="text-[10px] text-slate-400 truncate">{emp.position}</div>
-                                </div>
-                              </div>
-                              <span className="text-[10px] text-[#c99a2e] font-semibold shrink-0 ml-2 opacity-0 group-hover:opacity-100 transition-opacity">Fill -&gt;</span>
-                            </button>
-                          ))}
-                        </div>
-                      ))
-                    )}
-                  </div>
-
-                  {/* Footer hint */}
-                  <div className="px-3 py-1.5 border-t border-[#f0ece5] bg-[#faf8f5] text-[9px] text-slate-400 text-center">
-                    All employees - password: <span className="font-mono font-semibold text-slate-500">welcome123</span>
-                  </div>
-                </div>
-              );
-            })()}
-          </div>
-
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              void handleLogin();
-            }}
-            className="space-y-4"
-          >
-            <div>
-              <label htmlFor="login-email" className="block text-xs font-semibold text-slate-700 mb-1.5">Work Email</label>
-              <div className="pill-search !py-2 w-full bg-slate-50 border border-slate-200 focus-within:border-slate-400 focus-within:bg-white transition-all">
-                <input
-                  id="login-email"
-                  type="email"
-                  name="email"
-                  autoComplete="username"
-                  required
-                  value={loginEmail}
-                  onChange={(e) => setLoginEmail(e.target.value)}
-                  placeholder="e.g. admin@oxp.example"
-                  className="w-full text-xs outline-none bg-transparent"
-                />
-              </div>
             </div>
 
-            <div>
-              <label htmlFor="login-password" className="block text-xs font-semibold text-slate-700 mb-1.5">Password</label>
-              <div className="pill-search !py-2 w-full bg-slate-50 border border-slate-200 focus-within:border-slate-400 focus-within:bg-white transition-all">
-                <input
-                  id="login-password"
-                  type="password"
-                  name="password"
-                  autoComplete="current-password"
-                  required
-                  value={loginPassword}
-                  onChange={(e) => setLoginPassword(e.target.value)}
-                  placeholder="********"
-                  className="w-full text-xs outline-none bg-transparent"
-                />
-              </div>
+            <div className="space-y-2 mb-8">
+              <h2 className="text-2xl font-extrabold text-slate-900 tracking-tight">Sign In</h2>
+              <p className="text-xs text-[#8a7a6d]">Access your role-based enterprise workspace</p>
             </div>
 
-            <button
-              type="submit"
-              disabled={loginBusy}
-              className="w-full pill-btn pill-btn-black !py-2.5 justify-center text-xs font-semibold cursor-pointer disabled:opacity-50"
+            {loginError && (
+              <div className="mb-6 p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-700 flex items-center gap-2">
+                <AlertCircle size={15} className="shrink-0" />
+                <span>{loginError}</span>
+              </div>
+            )}
+
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                void handleLogin();
+              }}
+              className="space-y-4"
             >
-              {loginBusy ? 'Signing In...' : 'Sign In'}
-            </button>
-          </form>
+              <div>
+                <label htmlFor="login-email" className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  Work Email
+                </label>
+                <div className="pill-search !py-2 w-full bg-slate-50 border border-slate-200 focus-within:border-slate-400 focus-within:bg-white transition-all flex items-center gap-2 px-3 rounded-xl">
+                  <Mail className="size-4 text-slate-400 shrink-0" />
+                  <input
+                    id="login-email"
+                    type="email"
+                    name="email"
+                    autoComplete="username"
+                    required
+                    value={loginEmail}
+                    onChange={(e) => setLoginEmail(e.target.value)}
+                    placeholder="e.g. admin@oxp.example"
+                    className="w-full text-xs outline-none bg-transparent text-slate-800 placeholder:text-slate-400"
+                  />
+                </div>
+              </div>
 
-          <div className="pt-4 border-t border-[#f0ece5]">
-            <div className="text-[11px] font-semibold text-[#8a7a6d] uppercase tracking-wider text-center mb-3">
-              Quick Switch / Demo Role Logins
-            </div>
-            <div className="space-y-1.5">
-              {DEMO_ACCOUNTS.map((demo) => (
-                <button
-                  key={demo.role}
-                  type="button"
-                  onClick={() => void handleLogin(demo.email, demo.password)}
-                  disabled={loginBusy}
-                  className="w-full flex items-center justify-between p-2.5 rounded-xl border border-[#e5ded4] hover:border-slate-400 hover:bg-[#faf8f5] transition-all text-left cursor-pointer group"
-                >
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-7 h-7 rounded-lg bg-slate-100 flex items-center justify-center text-[10px] font-bold text-slate-700 group-hover:bg-[#1a1a1a] group-hover:text-white transition-colors">
-                      {demo.role.split(' ').map(n => n[0]).slice(0, 2).join('')}
-                    </div>
-                    <div>
-                      <div className="text-xs font-semibold text-slate-900 leading-tight flex items-center gap-1.5">
-                        {demo.role}
-                        <span className={`text-[9px] px-1.5 py-0.2 rounded border font-semibold ${ROLE_STYLES[demo.role] || ''}`}>
-                          Role
-                        </span>
-                      </div>
-                      <div className="text-[10px] text-slate-400">{demo.desc}</div>
-                    </div>
-                  </div>
-                  <span className="text-[11px] text-[#c99a2e] font-semibold group-hover:underline">
-                    Sign In -&gt;
-                  </span>
-                </button>
-              ))}
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label htmlFor="login-password" className="block text-xs font-semibold text-slate-700">
+                    Password
+                  </label>
+                  <Link href="/forgot-password" className="text-[11px] font-semibold text-[#c99a2e] hover:underline">
+                    Forgot password?
+                  </Link>
+                </div>
+                <div className="pill-search !py-2 w-full bg-slate-50 border border-slate-200 focus-within:border-slate-400 focus-within:bg-white transition-all flex items-center gap-2 px-3 rounded-xl">
+                  <Key className="size-4 text-slate-400 shrink-0" />
+                  <input
+                    id="login-password"
+                    type="password"
+                    name="password"
+                    autoComplete="current-password"
+                    required
+                    value={loginPassword}
+                    onChange={(e) => setLoginPassword(e.target.value)}
+                    placeholder="••••••••"
+                    className="w-full text-xs outline-none bg-transparent text-slate-800 placeholder:text-slate-400"
+                  />
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                disabled={loginBusy}
+                className="w-full pill-btn pill-btn-black !py-2.5 justify-center text-xs font-semibold cursor-pointer disabled:opacity-50 mt-2 flex items-center gap-2"
+              >
+                {loginBusy ? (
+                  <>
+                    <RefreshCw className="size-4 animate-spin" />
+                    <span>Signing In...</span>
+                  </>
+                ) : (
+                  <>
+                    <span>Sign In</span>
+                    <ChevronRight className="size-4" />
+                  </>
+                )}
+              </button>
+            </form>
+
+            <div className="mt-8 pt-6 border-t border-[#f0ece5] text-center">
+              <p className="text-xs text-slate-500">
+                Don&apos;t have an account?{' '}
+                <Link href="/signup" className="font-semibold text-[#c99a2e] hover:underline">
+                  Sign Up
+                </Link>
+              </p>
             </div>
           </div>
         </div>
