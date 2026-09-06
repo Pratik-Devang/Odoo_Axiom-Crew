@@ -116,15 +116,13 @@ export function PageShell({
             onNavigate(currentUser?.role === 'Employee' ? 'attendance' : currentUser?.role === 'HR Manager' ? 'users' : 'overview');
           }}
         >
-          {isOverview ? <span className="workora-brand-dot" /> : (
-            <img
-              src="/favicon.png"
-              alt="PeoplePay360 Logo"
-              className="w-8 h-8 rounded-lg object-contain border border-amber-200/60 shadow-2xs shrink-0"
-            />
-          )}
+          <img
+            src="/favicon.png"
+            alt="PeoplePay360 Logo"
+            className="w-8 h-8 rounded-lg object-contain border border-amber-200/60 shadow-2xs shrink-0"
+          />
           <span className="font-extrabold tracking-tight text-slate-900 text-[18px] leading-none flex items-center">
-            peoplepay<span className={isOverview ? '' : 'text-[#e6a817]'}>360</span>
+            peoplepay<span className="text-[#e6a817]">360</span>
           </span>
         </a>
 
@@ -232,7 +230,7 @@ export function PageShell({
           >
             <HelpCircle size={17} />
           </button>
-          {currentUser && !isOverview ? (
+          {currentUser ? (
             <div className="flex items-center gap-2 pl-2 border-l border-[#e5ded4]">
               <div className="text-right hidden sm:block">
                 <span className="font-bold text-xs text-slate-800 block leading-tight">
@@ -267,7 +265,7 @@ export function PageShell({
               aria-label="User profile"
               onClick={onAboutClick}
             >
-              {currentUser ? currentUser.name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase() : 'NR'}
+              NR
             </button>
           )}
         </div>

@@ -14,6 +14,10 @@ function compactRupees(value: number) {
   return `₹${Math.round(value)}`;
 }
 
+function clamp(value: number, min: number, max: number) {
+  return Math.min(Math.max(value, min), max);
+}
+
 function curvedPath(points: Array<{ x: number; y: number }>) {
   if (!points.length) return '';
   let path = `M ${points[0].x} ${points[0].y}`;
@@ -24,9 +28,17 @@ function curvedPath(points: Array<{ x: number; y: number }>) {
     const following = points[Math.min(points.length - 1, index + 2)];
     const minY = Math.min(current.y, next.y);
     const maxY = Math.max(current.y, next.y);
+<<<<<<< HEAD
+    const cp1x = current.x + (next.x - previous.x) / 6;
+    const cp2x = next.x - (following.x - current.x) / 6;
+    const cp1y = clamp(current.y + (next.y - previous.y) / 6, minY, maxY);
+    const cp2y = clamp(next.y - (following.y - current.y) / 6, minY, maxY);
+    path += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${next.x} ${next.y}`;
+=======
     const cp1y = Math.min(Math.max(current.y + (next.y - previous.y) / 6, minY), maxY);
     const cp2y = Math.min(Math.max(next.y - (following.y - current.y) / 6, minY), maxY);
     path += ` C ${current.x + (next.x - previous.x) / 6} ${cp1y}, ${next.x - (following.x - current.x) / 6} ${cp2y}, ${next.x} ${next.y}`;
+>>>>>>> a535fb6d791859860561793b0c8675588eaa9cbe
   }
   return path;
 }
@@ -57,26 +69,32 @@ export function MonthlySalaryTrendCard({ points, period, onPeriodChange, onManag
   const chartHeight = height - padding.top - padding.bottom;
   const plotBottom = padding.top + chartHeight;
   const values = visiblePoints.map((point) => point.value);
+  const positiveValues = values.filter((value) => value > 0);
   const rawMin = values.length ? Math.min(...values) : 0;
   const rawMax = values.length ? Math.max(...values, 1) : 1;
-  const spread = Math.max(rawMax - rawMin, rawMax * 0.12, 1);
-  const axisMin = rawMin <= 0 ? -Math.max(rawMax * 0.16, spread * 0.22, 1) : Math.max(0, rawMin - spread * 0.32);
-  const axisMax = rawMin <= 0 ? rawMax * 1.18 : rawMax + spread * 0.32;
+  const positiveMin = positiveValues.length ? Math.min(...positiveValues) : rawMin;
+  const displayFloor = positiveValues.length > 1 && positiveMin < rawMax * 0.22 ? rawMax * 0.58 : positiveMin;
+  const scaleValues = values.map((value) => (value > 0 ? Math.max(value, displayFloor) : value));
+  const scaleMin = scaleValues.length ? Math.min(...scaleValues) : 0;
+  const scaleMax = scaleValues.length ? Math.max(...scaleValues, 1) : 1;
+  const spread = Math.max(scaleMax - scaleMin, scaleMax * 0.12, 1);
+  const axisMin = rawMin <= 0 ? 0 : Math.max(0, scaleMin - spread * 0.32);
+  const axisMax = scaleMax + spread * 0.32;
   const valueToY = (value: number) => padding.top + chartHeight - ((value - axisMin) / (axisMax - axisMin)) * chartHeight;
   const coordinates = visiblePoints.map((point, index) => {
-    const y = valueToY(point.value);
+    const displayValue = point.value > 0 ? Math.max(point.value, displayFloor) : 0;
     return {
       ...point,
       x: padding.left + (visiblePoints.length > 1 ? (index / (visiblePoints.length - 1)) * chartWidth : chartWidth / 2),
-      y: Math.min(Math.max(y, padding.top), plotBottom),
+      y: clamp(valueToY(displayValue), padding.top, plotBottom),
     };
   });
   const line = curvedPath(coordinates);
-  const baseline = Math.min(valueToY(Math.max(0, axisMin)), plotBottom);
+  const baseline = clamp(valueToY(0), padding.top, plotBottom);
   const area = line ? `${line} L ${coordinates.at(-1)?.x ?? padding.left} ${baseline} L ${coordinates[0]?.x ?? padding.left} ${baseline} Z` : '';
   const activeCoordinate = coordinates.find((point) => point.period === activePeriod) || coordinates.at(-1);
   const ticks = [1, 2 / 3, 1 / 3, 0].map((ratio) => {
-    const value = rawMin <= 0 ? axisMax * ratio : axisMin + (axisMax - axisMin) * ratio;
+    const value = axisMin + (axisMax - axisMin) * ratio;
     return { value, y: valueToY(value) };
   });
   const labelX = (padding.left - 18) / width * 100;

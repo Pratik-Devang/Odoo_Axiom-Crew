@@ -1309,17 +1309,6 @@ tr:hover td {
   padding: 10px 7px 22px;
   gap: 12px;
 }
-.overview-shell .workora-topbar {
-  min-height: 52px;
-  top: 10px;
-  padding: 7px 16px;
-  border-radius: 18px;
-}
-.overview-shell .workora-brand { font-size: 17px; gap: 8px; }
-.overview-shell .nav-pill { padding: 7px 15px; font-size: 12px; }
-.overview-shell .circle-btn,
-.overview-shell .circle-avatar { width: 32px; height: 32px; }
-.overview-shell .workora-top-actions { gap: 8px; }
 .overview-shell .workora-subbar {
   min-height: 56px;
   padding: 9px 17px;
