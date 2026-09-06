@@ -20,6 +20,7 @@ export type AppStatus =
   | 'Absent'
   | 'Archived'
   | 'Expired'
+  | 'Inactive'
   | string;
 
 interface StatusBadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
@@ -48,6 +49,9 @@ export function StatusBadge({
   } else if (value === 'Validated') {
     styleClasses = 'bg-slate-900 text-white border-slate-900';
     dotColor = 'bg-white';
+  } else if (value === 'Inactive') {
+    styleClasses = 'bg-slate-100 text-slate-500 border-slate-200';
+    dotColor = 'bg-slate-400';
   } else if (pending.includes(value)) {
     styleClasses = 'bg-slate-50 text-slate-700 border-slate-200';
     dotColor = 'bg-amber-500';

@@ -1,14 +1,19 @@
 'use client';
 
 import Image from 'next/image';
+<<<<<<< HEAD
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 import { AuthBrandedPanel } from '@/components/auth/AuthBrandedPanel';
+=======
+import { useCallback, useEffect, useMemo, useState } from 'react';
+>>>>>>> 3f342e940546d8bcc43507f326bc198f6fe96171
 import {
   Plus,
   ChevronDown,
   ArrowUpRight,
   Clock3,
+  Power,
   LayoutGrid,
   List,
   Download,
@@ -26,11 +31,15 @@ import {
   Key,
   Mail,
   ChevronRight,
+  Eye,
+  EyeOff,
+  Lock,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Checkbox } from '@/components/ui/checkbox';
+import { AttendanceWidget } from '@/components/attendance-widget';
 import {
   type Workspace,
   type Row,
@@ -52,6 +61,7 @@ import OverviewDashboard from '@/components/overview-dashboard';
 import WorkingSchedules from '@/components/working-schedules';
 import { EmployeeRosterList } from '@/components/dashboard/EmployeeRosterList';
 import { getEmployeeRosterRows } from '@/lib/dashboard-calculations';
+import { exportDashboardPdf } from '@/lib/export';
 import RecordForm, { defaults, titles } from '@/components/record-form';
 import {
   PageShell,
@@ -205,6 +215,7 @@ export default function Home() {
     bank: '',
     assignedEmployeeIds: [],
   });
+  const [showUserPassword, setShowUserPassword] = useState(false);
 
   const checkAuth = useCallback(async () => {
     try {
@@ -353,7 +364,7 @@ export default function Home() {
     setMounted(true);
     void checkAuth();
     void load();
-    const timer = setInterval(() => setClockNow(new Date()), 30000);
+    const timer = setInterval(() => setClockNow(new Date()), 1000);
     return () => clearInterval(timer);
   }, [checkAuth, load]);
 
@@ -493,11 +504,11 @@ export default function Home() {
 
   const deleteRecord = async () => {
     if (!modal?.collection || !modal.record?.id) return;
-    const archived = modal.collection === 'employees';
+    const inactive = modal.collection === 'employees';
     const result = await act(
       'delete',
       { collection: modal.collection, id: modal.record.id },
-      archived ? 'Employee archived.' : 'Record deleted.'
+      inactive ? 'Employee inactive.' : 'Record deleted.'
     );
     if (result) setModal(null);
   };
@@ -550,13 +561,23 @@ export default function Home() {
   };
   const canReviewAllocation = !!currentUser && ['Admin', 'HR Manager', 'HR Payroll Manager'].includes(currentUser.role);
 
+  const clockEmployeeId = currentUser?.employeeId || s?.employees[0]?.id || '';
+  const clockEmployee = s?.employees.find((e) => e.id === clockEmployeeId);
+  const clockUserName = currentUser?.name || clockEmployee?.name || 'User';
+
   const currentClock =
-    mounted && clockNow && s
+    mounted && clockNow && s && clockEmployeeId
       ? s.attendance.find(
-          (a) => a.employeeId === currentUser?.employeeId && a.date === clockNow.toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' })
+          (a) => a.employeeId === clockEmployeeId && a.date === clockNow.toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' })
         )
       : null;
   const signedIn = !!currentClock?.checkIn && !currentClock?.checkOut;
+
+  const todayRecords = useMemo(() => {
+    if (!mounted || !clockNow || !s || !clockEmployeeId) return [];
+    const todayDate = clockNow.toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
+    return s.attendance.filter((a) => a.employeeId === clockEmployeeId && a.date === todayDate);
+  }, [mounted, clockNow, s, clockEmployeeId]);
   const allSlips = s?.payruns.flatMap((r) => r.slips.map((p: Row) => ({ ...p, runId: r.id, status: r.status }))) || [];
 
   const cellEmployee = (r: Row) => (
@@ -595,12 +616,22 @@ export default function Home() {
     {
       title: 'Payslip',
       render: (p: Row) => (
-        <button
-          className="inline-flex items-center gap-1 text-slate-900 hover:underline font-semibold cursor-pointer"
-          onClick={() => setModal({ kind: 'slip', record: p })}
-        >
-          <FileText size={14} /> View
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            className="inline-flex items-center gap-1 text-slate-900 hover:underline font-semibold cursor-pointer"
+            onClick={() => setModal({ kind: 'slip', record: p })}
+          >
+            <FileText size={14} /> View
+          </button>
+          <a
+            className="inline-flex items-center gap-1 text-amber-700 hover:underline font-semibold cursor-pointer text-xs"
+            href={`/api/payslips/${encodeURIComponent(p.id)}/pdf`}
+            download
+            title="Download PDF Payslip"
+          >
+            <Download size={13} /> PDF
+          </a>
+        </div>
       ),
     },
   ];
@@ -625,6 +656,29 @@ export default function Home() {
     ]);
   };
 
+<<<<<<< HEAD
+=======
+  const exportPdfReport = async () => {
+    if (!s) return;
+    try {
+      setBusy(true);
+      const pdfBytes = await exportDashboardPdf(s, period, department, employeeType);
+      const blob = new Blob([pdfBytes as unknown as BlobPart], { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `peoplepay360-${period}.pdf`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch {
+      setError('Failed to generate PDF export.');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const departments = s ? [...new Set(s.employees.map((e) => e.department))] : [];
+>>>>>>> 3f342e940546d8bcc43507f326bc198f6fe96171
 
   /* ---------------------------------------------------------
      LOGIN SCREEN (Crextio Design System)
@@ -1353,7 +1407,6 @@ export default function Home() {
 
     const filteredAttendance = baseAttendance
       .filter((a) => {
-        const matchesEmpFilter = !filterId || a.employeeId === filterId;
         const matchesPeriod = !period || a.date.startsWith(period);
         const emp = employee(a.employeeId);
         const matchesDept = department === 'All' || emp?.department === department;
@@ -1365,7 +1418,7 @@ export default function Home() {
             String(x || '').toLowerCase().includes(query.toLowerCase())
           ) ||
           (query.toLowerCase() === 'over9' && hoursWorked > 9);
-        return matchesEmpFilter && matchesPeriod && matchesDept && matchesQuery;
+        return matchesPeriod && matchesDept && matchesQuery;
       })
       .sort((a, b) => b.date.localeCompare(a.date));
 
@@ -1393,8 +1446,8 @@ export default function Home() {
             },
             { title: 'Check-in', render: (a) => a.checkIn || '-' },
             { title: 'Check-out', render: (a) => a.checkOut || '-' },
-            { title: 'Worked hours', render: (a) => hours(a).toFixed(2) },
-            { title: 'Status', render: (a) => <Badge value={attendanceStatus(a)} /> },
+            { title: 'Worked hours', render: (a) => (typeof a.workedHours === 'number' && a.workedHours > 0 ? a.workedHours.toFixed(2) : hours(a).toFixed(2)) },
+            { title: 'Status', render: (a) => <Badge value={a.status || attendanceStatus(a)} /> },
             { title: 'Source', render: (a) => (a.edited ? 'Manually edited' : 'Shift entry') },
           ]}
         />
@@ -1716,9 +1769,13 @@ export default function Home() {
           value={period}
           onChange={(e) => setPeriod(e.target.value)}
         />
-        <button className="pill-btn" onClick={exportPayroll}>
+        <button className="pill-btn cursor-pointer" onClick={exportPayroll} title="Export CSV Data">
           <Download size={14} />
-          Export
+          Export CSV
+        </button>
+        <button className="pill-btn cursor-pointer" onClick={() => void exportPdfReport()} title="Export PDF Summary Report">
+          <FileText size={14} />
+          Export PDF
         </button>
         {['Admin', 'HR Payroll Manager', 'HR Payroll User'].includes(currentUser.role) && (
           <button
@@ -1892,7 +1949,14 @@ export default function Home() {
                   ])
                 }
               >
-                <Download size={13} /> Export Payslips
+                <Download size={13} /> Export CSV
+              </button>
+              <button
+                className="pill-btn !py-1.5 cursor-pointer"
+                disabled={!run.slips.length}
+                onClick={() => void exportPdfReport()}
+              >
+                <FileText size={13} /> Export PDF Report
               </button>
               {['Admin', 'HR Payroll Manager'].includes(currentUser.role) && (
                 <button
@@ -2009,7 +2073,7 @@ export default function Home() {
                         .map((c) => c.employeeId)
                     ).size,
                 },
-                { title: 'Status', render: (r) => <Badge value={r.active ? 'Active' : 'Archived'} /> },
+                { title: 'Status', render: (r) => <Badge value={r.active ? 'Active' : 'Inactive'} /> },
               ]}
             />
           )}
@@ -2207,17 +2271,25 @@ export default function Home() {
           <div
             key={u.id}
             onClick={() => setSelectedUserDrawer(u)}
-            className="workora-card hover:border-slate-400 hover:shadow-md transition-all cursor-pointer p-4 space-y-3 bg-white rounded-2xl border border-[#e5ded4]"
+            className={`workora-card hover:border-slate-400 hover:shadow-md transition-all cursor-pointer p-4 space-y-3 rounded-2xl border ${
+              !u.active
+                ? 'bg-slate-50/80 border-slate-200 opacity-60 grayscale-[35%]'
+                : 'bg-white border-[#e5ded4]'
+            }`}
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <Avatar name={u.name} />
                 <div>
-                  <h3 className="font-bold text-slate-900 text-sm">{u.name}</h3>
+                  <h3 className={`font-bold text-sm ${!u.active ? 'text-slate-500' : 'text-slate-900'}`}>{u.name}</h3>
                   <p className="text-xs text-slate-500">{u.email}</p>
                 </div>
               </div>
-              <span className={`text-[10px] px-2 py-0.5 rounded-full border font-bold ${ROLE_STYLES[u.roleName || ''] || 'bg-slate-100 text-slate-700'}`}>
+              <span className={`text-[10px] px-2 py-0.5 rounded-full border font-bold ${
+                !u.active
+                  ? 'bg-slate-100 text-slate-500 border-slate-200'
+                  : (ROLE_STYLES[u.roleName || ''] || 'bg-slate-100 text-slate-700')
+              }`}>
                 {u.roleName || u.roleId}
               </span>
             </div>
@@ -2225,20 +2297,20 @@ export default function Home() {
             <div className="grid grid-cols-2 gap-2 text-xs pt-2 border-t border-slate-100">
               <div>
                 <span className="text-[10px] text-slate-400 block uppercase">Department</span>
-                <span className="font-semibold text-slate-800">{u.department || 'Engineering'}</span>
+                <span className={`font-semibold ${!u.active ? 'text-slate-500' : 'text-slate-800'}`}>{u.department || 'Engineering'}</span>
               </div>
               <div>
                 <span className="text-[10px] text-slate-400 block uppercase">Position</span>
-                <span className="font-semibold text-slate-800">{u.position || 'Team Member'}</span>
+                <span className={`font-semibold ${!u.active ? 'text-slate-500' : 'text-slate-800'}`}>{u.position || 'Team Member'}</span>
               </div>
             </div>
 
             <div className="flex items-center justify-between pt-1">
               <span className={`inline-flex items-center gap-1.5 text-[11px] font-semibold ${u.active ? 'text-emerald-700' : 'text-slate-400'}`}>
-                <span className={`w-1.5 h-1.5 rounded-full ${u.active ? 'bg-emerald-500' : 'bg-slate-300'}`} />
-                {u.active ? 'Active Account' : 'Deactivated'}
+                <span className={`w-1.5 h-1.5 rounded-full ${u.active ? 'bg-emerald-500' : 'bg-slate-400'}`} />
+                {u.active ? 'Active Account' : 'Inactive'}
               </span>
-              <span className="text-xs text-[#c99a2e] font-semibold hover:underline">Inspect →</span>
+              <span className={`text-xs font-semibold hover:underline ${!u.active ? 'text-slate-400' : 'text-[#c99a2e]'}`}>Inspect →</span>
             </div>
           </div>
         ))}
@@ -2247,6 +2319,7 @@ export default function Home() {
       <DataTable
         rows={filteredUsers}
         onSelect={(u) => setSelectedUserDrawer(u)}
+        rowClassName={(u) => (!u.active ? 'opacity-60 bg-slate-50/70 grayscale-[30%]' : '')}
         columns={[
           {
             title: 'Account User',
@@ -2254,7 +2327,7 @@ export default function Home() {
               <div className="flex items-center gap-2.5">
                 <Avatar name={u.name} />
                 <div>
-                  <span className="font-semibold text-slate-900 block">{u.name}</span>
+                  <span className={`font-semibold block ${!u.active ? 'text-slate-500' : 'text-slate-900'}`}>{u.name}</span>
                   <span className="text-[11px] text-slate-400">{u.email}</span>
                 </div>
               </div>
@@ -2263,28 +2336,40 @@ export default function Home() {
           {
             title: 'System Role',
             render: (u) => (
-              <span className={`px-2 py-0.5 rounded text-[11px] font-bold border ${ROLE_STYLES[u.roleName || ''] || 'bg-slate-100 text-slate-700'}`}>
+              <span className={`px-2 py-0.5 rounded text-[11px] font-bold border ${
+                !u.active
+                  ? 'bg-slate-100 text-slate-500 border-slate-200'
+                  : (ROLE_STYLES[u.roleName || ''] || 'bg-slate-100 text-slate-700')
+              }`}>
                 {u.roleName || u.roleId}
               </span>
             ),
           },
           {
             title: 'Department',
-            render: (u) => u.department || 'Engineering',
+            render: (u) => (
+              <span className={!u.active ? 'text-slate-400' : 'text-slate-700'}>
+                {u.department || 'Engineering'}
+              </span>
+            ),
           },
           {
             title: 'Position',
-            render: (u) => u.position || 'Team Member',
+            render: (u) => (
+              <span className={!u.active ? 'text-slate-400' : 'text-slate-700'}>
+                {u.position || 'Team Member'}
+              </span>
+            ),
           },
           {
             title: 'Status',
-            render: (u) => <Badge value={u.active ? 'Active' : 'Archived'} />,
+            render: (u) => <Badge value={u.active ? 'Active' : 'Inactive'} />,
           },
           {
-            title: 'Actions',
+            title: 'Actions', 
             render: (u) => (
               <button
-                className="text-xs font-semibold text-[#c99a2e] hover:underline cursor-pointer"
+                className={`text-xs font-semibold hover:underline cursor-pointer ${!u.active ? 'text-slate-400' : 'text-[#c99a2e]'}`}
                 onClick={(e) => {
                   e.stopPropagation();
                   setSelectedUserDrawer(u);
@@ -2422,11 +2507,11 @@ export default function Home() {
                   <XCircle size={20} />
                 </button>
 
-                <div className="w-20 h-20 rounded-full bg-[#1a1a1a] text-white text-2xl font-bold flex items-center justify-center border-4 border-[#f7f4ee] shadow-sm mx-auto mb-2.5">
+                <div className={`w-20 h-20 rounded-full ${selectedUserDrawer.active ? 'bg-[#1a1a1a]' : 'bg-slate-500'} text-white text-2xl font-bold flex items-center justify-center border-4 border-[#f7f4ee] shadow-sm mx-auto mb-2.5`}>
                   {initials(selectedUserDrawer.name)}
                 </div>
 
-                <h2 className="text-lg font-bold text-slate-900 tracking-tight">
+                <h2 className={`text-lg font-bold tracking-tight ${selectedUserDrawer.active ? 'text-slate-900' : 'text-slate-500'}`}>
                   {selectedUserDrawer.name}
                 </h2>
 
@@ -2438,10 +2523,10 @@ export default function Home() {
                   <span className={`inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-semibold border ${
                     selectedUserDrawer.active 
                       ? 'bg-[#f0fdf4] text-emerald-700 border-emerald-200' 
-                      : 'bg-slate-100 text-slate-600 border-slate-200'
+                      : 'bg-slate-100 text-slate-500 border-slate-200'
                   }`}>
                     <span className={`w-1.5 h-1.5 rounded-full ${selectedUserDrawer.active ? 'bg-emerald-500' : 'bg-slate-400'}`} />
-                    {selectedUserDrawer.active ? 'Active' : 'Deactivated'}
+                    {selectedUserDrawer.active ? 'Active' : 'Inactive'}
                   </span>
                 </div>
               </div>
@@ -2654,35 +2739,38 @@ export default function Home() {
             }
           }}
         >
-        <DialogContent className="workora-modal">
-          <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-            <div>
-              <DialogTitle className="text-base font-bold text-slate-900">
-                {modal?.kind === 'form'
-                  ? (modal.record?.id ? 'Edit ' : 'New ') + (titles[modal.collection!] || 'Record')
-                  : modal?.kind === 'userForm'
-                  ? (userFormData.id ? 'Edit User Account' : 'New User Account')
-                  : modal?.kind === 'wizard'
-                  ? 'New Payrun Workflow'
-                  : modal?.kind === 'slip'
-                  ? 'Employee Payslip'
-                  : modal?.kind === 'clock'
-                  ? 'Attendance Check-in'
-                  : modal?.kind === 'about'
-                  ? 'About PeoplePay360'
-                  : modal?.kind === 'allocation'
-                  ? 'Leave Allocation'
-                  : 'Time Off Request'}
-              </DialogTitle>
-              <DialogDescription className="text-xs text-slate-400 mt-0.5">
-                {modal?.kind === 'about'
-                  ? 'PeoplePay360 - Crextio Design System'
-                  : modal?.kind === 'clock'
-                  ? 'Nisha Rao - Finance Manager - Live Shift'
-                  : 'Connected records. One unified workspace.'}
-              </DialogDescription>
+        <DialogContent className={modal?.kind === 'clock' ? 'max-w-xs sm:max-w-sm !p-5 rounded-2xl bg-white border border-[#e5ded4] shadow-xl' : 'workora-modal'}>
+          {modal?.kind !== 'clock' ? (
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div>
+                <DialogTitle className="text-base font-bold text-slate-900">
+                  {modal?.kind === 'form'
+                    ? (modal.record?.id ? 'Edit ' : 'New ') + (titles[modal.collection!] || 'Record')
+                    : modal?.kind === 'userForm'
+                    ? (userFormData.id ? 'Edit User Account' : 'New User Account')
+                    : modal?.kind === 'wizard'
+                    ? 'New Payrun Workflow'
+                    : modal?.kind === 'slip'
+                    ? 'Employee Payslip'
+                    : modal?.kind === 'about'
+                    ? 'About PeoplePay360'
+                    : modal?.kind === 'allocation'
+                    ? 'Leave Allocation'
+                    : 'Time Off Request'}
+                </DialogTitle>
+                <DialogDescription className="text-xs text-slate-400 mt-0.5">
+                  {modal?.kind === 'about'
+                    ? 'PeoplePay360 - Crextio Design System'
+                    : 'Connected records. One unified workspace.'}
+                </DialogDescription>
+              </div>
             </div>
-          </div>
+          ) : (
+            <>
+              <DialogTitle className="sr-only">Attendance Widget</DialogTitle>
+              <DialogDescription className="sr-only">Quick Check In / Check Out Attendance Widget</DialogDescription>
+            </>
+          )}
 
           {error && <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-700 mb-3">{error}</div>}
 
@@ -2792,14 +2880,37 @@ export default function Home() {
               </div>
 
               <Field label={userFormData.id ? 'Password (leave blank to keep current)' : 'Account Password'}>
-                <Input
-                  type="password"
-                  required={!userFormData.id}
-                  value={userFormData.password}
-                  onChange={(e) => setUserFormData({ ...userFormData, password: e.target.value })}
-                  placeholder={userFormData.id ? '••••••••' : 'Enter password'}
-                  className="h-9 rounded-xl"
-                />
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                    <Lock size={15} />
+                  </div>
+                  <Input
+                    type={showUserPassword ? 'text' : 'password'}
+                    required={!userFormData.id}
+                    value={userFormData.password}
+                    onChange={(e) => setUserFormData({ ...userFormData, password: e.target.value })}
+                    placeholder={userFormData.id ? 'Leave blank to keep unchanged' : 'Enter secure password (min 8 characters)'}
+                    autoComplete="new-password"
+                    className="h-10 rounded-xl pl-9 pr-10 font-mono text-xs bg-slate-50/50 focus:bg-white transition-colors"
+                  />
+                  <button
+                    type="button"
+                    tabIndex={-1}
+                    onClick={() => setShowUserPassword(!showUserPassword)}
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
+                    title={showUserPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showUserPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
+                </div>
+                <div className="flex items-center justify-between text-[11px] text-slate-400 mt-1 px-1">
+                  <span>Minimum 8 characters</span>
+                  {userFormData.password ? (
+                    <span className={userFormData.password.length >= 8 ? 'text-emerald-600 font-semibold' : 'text-amber-600 font-semibold'}>
+                      {userFormData.password.length >= 8 ? '✓ Secure password' : `${userFormData.password.length}/8 characters`}
+                    </span>
+                  ) : null}
+                </div>
               </Field>
 
               <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-slate-700">
@@ -3009,65 +3120,32 @@ export default function Home() {
           )}
 
           {modal?.kind === 'clock' && s && (
-            <div className="space-y-4 text-center py-2">
-              <div className="text-4xl font-extrabold tracking-tight text-slate-900">
-                {mounted && clockNow
-                  ? clockNow.toLocaleTimeString('en-IN', {
-                      timeZone: 'Asia/Kolkata',
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    })
-                  : '10:00 AM'}
-              </div>
-              <p className="text-xs text-slate-400">
-                Today -{' '}
-                {mounted && clockNow
-                  ? clockNow.toLocaleDateString('en-IN', {
-                      timeZone: 'Asia/Kolkata',
-                      day: 'numeric',
-                      month: 'long',
-                    })
-                  : '5 September'}{' '}
-                - Asia/Kolkata
-              </p>
-
-              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-between text-xs">
-                <span className="font-semibold text-slate-700">
-                  {signedIn
-                    ? 'Checked in at ' + currentClock?.checkIn
-                    : currentClock?.checkOut
-                    ? "Today's shift completed"
-                    : 'You are not checked in'}
-                </span>
-                <Badge value={signedIn ? 'Present' : currentClock?.checkOut ? 'Completed' : 'Not checked in'} />
-              </div>
-
-              <div className="flex justify-center gap-3 pt-2">
-                <button
-                  className="pill-btn cursor-pointer"
-                  onClick={() => {
-                    setModal(null);
-                    navigate('attendance');
-                  }}
-                >
-                  View Records
-                </button>
-                <button
-                  className="pill-btn pill-btn-black cursor-pointer"
-                  disabled={busy || !!currentClock?.checkOut || !currentUser.employeeId}
-                  onClick={() =>
-                    currentUser.employeeId &&
-                    void act(
-                      'clock',
-                      { employeeId: currentUser.employeeId },
-                      signedIn ? 'Checked out.' : 'Checked in.'
-                    )
-                  }
-                >
-                  {signedIn ? 'Check out' : 'Check in'}
-                </button>
-              </div>
-            </div>
+            <AttendanceWidget
+              userName={clockUserName}
+              currentClock={currentClock}
+              signedIn={signedIn}
+              clockNow={clockNow}
+              todayRecords={todayRecords}
+              busy={busy}
+              onCheckIn={() => {
+                if (clockEmployeeId) {
+                  void act(
+                    'clock',
+                    { employeeId: clockEmployeeId },
+                    'Checked in successfully.'
+                  );
+                }
+              }}
+              onCheckOut={() => {
+                if (clockEmployeeId) {
+                  void act(
+                    'clock',
+                    { employeeId: clockEmployeeId },
+                    'Checked out successfully.'
+                  );
+                }
+              }}
+            />
           )}
 
           {modal?.kind === 'about' && (

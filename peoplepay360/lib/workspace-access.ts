@@ -106,9 +106,9 @@ export function canMutateWorkspace(
   }
 
   if (action === 'clock') {
+    if (['Admin', 'HR Payroll User', 'HR Payroll Manager'].includes(user.role)) return true;
     if (user.role === 'HR Manager')
       return (user.assignedEmployeeIds || []).includes(stringValue(payload.employeeId));
-    if (['HR Payroll User', 'HR Payroll Manager'].includes(user.role)) return true;
     return user.role === 'Employee' && !!user.employeeId && payload.employeeId === user.employeeId;
   }
 
