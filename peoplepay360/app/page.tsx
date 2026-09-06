@@ -642,19 +642,13 @@ export default function Home() {
   const allSlips = s?.payruns.flatMap((r) => r.slips.map((p: Row) => ({ ...p, runId: r.id, status: r.status }))) || [];
 
   const cellEmployee = (r: Row) => (
-    <button
-      className="flex items-center gap-2 text-left hover:underline cursor-pointer"
-      onClick={() => {
-        setActiveId(r.employeeId);
-        navigate('employee', r.employeeId);
-      }}
-    >
+    <div className="flex items-center gap-2 text-left">
       <Avatar name={empName(r.employeeId)} />
       <span>
         <span className="font-semibold text-slate-900 block leading-tight">{empName(r.employeeId)}</span>
         <span className="text-[11px] text-slate-400 block">{employee(r.employeeId)?.department}</span>
       </span>
-    </button>
+    </div>
   );
 
   const attendanceStatus = (a: Row) => {
@@ -1579,12 +1573,9 @@ export default function Home() {
             {
               title: 'Date',
               render: (a) => (
-                <button
-                  className="font-semibold text-slate-900 hover:underline cursor-pointer"
-                  onClick={() => openForm('attendance', a)}
-                >
+                <span className="font-semibold text-slate-900">
                   {a.date}
-                </button>
+                </span>
               ),
             },
             { title: 'Check-in', render: (a) => a.checkIn || '-' },
@@ -1750,15 +1741,9 @@ export default function Home() {
               {
                 title: 'Time off type',
                 render: (r) => (
-                  <button
-                    className="font-semibold text-slate-900 hover:underline cursor-pointer"
-                    onClick={() => {
-                      setError('');
-                      setModal({ kind: 'request', record: r });
-                    }}
-                  >
+                  <span className="font-semibold text-slate-900">
                     {leaveType(r.typeId)?.name}
-                  </button>
+                  </span>
                 ),
               },
               { title: 'Dates', render: (r) => r.start + ' - ' + r.end },
@@ -1769,7 +1754,8 @@ export default function Home() {
                 render: (r) => (
                   <button
                     className="inline-flex items-center gap-1 font-semibold text-slate-900 hover:underline cursor-pointer"
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.stopPropagation();
                       setError('');
                       setModal({ kind: 'request', record: r });
                     }}
@@ -1790,12 +1776,9 @@ export default function Home() {
               {
                 title: 'Type',
                 render: (r) => (
-                  <button
-                    className="font-semibold text-slate-900 hover:underline cursor-pointer"
-                    onClick={() => setModal({ kind: 'allocation', record: r })}
-                  >
+                  <span className="font-semibold text-slate-900">
                     {leaveType(r.typeId)?.name}
-                  </button>
+                  </span>
                 ),
               },
               { title: 'Allocated', render: (r) => r.amount + ' ' + leaveType(r.typeId)?.unit.toLowerCase() },
@@ -1817,12 +1800,9 @@ export default function Home() {
               {
                 title: 'Type',
                 render: (r) => (
-                  <button
-                    className="font-semibold text-slate-900 hover:underline cursor-pointer"
-                    onClick={() => openForm('leaveTypes', r)}
-                  >
+                  <span className="font-semibold text-slate-900">
                     {r.name}
-                  </button>
+                  </span>
                 ),
               },
               { title: 'Unit', render: (r) => r.unit },
