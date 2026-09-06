@@ -673,7 +673,10 @@ export default function Home() {
       render: (p: Row) => (
         <button
           className="inline-flex items-center gap-1 text-slate-900 hover:underline font-semibold cursor-pointer"
-          onClick={() => setModal({ kind: 'slip', record: p })}
+          onClick={(e) => {
+            e.stopPropagation();
+            setModal({ kind: 'slip', record: p });
+          }}
         >
           <FileText size={14} /> View
         </button>
@@ -2326,13 +2329,9 @@ export default function Home() {
                 {
                   title: 'Payrun',
                   render: (r) => (
-                    <button
-                      className="font-semibold text-slate-900 hover:underline flex items-center gap-1 cursor-pointer"
-                      onClick={() => navigate('run', r.id)}
-                    >
+                    <span className="font-semibold text-slate-900 flex items-center gap-1">
                       {r.name}
-                      <ArrowUpRight size={13} />
-                    </button>
+                    </span>
                   ),
                 },
                 { title: 'Period', render: (r) => r.period + '-01 - ' + monthEnd(r.period) },
@@ -2367,17 +2366,7 @@ export default function Home() {
               columns={[
                 {
                   title: 'Structure name',
-                  render: (r) =>
-                    currentUser.role === 'HR Payroll User' ? (
-                      <span className="font-semibold text-slate-900">{r.name}</span>
-                    ) : (
-                      <button
-                        className="font-semibold text-slate-900 hover:underline cursor-pointer"
-                        onClick={() => openForm('structures', r)}
-                      >
-                        {r.name}
-                      </button>
-                    ),
+                  render: (r) => <span className="font-semibold text-slate-900">{r.name}</span>,
                 },
                 { title: 'Rules', render: (r) => r.ruleIds.length + ' rules' },
                 {
@@ -2402,17 +2391,7 @@ export default function Home() {
               columns={[
                 {
                   title: 'Rule name',
-                  render: (r) =>
-                    currentUser.role === 'HR Payroll User' ? (
-                      <span className="font-semibold text-slate-900">{r.name}</span>
-                    ) : (
-                      <button
-                        className="font-semibold text-slate-900 hover:underline cursor-pointer"
-                        onClick={() => openForm('rules', r)}
-                      >
-                        {r.name}
-                      </button>
-                    ),
+                  render: (r) => <span className="font-semibold text-slate-900">{r.name}</span>,
                 },
                 {
                   title: 'Code',

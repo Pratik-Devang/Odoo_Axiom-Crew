@@ -6,8 +6,10 @@ DELETE FROM user_roles
 WHERE user_id = 'u_employee' AND role_id <> 'employee';
 
 INSERT INTO user_roles (user_id, role_id)
-VALUES ('u_employee', 'employee')
+SELECT 'u_employee', 'employee'
+WHERE EXISTS (SELECT 1 FROM users WHERE id = 'u_employee')
 ON CONFLICT (user_id, role_id) DO NOTHING;
 
 DELETE FROM manager_employee_assignments
 WHERE manager_user_id = 'u_employee';
+
