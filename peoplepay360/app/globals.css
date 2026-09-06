@@ -1477,18 +1477,13 @@ tr:hover td {
 .salary-trend-header h2 svg { color: #cf7408; }
 .salary-trend-header p { margin: 3px 0 0; color: #758195; font-size: 10px; }
 .salary-trend-header button { display: flex; align-items: center; gap: 4px; padding: 3px 0; color: #aa5708; font-size: 11px; font-weight: 700; white-space: nowrap; }
-<<<<<<< HEAD
 .salary-trend-summary { min-height: 58px; padding: 12px 22px 0; display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
-=======
-.salary-trend-summary { min-height: 66px; padding: 14px 22px 3px; display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
->>>>>>> f00691d7551c679eb78c2451d43fa3f00da45a1e
 .salary-trend-summary > div { display: flex; align-items: center; flex-wrap: wrap; gap: 5px 10px; }
 .salary-trend-summary > div > span { width: 100%; color: #748195; font-size: 9px; font-weight: 750; }
 .salary-trend-summary strong { color: #111827; font-size: 19px; line-height: 1; letter-spacing: -.45px; }
 .salary-trend-summary em { padding: 3px 8px; border: 1px solid #f0c67c; border-radius: 999px; background: #fffaf0; color: #a85b08; font-size: 9px; font-style: normal; font-weight: 750; }
 .salary-trend-legend { display: flex; align-items: center; gap: 6px; padding-top: 14px; color: #718096; font-size: 9px; font-weight: 650; white-space: nowrap; }
 .salary-trend-legend i { width: 9px; height: 9px; border-radius: 50%; background: #f59e0b; }
-<<<<<<< HEAD
 .salary-trend-window-control {
   margin: 0 22px 10px 112px;
   display: grid;
@@ -1546,13 +1541,6 @@ tr:hover td {
   line-height: 1;
   white-space: nowrap;
 }
-=======
-.salary-trend-plot { height: 280px; padding: 0 9px 7px; }
-.salary-trend-plot svg { display: block; width: 100%; height: 100%; overflow: visible; }
-.salary-trend-plot .grid-line { stroke: #e8e2db; stroke-width: 1; stroke-dasharray: 7 7; }
-.salary-trend-plot .axis-line { stroke: #ded8d1; stroke-width: 1.2; }
-.salary-trend-plot .axis-label { fill: #8b8178; font-size: 13px; font-weight: 650; }
->>>>>>> f00691d7551c679eb78c2451d43fa3f00da45a1e
 .salary-trend-plot .salary-line { fill: none; stroke: #d47709; stroke-width: 5; stroke-linecap: round; stroke-linejoin: round; }
 .salary-trend-plot .selection-line { stroke: #a9570a; stroke-width: 2; stroke-dasharray: 6 7; }
 .salary-trend-plot .salary-point { cursor: pointer; outline: none; }
@@ -1560,7 +1548,6 @@ tr:hover td {
 .salary-trend-plot .point-dot { fill: #fff; stroke: #d47709; stroke-width: 3.5; transition: r .15s ease; }
 .salary-trend-plot .point-dot.active { fill: #d47709; stroke: #efb052; }
 .salary-trend-plot .salary-point:focus-visible .point-halo { fill: #f59e0b; opacity: .42; }
-<<<<<<< HEAD
 .salary-trend-plot .month-label {
   position: absolute;
   transform: translate(-50%, -50%);
@@ -1573,10 +1560,6 @@ tr:hover td {
 .salary-trend-plot .month-label.first { transform: translate(0, -50%); }
 .salary-trend-plot .month-label.last { transform: translate(-100%, -50%); }
 .salary-trend-plot .month-label.active { color: #252525; font-weight: 800; }
-=======
-.salary-trend-plot .month-label { fill: #8b8178; font-size: 13px; font-weight: 550; }
-.salary-trend-plot .month-label.active { fill: #252525; font-weight: 800; }
->>>>>>> f00691d7551c679eb78c2451d43fa3f00da45a1e
 .attention-list { flex: 1; padding: 8px 9px; display: flex; flex-direction: column; gap: 6px; }
 .attention-list > div { min-height: 49px; padding: 8px; display: flex; justify-content: space-between; gap: 6px; border: 1px solid #e5ded4; border-radius: 10px; background: #fbf8f3; }
 .attention-list > div > span { display: grid; grid-template-columns: auto 1fr; min-width: 0; gap: 2px 5px; align-items: center; }
@@ -1642,16 +1625,12 @@ tr:hover td {
   .salary-trend-header { padding-inline: 14px; }
   .salary-trend-header p { max-width: 270px; }
   .salary-trend-summary { padding-inline: 14px; }
-<<<<<<< HEAD
   .salary-trend-window-control {
     margin: 0 14px 8px;
     grid-template-columns: 24px minmax(74px, auto) minmax(110px, 1fr) 24px;
     gap: 8px;
   }
   .salary-trend-plot { height: 270px; padding: 0 0 16px; }
-=======
-  .salary-trend-plot { height: 235px; padding-inline: 0; }
->>>>>>> f00691d7551c679eb78c2451d43fa3f00da45a1e
 }
 @media (max-width: 520px) {
   .salary-trend-header p { display: none; }
@@ -1661,7 +1640,6 @@ tr:hover td {
   .salary-trend-summary { min-height: 62px; }
   .salary-trend-summary strong { font-size: 17px; }
   .salary-trend-legend { display: none; }
-<<<<<<< HEAD
   .salary-trend-window-control {
     font-size: 8px;
     gap: 7px;
@@ -1669,7 +1647,4 @@ tr:hover td {
   }
   .salary-trend-window-control button { width: 22px; height: 22px; }
   .salary-trend-plot { height: 246px; }
-=======
-  .salary-trend-plot { height: 210px; }
->>>>>>> f00691d7551c679eb78c2451d43fa3f00da45a1e
 }
