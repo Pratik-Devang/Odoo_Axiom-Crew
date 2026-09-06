@@ -370,28 +370,49 @@ async function seedDatabase() {
     await insertRows(client, 'payrun_employees', ['payrun_id','employee_id','period'], memberships);
     await insertRows(client, 'payslips', ['id','payrun_id','employee_id','period','structure_id','contract_id','basic','gross','deductions','net','worked_days','scheduled_days','unpaid_leave_days','payable_days','lines'], payslips);
 
-    const roleFor = (employee) => employee.department === 'HR' && /Head|Manager|Partner/.test(employee.position) ? 'hr_manager'
+    const managerEmployeeIds = new Set(employees.map((employee) => employee.manager_employee_id).filter(Boolean));
+    const roleFor = (employee) => managerEmployeeIds.has(employee.id) ? 'hr_manager'
       : employee.department === 'Finance' && /Director|Manager|Payroll/.test(employee.position) ? 'payroll_user' : 'employee';
-    const users = employees.map((employee) => ({ id: `user_${employee.id}`, email: employee.email, name: employee.name, role_id: roleFor(employee), employee_id: employee.id, password: hashPassword('welcome123'), active: employee.status === 'Active' }));
+    // Sara's named demo account is the canonical account for her employee row.
+    // Excluding a second generated account prevents duplicate manager cards.
+    const demoLinkedEmployeeNames = new Set(['Rajesh Varma', 'Nisha Rao', 'Sara Khan', 'John Dsouza']);
+    const users = employees
+      .filter((employee) => !demoLinkedEmployeeNames.has(employee.name))
+      .map((employee) => ({ id: `user_${employee.id}`, email: employee.email, name: employee.name, role_id: roleFor(employee), employee_id: employee.id, password: hashPassword('welcome123'), active: employee.status === 'Active' }));
     const employeeByName = new Map(employees.map((employee) => [employee.name, employee]));
     const demoUsers = [
       ['u_admin','admin@oxp.example','PeoplePay360 Administrator','admin','Rajesh Varma','admin123'],
       ['u_payroll_manager','nisha@oxp.example','Nisha Rao','payroll_manager','Nisha Rao','payrollmgr123'],
-      ['u_payroll_user','payroll.user@oxp.example','Payroll Operations User','payroll_user','Nisha Rao','payroll123'],
+      ['u_payroll_user','payroll.user@oxp.example','Payroll Operations User','payroll_user',null,'payroll123'],
       ['u_hr_manager','sara@oxp.example','Sara Khan','hr_manager','Sara Khan','hrmanager123'],
-      ['u_employee','john@oxp.example','John Dsouza','employee','Rohan Patel','employee123'],
-    ].map(([id,email,name,roleId,employeeName,password]) => ({ id,email,name,role_id:roleId,employee_id:employeeByName.get(employeeName)?.id ?? employees[0].id,password:hashPassword(password),active:true }));
+      ['u_employee','john@oxp.example','John Dsouza','employee','John Dsouza','employee123'],
+    ].map(([id,email,name,roleId,employeeName,password]) => ({ id,email,name,role_id:roleId,employee_id:employeeName ? employeeByName.get(employeeName)?.id ?? null : null,password:hashPassword(password),active:true }));
     users.push(...demoUsers);
     await insertRows(client, 'users', ['id','email','name','role_id','employee_id','password','active'], users);
     await insertRows(client, 'user_roles', ['user_id','role_id'], users.map((user) => ({ user_id: user.id, role_id: user.role_id })));
+    const managerUserByEmployeeId = new Map(
+      users
+        .filter((user) => user.role_id === 'hr_manager' && user.employee_id)
+        .map((user) => [user.employee_id, user.id]),
+    );
+    const managerAssignments = employees
+      .filter((employee) => managerUserByEmployeeId.has(employee.manager_employee_id))
+      .map((employee) => ({
+        manager_user_id: managerUserByEmployeeId.get(employee.manager_employee_id),
+        employee_id: employee.id,
+      }));
+    await insertRows(client, 'manager_employee_assignments', ['manager_user_id','employee_id'], managerAssignments);
     const integrity = (await client.query(`SELECT
       (SELECT count(*)::int FROM employees) AS employees,
       (SELECT count(*)::int FROM employees WHERE manager_employee_id = id) AS self_managers,
       (SELECT count(*)::int FROM employees e WHERE e.manager_employee_id IS NOT NULL AND NOT EXISTS (SELECT 1 FROM employees m WHERE m.id=e.manager_employee_id)) AS missing_managers,
       (SELECT count(*)::int FROM contracts WHERE end_date IS NOT NULL AND end_date < start_date) AS invalid_contract_dates,
-      (SELECT count(*)::int FROM (SELECT employee_id,date FROM attendance GROUP BY employee_id,date HAVING count(*) > 1) duplicates) AS duplicate_attendance
+      (SELECT count(*)::int FROM (SELECT employee_id,date FROM attendance GROUP BY employee_id,date HAVING count(*) > 1) duplicates) AS duplicate_attendance,
+      (SELECT count(*)::int FROM users WHERE role_id='hr_manager') AS managers,
+      (SELECT count(*)::int FROM manager_employee_assignments) AS manager_assignments,
+      (SELECT count(*)::int FROM users GROUP BY employee_id HAVING employee_id IS NOT NULL AND count(*) > 1 LIMIT 1) AS duplicate_employee_accounts
     `)).rows[0];
-    if (integrity.employees !== 300 || integrity.self_managers || integrity.missing_managers || integrity.invalid_contract_dates || integrity.duplicate_attendance) {
+    if (integrity.employees !== 300 || integrity.self_managers || integrity.missing_managers || integrity.invalid_contract_dates || integrity.duplicate_attendance || !integrity.managers || !integrity.manager_assignments || integrity.duplicate_employee_accounts) {
       throw new Error(`Generated data failed integrity checks: ${JSON.stringify(integrity)}`);
     }
     await client.query(`INSERT INTO audit_logs (id,action,at,actor) VALUES ('audit_company_seed','seedCompany300',CURRENT_TIMESTAMP,'Database Seeder')`);

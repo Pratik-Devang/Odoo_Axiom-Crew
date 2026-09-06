@@ -193,7 +193,9 @@ const EMPLOYEE_QUICK_LOGINS = [
   { name: 'Varun Reddy', position: 'Data Platform Engineer', department: 'Engineering', email: 'varun.reddy@oxp.example' },
   { name: 'Vikramaditya Rao', position: 'VP of Technology & Operations', department: 'Management', email: 'vikram.rao@oxp.example' },
   { name: 'Zoya Khan', position: 'Inbound Sales Associate', department: 'Sales', email: 'zoya.khan@oxp.example' }
-].map(e => ({ ...e, password: 'welcome123' }));
+]
+  .filter(e => !['Rajesh Varma', 'Nisha Rao', 'Sara Khan', 'John Dsouza'].includes(e.name))
+  .map(e => ({ ...e, password: 'welcome123' }));
 
 
 const DEFAULT_LOGIN = DEMO_ACCOUNTS[0];
