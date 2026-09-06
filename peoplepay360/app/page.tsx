@@ -1164,6 +1164,10 @@ export default function Home() {
         ) : (
           <DataTable
             rows={filteredEmployees}
+            onSelect={(e) => setActiveId(e.id)}
+            rowClassName={(e) =>
+              e.id === activeEmp?.id ? '!bg-amber-50/80 font-semibold border-l-4 border-[#e6a817]' : ''
+            }
             columns={[
               {
                 title: 'Employee',
@@ -1406,6 +1410,10 @@ export default function Home() {
         </div>
         <DataTable
           rows={filteredContracts}
+          onSelect={(c) => setActiveId(c.id)}
+          rowClassName={(c) =>
+            c.id === activeContractRecord?.id ? '!bg-amber-50/80 font-semibold border-l-4 border-[#e6a817]' : ''
+          }
           columns={[
             {
               title: 'Contract',
@@ -1525,7 +1533,10 @@ export default function Home() {
       ? s.employees.filter((e) => e.id === currentUser.employeeId)
       : s.employees;
 
-    const activeEmp = employee(activeId) || employeePool[0];
+    const activeAttRecord = s.attendance.find((a) => a.id === activeId);
+    const activeEmp = activeAttRecord
+      ? employee(activeAttRecord.employeeId)
+      : (employee(activeId) || employeePool[0]);
 
     const baseAttendance = currentUser.role === 'Employee' && currentUser.employeeId
       ? s.attendance.filter((a) => a.employeeId === currentUser.employeeId)
@@ -1557,6 +1568,12 @@ export default function Home() {
         </div>
         <DataTable
           rows={filteredAttendance}
+          onSelect={(a) => setActiveId(a.id)}
+          rowClassName={(a) =>
+            (a.id === activeAttRecord?.id || a.employeeId === activeEmp?.id)
+              ? '!bg-amber-50/80 font-semibold border-l-4 border-[#e6a817]'
+              : ''
+          }
           columns={[
             { title: 'Employee', render: cellEmployee },
             {
@@ -1592,9 +1609,23 @@ export default function Home() {
         <DetailPanel
           avatar={initials(activeEmp.name)}
           title={activeEmp.name}
-          subtitle={`Schedule: ${sched?.name || 'Standard 40h'}`}
-          badge={rate >= 80 ? 'Present' : 'Irregular'}
+          subtitle={activeAttRecord ? `Shift Date: ${activeAttRecord.date}` : `Schedule: ${sched?.name || 'Standard 40h'}`}
+          badge={activeAttRecord ? (activeAttRecord.status || attendanceStatus(activeAttRecord)) : (rate >= 80 ? 'Present' : 'Irregular')}
         >
+          {activeAttRecord && (
+            <DetailSection title="SELECTED SHIFT LOG">
+              <DetailRow label="Shift Date" value={activeAttRecord.date} />
+              <DetailRow label="Check-in Time" value={activeAttRecord.checkIn || 'Not recorded'} />
+              <DetailRow label="Check-out Time" value={activeAttRecord.checkOut || 'Not recorded'} />
+              <DetailRow
+                label="Worked Hours"
+                value={`${(typeof activeAttRecord.workedHours === 'number' && activeAttRecord.workedHours > 0 ? activeAttRecord.workedHours : hours(activeAttRecord)).toFixed(2)} hrs`}
+              />
+              <DetailRow label="Shift Status" value={activeAttRecord.status || attendanceStatus(activeAttRecord)} />
+              <DetailRow label="Entry Source" value={activeAttRecord.edited ? 'Manually Edited' : 'System Punch'} />
+            </DetailSection>
+          )}
+
           <DetailSection title="ATTENDANCE SUMMARY">
             <DetailRow label="Recorded Days" value={`${att.length} shifts`} />
             <DetailRow label="Completed Check-outs" value={`${complete} of ${present}`} />
@@ -1613,6 +1644,15 @@ export default function Home() {
           </DetailSection>
 
           <DetailSection title="QUICK ACTIONS">
+            {activeAttRecord && (
+              <button
+                className="doc-chip hover:bg-[#ede7de] transition-colors cursor-pointer"
+                onClick={() => openForm('attendance', activeAttRecord)}
+              >
+                <Clock3 className="size-3.5 text-[#c99a2e]" />
+                <span className="doc-chip-name">Edit Shift Record</span>
+              </button>
+            )}
             <button
               className="doc-chip hover:bg-[#ede7de] transition-colors cursor-pointer"
               onClick={() => openForm('attendance', { ...defaults('attendance', s, activeEmp.id), date: todayIso })}
@@ -1689,6 +1729,12 @@ export default function Home() {
     const filteredRequests = filtered(baseRequests);
     const activeReq = baseRequests.find((r) => r.id === activeId) || filteredRequests[0];
 
+    const filteredAllocations = filtered(s.allocations);
+    const activeAlloc = s.allocations.find((a) => a.id === activeId) || filteredAllocations[0];
+
+    const filteredTypes = filtered(s.leaveTypes);
+    const activeType = s.leaveTypes.find((lt) => lt.id === activeId) || filteredTypes[0];
+
     centerContent = (
       <div className="workora-table-container">
         <div className="table-tab-strip">
@@ -1697,6 +1743,8 @@ export default function Home() {
         {view === 'requests' ? (
           <DataTable
             rows={filteredRequests}
+            onSelect={(r) => setActiveId(r.id)}
+            rowClassName={(r) => (r.id === activeReq?.id ? '!bg-amber-50/80 font-semibold border-l-4 border-[#e6a817]' : '')}
             columns={[
               { title: 'Employee', render: cellEmployee },
               {
@@ -1734,7 +1782,9 @@ export default function Home() {
           />
         ) : view === 'allocations' ? (
           <DataTable
-            rows={filtered(s.allocations)}
+            rows={filteredAllocations}
+            onSelect={(a) => setActiveId(a.id)}
+            rowClassName={(a) => (a.id === activeAlloc?.id ? '!bg-amber-50/80 font-semibold border-l-4 border-[#e6a817]' : '')}
             columns={[
               { title: 'Employee', render: cellEmployee },
               {
@@ -1760,7 +1810,9 @@ export default function Home() {
           />
         ) : (
           <DataTable
-            rows={filtered(s.leaveTypes)}
+            rows={filteredTypes}
+            onSelect={(lt) => setActiveId(lt.id)}
+            rowClassName={(lt) => (lt.id === activeType?.id ? '!bg-amber-50/80 font-semibold border-l-4 border-[#e6a817]' : '')}
             columns={[
               {
                 title: 'Type',
@@ -1784,7 +1836,7 @@ export default function Home() {
       </div>
     );
 
-    if (activeReq) {
+    if (view === 'requests' && activeReq) {
       const emp = employee(activeReq.employeeId);
       rightSlot = (
         <DetailPanel
@@ -1838,6 +1890,79 @@ export default function Home() {
                 This request has been finalized ({activeReq.status}).
               </div>
             )}
+          </DetailSection>
+        </DetailPanel>
+      );
+    } else if (view === 'allocations' && activeAlloc) {
+      const emp = employee(activeAlloc.employeeId);
+      const lt = leaveType(activeAlloc.typeId);
+      const balance = allocationBalance(s, activeAlloc);
+      const taken = activeAlloc.status === 'Approved' ? activeAlloc.amount - balance : 0;
+
+      rightSlot = (
+        <DetailPanel
+          avatar={initials(emp?.name || 'AL')}
+          title={emp?.name || 'Leave Allocation'}
+          subtitle={lt?.name || 'Allocation Record'}
+          badge={activeAlloc.status}
+        >
+          <DetailSection title="ALLOCATION DETAILS">
+            <DetailRow label="Employee" value={emp?.name} />
+            <DetailRow label="Leave Policy" value={lt?.name} />
+            <DetailRow label="Allocated Days" value={`${activeAlloc.amount} ${lt?.unit?.toLowerCase() || 'days'}`} />
+            <DetailRow label="Days Taken" value={`${taken} ${lt?.unit?.toLowerCase() || 'days'}`} />
+            <DetailRow label="Remaining Quota" value={`${balance} ${lt?.unit?.toLowerCase() || 'days'}`} />
+            <DetailRow label="Validity Period" value={`${activeAlloc.start} — ${activeAlloc.end}`} />
+            <DetailRow label="Approver" value={activeAlloc.approver || 'System Approved'} />
+          </DetailSection>
+
+          <DetailSection title="QUOTA BALANCE">
+            <StatBar
+              label="Remaining Quota"
+              value={activeAlloc.amount > 0 ? Math.round((balance / activeAlloc.amount) * 100) : 0}
+              displayValue={`${balance} days remaining`}
+              variant={balance > 0 ? 'gold' : 'dark'}
+            />
+          </DetailSection>
+
+          <DetailSection title="QUICK ACTIONS">
+            <button
+              className="doc-chip hover:bg-[#ede7de] transition-colors cursor-pointer"
+              onClick={() => openForm('allocations', activeAlloc)}
+            >
+              <FileText className="size-3.5 text-[#c99a2e]" />
+              <span className="doc-chip-name">Edit Allocation</span>
+            </button>
+          </DetailSection>
+        </DetailPanel>
+      );
+    } else if (view === 'leaveTypes' && activeType) {
+      rightSlot = (
+        <DetailPanel
+          avatar={initials(activeType.name)}
+          title={activeType.name}
+          subtitle="Leave Policy Blueprint"
+          badge={activeType.active ? 'Active' : 'Inactive'}
+        >
+          <DetailSection title="POLICY SPECIFICATIONS">
+            <DetailRow label="Policy Name" value={activeType.name} />
+            <DetailRow label="Unit of Measure" value={activeType.unit} />
+            <DetailRow label="Requires Allocation" value={activeType.requiresAllocation ? 'Yes' : 'No'} />
+            <DetailRow label="Approval Workflow" value={activeType.approvalWorkflow || 'HR Approval'} />
+            <DetailRow label="Payroll Impact" value={activeType.payrollImpact || 'Paid'} />
+            {activeType.payrollWorkEntry && (
+              <DetailRow label="Work Entry Code" value={activeType.payrollWorkEntry} />
+            )}
+          </DetailSection>
+
+          <DetailSection title="QUICK ACTIONS">
+            <button
+              className="doc-chip hover:bg-[#ede7de] transition-colors cursor-pointer"
+              onClick={() => openForm('leaveTypes', activeType)}
+            >
+              <FileText className="size-3.5 text-[#c99a2e]" />
+              <span className="doc-chip-name">Edit Policy Settings</span>
+            </button>
           </DetailSection>
         </DetailPanel>
       );
@@ -1952,6 +2077,8 @@ export default function Home() {
     ) : null;
 
     if (view === 'run' && run) {
+      const activeRunSlip = run.slips.find((p: Row) => p.id === activeId || p.employeeId === activeId) || run.slips[0];
+
       centerContent = (
         <div className="space-y-4">
           <div className="workora-card space-y-4">
@@ -2105,13 +2232,106 @@ export default function Home() {
             </div>
             <DataTable
               rows={run.slips}
+              onSelect={(p: Row) => setActiveId(p.id)}
+              rowClassName={(p: Row) => (p.id === activeRunSlip?.id ? '!bg-amber-50/80 font-semibold border-l-4 border-[#e6a817]' : '')}
               columns={runSlipColumns}
               empty="Click Compute to generate payslips from contracts and rules."
             />
           </div>
         </div>
       );
+
+      if (currentUser.role !== 'Employee') {
+        const emp = activeRunSlip ? employee(activeRunSlip.employeeId) : null;
+        const net = run.slips.reduce((n: number, p: Row) => n + p.net, 0);
+        const gross = run.slips.reduce((n: number, p: Row) => n + p.gross, 0);
+        const deduct = run.slips.reduce((n: number, p: Row) => n + p.deductions, 0);
+
+        rightSlot = (
+          <DetailPanel
+            avatar={initials(emp?.name || run.name || 'PR')}
+            title={emp ? emp.name : run.name}
+            subtitle={activeRunSlip ? `Period: ${activeRunSlip.period}` : `Payrun: ${run.period}`}
+            badge={run.status}
+          >
+            {activeRunSlip && (
+              <DetailSection title="SELECTED PAYSLIP SUMMARY">
+                <DetailRow label="Basic Wage" value={money(activeRunSlip.basic)} />
+                <DetailRow label="Gross Salary" value={money(activeRunSlip.gross)} />
+                <DetailRow label="Total Deductions" value={money(activeRunSlip.deductions)} />
+                <DetailRow label="Net Payable" value={<b>{money(activeRunSlip.net)}</b>} />
+                <DetailRow label="Worked Days" value={`${activeRunSlip.workedDays} days`} />
+                <DetailRow label="Payable Days" value={`${activeRunSlip.payableDays || activeRunSlip.workedDays} days`} />
+              </DetailSection>
+            )}
+
+            <DetailSection title="FINANCIAL SUMMARY">
+              <DetailRow label="Net Salary Total" value={<b>{money(net)}</b>} />
+              <DetailRow label="Gross Payroll Total" value={money(gross)} />
+              <DetailRow label="Total Deductions" value={money(deduct)} />
+              <DetailRow label="Staff Included" value={`${run.employeeIds.length} employees`} />
+            </DetailSection>
+
+            <DetailSection title="DISBURSEMENT PROGRESS">
+              <StatBar
+                label="Payroll Completion"
+                value={run.status === 'Paid' ? 100 : run.status === 'Validated' ? 75 : 50}
+                displayValue={run.status}
+                variant={run.status === 'Paid' ? 'green' : 'gold'}
+              />
+            </DetailSection>
+
+            <DetailSection title="QUICK ACTIONS">
+              {activeRunSlip && (
+                <button
+                  className="doc-chip hover:bg-[#ede7de] transition-colors cursor-pointer"
+                  onClick={() => setModal({ kind: 'slip', record: activeRunSlip })}
+                >
+                  <FileText className="size-3.5 text-[#c99a2e]" />
+                  <span className="doc-chip-name">View Full Payslip Document</span>
+                </button>
+              )}
+              <button
+                className="doc-chip hover:bg-[#ede7de] transition-colors cursor-pointer"
+                onClick={() =>
+                  downloadCsv('payslips-' + run.period + '.csv', [
+                    ['Employee', 'Period', 'Basic', 'Gross', 'Deductions', 'Net'],
+                    ...run.slips.map((p: Row) => [
+                      empName(p.employeeId),
+                      p.period,
+                      p.basic,
+                      p.gross,
+                      p.deductions,
+                      p.net,
+                    ]),
+                  ])
+                }
+              >
+                <Download className="size-3.5 text-slate-500" />
+                <span className="doc-chip-name">Export Generated Payslips</span>
+              </button>
+            </DetailSection>
+          </DetailPanel>
+        );
+      }
     } else {
+      const filteredPayruns = filtered(s.payruns).filter((r) => !period || r.period === period).slice().reverse();
+      const activePayrunRecord = s.payruns.find((r) => r.id === activeId) || filteredPayruns[0];
+
+      const filteredSlips = filtered(allSlips).filter((p) => {
+        const matchesPeriod = !period || p.period === period;
+        const emp = employee(p.employeeId);
+        const matchesDept = department === 'All' || emp?.department === department;
+        return matchesPeriod && matchesDept;
+      });
+      const activeSlipRecord = allSlips.find((p) => p.id === activeId) || filteredSlips[0];
+
+      const filteredStructures = filtered(s.structures);
+      const activeStructureRecord = s.structures.find((str) => str.id === activeId) || filteredStructures[0];
+
+      const sortedRules = filtered(s.rules).sort((a, b) => a.sequence - b.sequence);
+      const activeRuleRecord = s.rules.find((r) => r.id === activeId) || sortedRules[0];
+
       centerContent = (
         <div className="workora-table-container">
           <div className="table-tab-strip">
@@ -2119,7 +2339,9 @@ export default function Home() {
           </div>
           {view === 'payruns' && (
             <DataTable
-              rows={filtered(s.payruns).filter((r) => !period || r.period === period).slice().reverse()}
+              rows={filteredPayruns}
+              onSelect={(r) => setActiveId(r.id)}
+              rowClassName={(r) => (r.id === activePayrunRecord?.id ? '!bg-amber-50/80 font-semibold border-l-4 border-[#e6a817]' : '')}
               columns={[
                 {
                   title: 'Payrun',
@@ -2145,12 +2367,9 @@ export default function Home() {
 
           {view === 'payslips' && (
             <DataTable
-              rows={filtered(allSlips).filter((p) => {
-                const matchesPeriod = !period || p.period === period;
-                const emp = employee(p.employeeId);
-                const matchesDept = department === 'All' || emp?.department === department;
-                return matchesPeriod && matchesDept;
-              })}
+              rows={filteredSlips}
+              onSelect={(p) => setActiveId(p.id)}
+              rowClassName={(p) => (p.id === activeSlipRecord?.id ? '!bg-amber-50/80 font-semibold border-l-4 border-[#e6a817]' : '')}
               columns={[
                 { title: 'Period', render: (p) => niceMonth(p.period) },
                 ...runSlipColumns.slice(0, -1),
@@ -2162,7 +2381,9 @@ export default function Home() {
 
           {view === 'structures' && (
             <DataTable
-              rows={filtered(s.structures)}
+              rows={filteredStructures}
+              onSelect={(str) => setActiveId(str.id)}
+              rowClassName={(str) => (str.id === activeStructureRecord?.id ? '!bg-amber-50/80 font-semibold border-l-4 border-[#e6a817]' : '')}
               columns={[
                 {
                   title: 'Structure name',
@@ -2195,7 +2416,9 @@ export default function Home() {
 
           {view === 'rules' && (
             <DataTable
-              rows={filtered(s.rules).sort((a, b) => a.sequence - b.sequence)}
+              rows={sortedRules}
+              onSelect={(r) => setActiveId(r.id)}
+              rowClassName={(r) => (r.id === activeRuleRecord?.id ? '!bg-amber-50/80 font-semibold border-l-4 border-[#e6a817]' : '')}
               columns={[
                 {
                   title: 'Rule name',
@@ -2236,66 +2459,156 @@ export default function Home() {
           )}
         </div>
       );
-    }
 
-    if (activeRun && currentUser.role !== 'Employee') {
-      const net = activeRun.slips.reduce((n: number, p: Row) => n + p.net, 0);
-      const gross = activeRun.slips.reduce((n: number, p: Row) => n + p.gross, 0);
-      const deduct = activeRun.slips.reduce((n: number, p: Row) => n + p.deductions, 0);
+      if (view === 'payruns' && activePayrunRecord && currentUser.role !== 'Employee') {
+        const net = activePayrunRecord.slips.reduce((n: number, p: Row) => n + p.net, 0);
+        const gross = activePayrunRecord.slips.reduce((n: number, p: Row) => n + p.gross, 0);
+        const deduct = activePayrunRecord.slips.reduce((n: number, p: Row) => n + p.deductions, 0);
 
-      rightSlot = (
-        <DetailPanel
-          avatar="PR"
-          title={activeRun.name}
-          subtitle={`Period: ${activeRun.period}`}
-          badge={activeRun.status}
-        >
-          <DetailSection title="FINANCIAL SUMMARY">
-            <DetailRow label="Net Salary" value={<b>{money(net)}</b>} />
-            <DetailRow label="Gross Salary" value={money(gross)} />
-            <DetailRow label="Total Deductions" value={money(deduct)} />
-            <DetailRow label="Staff Included" value={`${activeRun.employeeIds.length} employees`} />
-          </DetailSection>
+        rightSlot = (
+          <DetailPanel
+            avatar="PR"
+            title={activePayrunRecord.name}
+            subtitle={`Period: ${activePayrunRecord.period}`}
+            badge={activePayrunRecord.status}
+          >
+            <DetailSection title="FINANCIAL SUMMARY">
+              <DetailRow label="Net Salary Total" value={<b>{money(net)}</b>} />
+              <DetailRow label="Gross Salary Total" value={money(gross)} />
+              <DetailRow label="Total Deductions" value={money(deduct)} />
+              <DetailRow label="Staff Included" value={`${activePayrunRecord.employeeIds.length} employees`} />
+            </DetailSection>
 
-          <DetailSection title="DISBURSEMENT PROGRESS">
-            <StatBar
-              label="Payroll Completion"
-              value={activeRun.status === 'Paid' ? 100 : activeRun.status === 'Validated' ? 75 : 50}
-              displayValue={activeRun.status}
-              variant={activeRun.status === 'Paid' ? 'green' : 'gold'}
-            />
-          </DetailSection>
+            <DetailSection title="DISBURSEMENT PROGRESS">
+              <StatBar
+                label="Payroll Completion"
+                value={activePayrunRecord.status === 'Paid' ? 100 : activePayrunRecord.status === 'Validated' ? 75 : 50}
+                displayValue={activePayrunRecord.status}
+                variant={activePayrunRecord.status === 'Paid' ? 'green' : 'gold'}
+              />
+            </DetailSection>
 
-          <DetailSection title="QUICK ACTIONS">
-            <button
-              className="doc-chip hover:bg-[#ede7de] transition-colors cursor-pointer"
-              onClick={() => navigate('run', activeRun.id)}
-            >
-              <ArrowUpRight className="size-3.5 text-[#c99a2e]" />
-              <span className="doc-chip-name">Open Payrun Workflow</span>
-            </button>
-            <button
-              className="doc-chip hover:bg-[#ede7de] transition-colors cursor-pointer"
-              onClick={() =>
-                downloadCsv('payslips-' + activeRun.period + '.csv', [
-                  ['Employee', 'Period', 'Basic', 'Gross', 'Deductions', 'Net'],
-                  ...activeRun.slips.map((p: Row) => [
-                    empName(p.employeeId),
-                    p.period,
-                    p.basic,
-                    p.gross,
-                    p.deductions,
-                    p.net,
-                  ]),
-                ])
-              }
-            >
-              <Download className="size-3.5 text-slate-500" />
-              <span className="doc-chip-name">Export Generated Payslips</span>
-            </button>
-          </DetailSection>
-        </DetailPanel>
-      );
+            <DetailSection title="QUICK ACTIONS">
+              <button
+                className="doc-chip hover:bg-[#ede7de] transition-colors cursor-pointer"
+                onClick={() => navigate('run', activePayrunRecord.id)}
+              >
+                <ArrowUpRight className="size-3.5 text-[#c99a2e]" />
+                <span className="doc-chip-name">Open Payrun Workflow</span>
+              </button>
+            </DetailSection>
+          </DetailPanel>
+        );
+      } else if (view === 'payslips' && activeSlipRecord) {
+        const emp = employee(activeSlipRecord.employeeId);
+        rightSlot = (
+          <DetailPanel
+            avatar={initials(emp?.name || 'PS')}
+            title={emp?.name || 'Employee Payslip'}
+            subtitle={`Period: ${niceMonth(activeSlipRecord.period)}`}
+            badge={activeSlipRecord.status || 'Finalized'}
+          >
+            <DetailSection title="COMPENSATION BREAKDOWN">
+              <DetailRow label="Basic Salary" value={money(activeSlipRecord.basic)} />
+              <DetailRow label="Gross Salary" value={money(activeSlipRecord.gross)} />
+              <DetailRow label="Deductions" value={money(activeSlipRecord.deductions)} />
+              <DetailRow label="Net Salary" value={<b>{money(activeSlipRecord.net)}</b>} />
+            </DetailSection>
+
+            <DetailSection title="ATTENDANCE SUMMARY">
+              <DetailRow label="Worked Days" value={`${activeSlipRecord.workedDays} days`} />
+              <DetailRow label="Scheduled Days" value={`${activeSlipRecord.scheduledDays || 0} days`} />
+              <DetailRow label="Unpaid Leave" value={`${activeSlipRecord.unpaidLeaveDays || 0} days`} />
+              <DetailRow label="Payable Days" value={`${activeSlipRecord.payableDays || activeSlipRecord.workedDays} days`} />
+            </DetailSection>
+
+            <DetailSection title="QUICK ACTIONS">
+              <button
+                className="doc-chip hover:bg-[#ede7de] transition-colors cursor-pointer"
+                onClick={() => setModal({ kind: 'slip', record: activeSlipRecord })}
+              >
+                <FileText className="size-3.5 text-[#c99a2e]" />
+                <span className="doc-chip-name">View Payslip Statement</span>
+              </button>
+            </DetailSection>
+          </DetailPanel>
+        );
+      } else if (view === 'structures' && activeStructureRecord) {
+        const structureRules = s.rules.filter((r) => activeStructureRecord.ruleIds.includes(r.id));
+        const assignedEmpCount = s.contracts.filter((c) => c.structureId === activeStructureRecord.id).length;
+
+        rightSlot = (
+          <DetailPanel
+            avatar={initials(activeStructureRecord.name)}
+            title={activeStructureRecord.name}
+            subtitle="Salary Structure Blueprint"
+            badge={activeStructureRecord.active ? 'Active' : 'Inactive'}
+          >
+            <DetailSection title="STRUCTURE DETAILS">
+              <DetailRow label="Structure Name" value={activeStructureRecord.name} />
+              <DetailRow label="Configured Rules" value={`${activeStructureRecord.ruleIds.length} rules`} />
+              <DetailRow label="Active Contracts" value={`${assignedEmpCount} employees`} />
+            </DetailSection>
+
+            <DetailSection title="INCLUDED RULES">
+              {structureRules.map((rule) => (
+                <DetailRow key={rule.id} label={rule.name} value={rule.code} />
+              ))}
+            </DetailSection>
+
+            {currentUser.role !== 'HR Payroll User' && (
+              <DetailSection title="QUICK ACTIONS">
+                <button
+                  className="doc-chip hover:bg-[#ede7de] transition-colors cursor-pointer"
+                  onClick={() => openForm('structures', activeStructureRecord)}
+                >
+                  <FileText className="size-3.5 text-[#c99a2e]" />
+                  <span className="doc-chip-name">Edit Structure Rules</span>
+                </button>
+              </DetailSection>
+            )}
+          </DetailPanel>
+        );
+      } else if (view === 'rules' && activeRuleRecord) {
+        rightSlot = (
+          <DetailPanel
+            avatar={initials(activeRuleRecord.name)}
+            title={activeRuleRecord.name}
+            subtitle={`Code: ${activeRuleRecord.code}`}
+            badge={activeRuleRecord.category}
+          >
+            <DetailSection title="RULE SPECIFICATIONS">
+              <DetailRow label="Rule Name" value={activeRuleRecord.name} />
+              <DetailRow label="Code" value={activeRuleRecord.code} />
+              <DetailRow label="Category" value={activeRuleRecord.category} />
+              <DetailRow label="Sequence" value={activeRuleRecord.sequence} />
+              <DetailRow label="Calculation Method" value={activeRuleRecord.method} />
+              <DetailRow
+                label="Calculation Expression"
+                value={
+                  activeRuleRecord.method === 'Formula'
+                    ? activeRuleRecord.expression
+                    : activeRuleRecord.method === 'Percentage'
+                    ? `${activeRuleRecord.value}% × ${activeRuleRecord.base}`
+                    : money(activeRuleRecord.value)
+                }
+              />
+            </DetailSection>
+
+            {currentUser.role !== 'HR Payroll User' && (
+              <DetailSection title="QUICK ACTIONS">
+                <button
+                  className="doc-chip hover:bg-[#ede7de] transition-colors cursor-pointer"
+                  onClick={() => openForm('rules', activeRuleRecord)}
+                >
+                  <FileText className="size-3.5 text-[#c99a2e]" />
+                  <span className="doc-chip-name">Edit Rule Configuration</span>
+                </button>
+              </DetailSection>
+            )}
+          </DetailPanel>
+        );
+      }
     }
   } else if (view === 'users') {
     pageTitle = 'System Users & Administration';

@@ -92,19 +92,32 @@ export function DataTable({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {visibleRows.map((r) => (
-            <TableRow
-              key={r.id}
-              onClick={() => onSelect?.(r)}
-              className={`${onSelect ? 'cursor-pointer ' : ''}hover:bg-slate-50/80 transition-colors border-b border-slate-100/80 ${rowClassName ? rowClassName(r) : ''}`}
-            >
-              {columns.map((c, i) => (
-                <TableCell key={i} className="py-3 px-4 text-xs font-medium text-slate-700">
-                  {c.render(r)}
-                </TableCell>
-              ))}
-            </TableRow>
-          ))}
+          {visibleRows.map((r) => {
+            const extraClass = rowClassName ? rowClassName(r) : '';
+            const isClickable = !!onSelect;
+            return (
+              <TableRow
+                key={r.id}
+                onClick={() => onSelect?.(r)}
+                tabIndex={isClickable ? 0 : undefined}
+                onKeyDown={(e) => {
+                  if (isClickable && (e.key === 'Enter' || e.key === ' ')) {
+                    e.preventDefault();
+                    onSelect(r);
+                  }
+                }}
+                className={`transition-all border-b border-slate-100/80 ${
+                  isClickable ? 'cursor-pointer hover:bg-amber-50/40 active:scale-[0.999] ' : ''
+                }${extraClass}`}
+              >
+                {columns.map((c, i) => (
+                  <TableCell key={i} className="py-3 px-4 text-xs font-medium text-slate-700">
+                    {c.render(r)}
+                  </TableCell>
+                ))}
+              </TableRow>
+            );
+          })}
           {!rows.length && (
             <TableRow>
               <TableCell colSpan={columns.length} className="py-10">
