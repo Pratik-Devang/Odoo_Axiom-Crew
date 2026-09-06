@@ -75,7 +75,35 @@ export function mutate(source:Workspace,action:string,p:Record<string,any>,actor
   if(action==='markPaid'){requireThat(r!.status==='Validated','Validate payroll before marking it paid.');r!.status='Paid';r!.paidAt=new Date().toISOString();}
  }
  else if(action==='clock'){
-  const now=new Date(),dateValue=now.toLocaleDateString('en-CA',{timeZone:'Asia/Kolkata'}),timeValue=now.toLocaleTimeString('en-GB',{timeZone:'Asia/Kolkata',hour:'2-digit',minute:'2-digit'});requireThat(exists(s.employees,p.employeeId),'Employee not found.');const a=s.attendance.find(a=>a.employeeId===p.employeeId&&a.date===dateValue);if(a?.checkOut)throw new Error('Attendance for today is complete. Use Attendance to review it.');if(a?.checkIn){requireThat(timeValue>a.checkIn,'Please wait until the next minute to check out.');a.checkOut=timeValue;}else if(a){a.checkIn=timeValue;}else s.attendance.push({id:uid(),employeeId:p.employeeId,date:dateValue,checkIn:timeValue,checkOut:'',edited:false});
+  const now=new Date(),dateValue=now.toLocaleDateString('en-CA',{timeZone:'Asia/Kolkata'}),timeValue=now.toLocaleTimeString('en-GB',{timeZone:'Asia/Kolkata',hour:'2-digit',minute:'2-digit'});
+  requireThat(exists(s.employees,p.employeeId),'Employee not found.');
+  const a=s.attendance.find(a=>a.employeeId===p.employeeId&&a.date===dateValue);
+  if(a?.checkOut)throw new Error('Attendance for today is complete. Use Attendance module to review records.');
+  const sched=employeeSchedule(s,p.employeeId,dateValue);
+  const exp=scheduleRowForDate(sched,dateValue)?.start||'09:00';
+  if(a?.checkIn){
+    a.checkOut=timeValue;
+    const inM=(+a.checkIn.slice(0,2)*60 + +a.checkIn.slice(3));
+    const outM=(+timeValue.slice(0,2)*60 + +timeValue.slice(3));
+    const diff=Math.max(0,outM-inM);
+    a.workedHours=round(diff/60);
+    a.status='Completed';
+  }else if(a){
+    a.checkIn=timeValue;
+    a.workedHours=0;
+    a.status=timeValue>exp?'Late':'Present';
+  }else {
+    s.attendance.push({
+      id:uid(),
+      employeeId:p.employeeId,
+      date:dateValue,
+      checkIn:timeValue,
+      checkOut:'',
+      workedHours:0,
+      status:timeValue>exp?'Late':'Present',
+      edited:false
+    });
+  }
  }
  else throw new Error('Unknown action.');
  s.audit.unshift({id:uid(),action,at:new Date().toISOString(),actor});s.audit=s.audit.slice(0,100);return s;

@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { canView, type AppUser } from '@/lib/domain';
-import { LogOut, Shield } from 'lucide-react';
+import { LogOut, Shield, Power } from 'lucide-react';
 
 /* ─────────────────────────────────────────────────────────
    1. TYPES
@@ -194,14 +194,27 @@ export function PageShell({
 
         {/* Right Action Utility Buttons */}
         <div className="workora-top-actions items-center gap-2">
-          {(!currentUser || currentUser.employeeId || isOverview) && (
+          {onClockClick && (
             <button
-              className={`circle-btn ${isCheckedIn ? 'clock-active' : ''}`}
-              title={isCheckedIn ? 'Checked in · Live Shift' : 'Attendance check-in'}
-              aria-label="Attendance check-in"
+              className={`circle-btn relative transition-all cursor-pointer ${
+                isCheckedIn
+                  ? 'clock-active !bg-emerald-50 !border-emerald-300 !text-emerald-700 hover:!bg-emerald-100 shadow-2xs'
+                  : '!bg-rose-50/80 !border-rose-200 !text-rose-600 hover:!bg-rose-100 hover:!border-rose-300 shadow-2xs'
+              }`}
+              title={
+                isCheckedIn
+                  ? 'Active shift in progress · Click to open Attendance Widget'
+                  : 'No active session · Click to open Attendance Widget'
+              }
+              aria-label="Attendance quick widget"
               onClick={onClockClick}
             >
-              <Clock3 size={17} />
+              <Power size={15} className="stroke-[2.5]" />
+              <span
+                className={`absolute -top-0.5 -right-0.5 size-2.5 rounded-full border-2 border-white transition-colors ${
+                  isCheckedIn ? 'bg-emerald-500 ring-1 ring-emerald-400 animate-pulse' : 'bg-rose-500 ring-1 ring-rose-400'
+                }`}
+              />
             </button>
           )}
           <button

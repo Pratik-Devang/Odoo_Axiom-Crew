@@ -1,12 +1,13 @@
 'use client';
 
 import Image from 'next/image';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Plus,
   ChevronDown,
   ArrowUpRight,
   Clock3,
+  Power,
   LayoutGrid,
   List,
   Download,
@@ -32,6 +33,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Checkbox } from '@/components/ui/checkbox';
+import { AttendanceWidget } from '@/components/attendance-widget';
 import {
   type Workspace,
   type Row,
@@ -387,7 +389,7 @@ export default function Home() {
     setMounted(true);
     void checkAuth();
     void load();
-    const timer = setInterval(() => setClockNow(new Date()), 30000);
+    const timer = setInterval(() => setClockNow(new Date()), 1000);
     return () => clearInterval(timer);
   }, [checkAuth, load]);
 
@@ -432,6 +434,7 @@ export default function Home() {
     let resolvedId = id || '';
     let newQuery = '';
 
+    let targetFilterId = '';
     if (resolvedId.startsWith('dept:')) {
       const deptName = resolvedId.replace('dept:', '');
       setDepartment(deptName);
@@ -444,11 +447,14 @@ export default function Home() {
     } else if (resolvedId.startsWith('period:')) {
       setPeriod(resolvedId.replace('period:', ''));
       resolvedId = '';
+    } else if (resolvedView === 'attendance' && resolvedId) {
+      targetFilterId = resolvedId;
+      resolvedId = '';
     }
 
     setView(resolvedView);
     setActiveId(resolvedId);
-    setFilterId('');
+    setFilterId(targetFilterId);
     setQuery(newQuery);
     setModal(null);
     setError('');
@@ -575,13 +581,23 @@ export default function Home() {
   };
   const canReviewAllocation = !!currentUser && ['Admin', 'HR Manager', 'HR Payroll Manager'].includes(currentUser.role);
 
+  const clockEmployeeId = currentUser?.employeeId || s?.employees[0]?.id || '';
+  const clockEmployee = s?.employees.find((e) => e.id === clockEmployeeId);
+  const clockUserName = currentUser?.name || clockEmployee?.name || 'User';
+
   const currentClock =
-    mounted && clockNow && s
+    mounted && clockNow && s && clockEmployeeId
       ? s.attendance.find(
-          (a) => a.employeeId === currentUser?.employeeId && a.date === clockNow.toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' })
+          (a) => a.employeeId === clockEmployeeId && a.date === clockNow.toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' })
         )
       : null;
   const signedIn = !!currentClock?.checkIn && !currentClock?.checkOut;
+
+  const todayRecords = useMemo(() => {
+    if (!mounted || !clockNow || !s || !clockEmployeeId) return [];
+    const todayDate = clockNow.toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
+    return s.attendance.filter((a) => a.employeeId === clockEmployeeId && a.date === todayDate);
+  }, [mounted, clockNow, s, clockEmployeeId]);
   const allSlips = s?.payruns.flatMap((r) => r.slips.map((p: Row) => ({ ...p, runId: r.id, status: r.status }))) || [];
 
   const cellEmployee = (r: Row) => (
@@ -1177,9 +1193,26 @@ export default function Home() {
               meta={`${sched?.start || '09:00'} - ${sched?.end || '18:00'}`}
               onClick={() => navigate('schedules')}
             />
+            <DocChip
+              name="Shift Attendance Logs"
+              meta={`${att.length} shifts this month`}
+              onClick={() => related('attendance', activeEmp.id)}
+            />
           </DetailSection>
 
           <DetailSection title="STATISTICS">
+            <div
+              className="cursor-pointer group"
+              onClick={() => related('attendance', activeEmp.id)}
+              title="Click to view shift attendance records"
+            >
+              <StatBar
+                label="Shift Attendance Rate"
+                value={attRate}
+                displayValue={`${attRate}%`}
+                variant={attRate >= 80 ? 'gold' : 'dark'}
+              />
+            </div>
             <StatBar
               label="Shift Attendance Rate"
               value={attRate}
@@ -1209,6 +1242,13 @@ export default function Home() {
               >
                 <FileText className="size-3.5 text-slate-500" />
                 <span className="doc-chip-name">View Contract Terms</span>
+              </button>
+              <button
+                className="doc-chip hover:bg-[#ede7de] transition-colors cursor-pointer"
+                onClick={() => related('attendance', activeEmp.id)}
+              >
+                <Clock3 className="size-3.5 text-slate-500" />
+                <span className="doc-chip-name">Shift Attendance Records</span>
               </button>
               <button
                 className="doc-chip hover:bg-[#ede7de] transition-colors cursor-pointer"
@@ -1495,9 +1535,26 @@ export default function Home() {
 
     centerContent = (
       <div className="workora-table-container">
+        {filterId && (
+          <div className="mb-3 px-3.5 py-2.5 bg-amber-50/90 border border-amber-200/90 rounded-2xl flex items-center justify-between text-xs">
+            <span className="text-amber-900 font-medium flex items-center gap-1.5">
+              <Clock3 size={14} className="text-[#c99a2e]" />
+              Showing attendance records for <strong className="font-bold text-slate-900">{empName(filterId)}</strong>
+            </span>
+            <button
+              className="text-xs font-bold text-amber-800 hover:text-amber-950 underline cursor-pointer"
+              onClick={() => setFilterId('')}
+            >
+              ✕ Show All Employees
+            </button>
+          </div>
+        )}
         <div className="table-tab-strip flex items-center justify-between">
           <div className="flex items-center gap-6">
             <button className="table-tab-item active">Shift Records ({filteredAttendance.length})</button>
+            <button className="table-tab-item active">
+              {filterId ? `${empName(filterId)} Shifts` : 'Shift Records'} ({filteredAttendance.length})
+            </button>
           </div>
         </div>
         <DataTable
@@ -1517,12 +1574,41 @@ export default function Home() {
             },
             { title: 'Check-in', render: (a) => a.checkIn || '-' },
             { title: 'Check-out', render: (a) => a.checkOut || '-' },
-            { title: 'Worked hours', render: (a) => hours(a).toFixed(2) },
-            { title: 'Status', render: (a) => <Badge value={attendanceStatus(a)} /> },
+            { title: 'Worked hours', render: (a) => (typeof a.workedHours === 'number' && a.workedHours > 0 ? a.workedHours.toFixed(2) : hours(a).toFixed(2)) },
+            { title: 'Status', render: (a) => <Badge value={a.status || attendanceStatus(a)} /> },
             { title: 'Source', render: (a) => (a.edited ? 'Manually edited' : 'Shift entry') },
           ]}
         />
       </div>
+    );
+
+    const attendanceWidgetCard = (
+      <AttendanceWidget
+        userName={clockUserName}
+        currentClock={currentClock}
+        signedIn={signedIn}
+        clockNow={clockNow}
+        todayRecords={todayRecords}
+        onCheckIn={() => {
+          if (clockEmployeeId) {
+            void act(
+              'clock',
+              { employeeId: clockEmployeeId },
+              'Checked in successfully.'
+            );
+          }
+        }}
+        onCheckOut={() => {
+          if (clockEmployeeId) {
+            void act(
+              'clock',
+              { employeeId: clockEmployeeId },
+              'Checked out successfully.'
+            );
+          }
+        }}
+        onHeaderIconClick={() => setModal({ kind: 'clock' })}
+      />
     );
 
     if (activeEmp) {
@@ -1534,46 +1620,56 @@ export default function Home() {
       const sched = s.schedules.find((sc) => sc.id === activeEmp.scheduleId);
 
       rightSlot = (
-        <DetailPanel
-          avatar={initials(activeEmp.name)}
-          title={activeEmp.name}
-          subtitle={`Schedule: ${sched?.name || 'Standard 40h'}`}
-          badge={rate >= 80 ? 'Present' : 'Irregular'}
-        >
-          <DetailSection title="ATTENDANCE SUMMARY">
-            <DetailRow label="Recorded Days" value={`${att.length} shifts`} />
-            <DetailRow label="Completed Check-outs" value={`${complete} of ${present}`} />
-            <DetailRow label="Missing Check-outs" value={`${missing} days`} />
-            <DetailRow label="Schedule Type" value={sched?.type || 'Fixed'} />
-            <DetailRow label="Weekly Hours" value={`${scheduleWeeklyHours(sched).toFixed(1)} hours`} />
-          </DetailSection>
+        <div className="space-y-4">
+          {attendanceWidgetCard}
 
-          <DetailSection title="STATISTICS">
-            <StatBar
-              label="Monthly Present Rate"
-              value={rate}
-              displayValue={`${rate}%`}
-              variant={rate >= 80 ? 'gold' : 'dark'}
-            />
-          </DetailSection>
+          <DetailPanel
+            avatar={initials(activeEmp.name)}
+            title={activeEmp.name}
+            subtitle={`Schedule: ${sched?.name || 'Standard 40h'}`}
+            badge={rate >= 80 ? 'Present' : 'Irregular'}
+          >
+            <DetailSection title="ATTENDANCE SUMMARY">
+              <DetailRow label="Recorded Days" value={`${att.length} shifts`} />
+              <DetailRow label="Completed Check-outs" value={`${complete} of ${present}`} />
+              <DetailRow label="Missing Check-outs" value={`${missing} days`} />
+              <DetailRow label="Schedule Type" value={sched?.type || 'Fixed'} />
+              <DetailRow label="Weekly Hours" value={`${scheduleWeeklyHours(sched).toFixed(1)} hours`} />
+            </DetailSection>
 
-          <DetailSection title="QUICK ACTIONS">
-            <button
-              className="doc-chip hover:bg-[#ede7de] transition-colors cursor-pointer"
-              onClick={() => openForm('attendance', { ...defaults('attendance', s, activeEmp.id), date: todayIso })}
-            >
-              <Clock3 className="size-3.5 text-[#c99a2e]" />
-              <span className="doc-chip-name">Add Attendance Punch</span>
-            </button>
-            <button
-              className="doc-chip hover:bg-[#ede7de] transition-colors cursor-pointer"
-              onClick={() => related('requests', activeEmp.id)}
-            >
-              <CalendarDays className="size-3.5 text-slate-500" />
-              <span className="doc-chip-name">Review Leave Balance</span>
-            </button>
-          </DetailSection>
-        </DetailPanel>
+            <DetailSection title="STATISTICS">
+              <StatBar
+                label="Monthly Present Rate"
+                value={rate}
+                displayValue={`${rate}%`}
+                variant={rate >= 80 ? 'gold' : 'dark'}
+              />
+            </DetailSection>
+
+            <DetailSection title="QUICK ACTIONS">
+              <button
+                className="doc-chip hover:bg-[#ede7de] transition-colors cursor-pointer"
+                onClick={() => openForm('attendance', { ...defaults('attendance', s, activeEmp.id), date: todayIso })}
+              >
+                <Clock3 className="size-3.5 text-[#c99a2e]" />
+                <span className="doc-chip-name">Add Attendance Punch</span>
+              </button>
+              <button
+                className="doc-chip hover:bg-[#ede7de] transition-colors cursor-pointer"
+                onClick={() => related('requests', activeEmp.id)}
+              >
+                <CalendarDays className="size-3.5 text-slate-500" />
+                <span className="doc-chip-name">Review Leave Balance</span>
+              </button>
+            </DetailSection>
+          </DetailPanel>
+        </div>
+      );
+    } else {
+      rightSlot = (
+        <div className="space-y-4">
+          {attendanceWidgetCard}
+        </div>
       );
     }
   } else if (['requests', 'allocations', 'leaveTypes'].includes(view)) {
@@ -2688,6 +2784,25 @@ export default function Home() {
                       displayValue="16 days"
                       variant="green"
                     />
+                    <button
+                      type="button"
+                      className="w-full text-xs font-semibold py-2 px-3 rounded-xl border border-[#e5ded4] bg-[#faf8f5] hover:bg-[#ede7de] text-slate-700 flex items-center justify-between cursor-pointer transition-colors mt-2"
+                      onClick={() => {
+                        const targetEmpId = selectedUserDrawer.employeeId || s.employees.find(e => e.email.toLowerCase() === selectedUserDrawer.email.toLowerCase())?.id;
+                        setSelectedUserDrawer(null);
+                        if (targetEmpId) {
+                          related('attendance', targetEmpId);
+                        } else {
+                          navigate('attendance');
+                        }
+                      }}
+                    >
+                      <span className="flex items-center gap-1.5">
+                        <Clock3 size={13} className="text-[#c99a2e]" />
+                        View Employee Shift Records
+                      </span>
+                      <ChevronRight size={13} className="text-slate-400" />
+                    </button>
                   </div>
                 </details>
 
@@ -2782,35 +2897,38 @@ export default function Home() {
             }
           }}
         >
-        <DialogContent className="workora-modal">
-          <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-            <div>
-              <DialogTitle className="text-base font-bold text-slate-900">
-                {modal?.kind === 'form'
-                  ? (modal.record?.id ? 'Edit ' : 'New ') + (titles[modal.collection!] || 'Record')
-                  : modal?.kind === 'userForm'
-                  ? (userFormData.id ? 'Edit User Account' : 'New User Account')
-                  : modal?.kind === 'wizard'
-                  ? 'New Payrun Workflow'
-                  : modal?.kind === 'slip'
-                  ? 'Employee Payslip'
-                  : modal?.kind === 'clock'
-                  ? 'Attendance Check-in'
-                  : modal?.kind === 'about'
-                  ? 'About PeoplePay360'
-                  : modal?.kind === 'allocation'
-                  ? 'Leave Allocation'
-                  : 'Time Off Request'}
-              </DialogTitle>
-              <DialogDescription className="text-xs text-slate-400 mt-0.5">
-                {modal?.kind === 'about'
-                  ? 'PeoplePay360 - Crextio Design System'
-                  : modal?.kind === 'clock'
-                  ? 'Nisha Rao - Finance Manager - Live Shift'
-                  : 'Connected records. One unified workspace.'}
-              </DialogDescription>
+        <DialogContent className={modal?.kind === 'clock' ? 'max-w-md !p-6 rounded-3xl bg-white border border-[#e5ded4] shadow-2xl' : 'workora-modal'}>
+          {modal?.kind !== 'clock' ? (
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div>
+                <DialogTitle className="text-base font-bold text-slate-900">
+                  {modal?.kind === 'form'
+                    ? (modal.record?.id ? 'Edit ' : 'New ') + (titles[modal.collection!] || 'Record')
+                    : modal?.kind === 'userForm'
+                    ? (userFormData.id ? 'Edit User Account' : 'New User Account')
+                    : modal?.kind === 'wizard'
+                    ? 'New Payrun Workflow'
+                    : modal?.kind === 'slip'
+                    ? 'Employee Payslip'
+                    : modal?.kind === 'about'
+                    ? 'About PeoplePay360'
+                    : modal?.kind === 'allocation'
+                    ? 'Leave Allocation'
+                    : 'Time Off Request'}
+                </DialogTitle>
+                <DialogDescription className="text-xs text-slate-400 mt-0.5">
+                  {modal?.kind === 'about'
+                    ? 'PeoplePay360 - Crextio Design System'
+                    : 'Connected records. One unified workspace.'}
+                </DialogDescription>
+              </div>
             </div>
-          </div>
+          ) : (
+            <>
+              <DialogTitle className="sr-only">Attendance Widget</DialogTitle>
+              <DialogDescription className="sr-only">Quick Check In / Check Out Attendance Widget</DialogDescription>
+            </>
+          )}
 
           {error && <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-700 mb-3">{error}</div>}
 
@@ -3160,64 +3278,48 @@ export default function Home() {
           )}
 
           {modal?.kind === 'clock' && s && (
-            <div className="space-y-4 text-center py-2">
-              <div className="text-4xl font-extrabold tracking-tight text-slate-900">
-                {mounted && clockNow
-                  ? clockNow.toLocaleTimeString('en-IN', {
-                      timeZone: 'Asia/Kolkata',
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    })
-                  : '10:00 AM'}
-              </div>
-              <p className="text-xs text-slate-400">
-                Today -{' '}
-                {mounted && clockNow
-                  ? clockNow.toLocaleDateString('en-IN', {
-                      timeZone: 'Asia/Kolkata',
-                      day: 'numeric',
-                      month: 'long',
-                    })
-                  : '5 September'}{' '}
-                - Asia/Kolkata
-              </p>
-
-              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-between text-xs">
-                <span className="font-semibold text-slate-700">
-                  {signedIn
-                    ? 'Checked in at ' + currentClock?.checkIn
-                    : currentClock?.checkOut
-                    ? "Today's shift completed"
-                    : 'You are not checked in'}
-                </span>
-                <Badge value={signedIn ? 'Present' : currentClock?.checkOut ? 'Completed' : 'Not checked in'} />
-              </div>
-
-              <div className="flex justify-center gap-3 pt-2">
-                <button
-                  className="pill-btn cursor-pointer"
-                  onClick={() => {
-                    setModal(null);
-                    navigate('attendance');
-                  }}
-                >
-                  View Records
-                </button>
-                <button
-                  className="pill-btn pill-btn-black cursor-pointer"
-                  disabled={busy || !!currentClock?.checkOut || !currentUser.employeeId}
-                  onClick={() =>
-                    currentUser.employeeId &&
+            <div className="p-0">
+              <AttendanceWidget
+                userName={clockUserName}
+                currentClock={currentClock}
+                signedIn={signedIn}
+                clockNow={clockNow}
+                todayRecords={todayRecords}
+                busy={busy}
+                isPopup={true}
+                className="border-0 shadow-none p-1 sm:p-2"
+                onCheckIn={() => {
+                  if (clockEmployeeId) {
                     void act(
                       'clock',
-                      { employeeId: currentUser.employeeId },
-                      signedIn ? 'Checked out.' : 'Checked in.'
-                    )
+                      { employeeId: clockEmployeeId },
+                      'Checked in successfully.'
+                    );
                   }
-                >
-                  {signedIn ? 'Check out' : 'Check in'}
-                </button>
-              </div>
+                }}
+                onCheckOut={() => {
+                  if (clockEmployeeId) {
+                    void act(
+                      'clock',
+                      { employeeId: clockEmployeeId },
+                      'Checked out successfully.'
+                    );
+                  }
+                }}
+                onViewRecords={() => {
+                  setModal(null);
+                  navigate('attendance');
+                }}
+                onHeaderIconClick={() => {
+                  if (clockEmployeeId) {
+                    if (signedIn) {
+                      void act('clock', { employeeId: clockEmployeeId }, 'Checked out successfully.');
+                    } else {
+                      void act('clock', { employeeId: clockEmployeeId }, 'Checked in successfully.');
+                    }
+                  }
+                }}
+              />
             </div>
           )}
 

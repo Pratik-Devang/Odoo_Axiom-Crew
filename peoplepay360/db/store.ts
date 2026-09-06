@@ -22,6 +22,8 @@ async function ensureSchema(client: PoolClient) {
       ALTER TABLE payruns ADD COLUMN IF NOT EXISTS paid_at TIMESTAMPTZ;
 
       ALTER TABLE attendance ADD COLUMN IF NOT EXISTS overtime NUMERIC(5,2) DEFAULT 0;
+      ALTER TABLE attendance ADD COLUMN IF NOT EXISTS worked_hours NUMERIC(5,2) DEFAULT 0;
+      ALTER TABLE attendance ADD COLUMN IF NOT EXISTS status VARCHAR(50) DEFAULT 'Present';
 
       ALTER TABLE schedules ADD COLUMN IF NOT EXISTS company VARCHAR(100) NOT NULL DEFAULT 'My Company';
       ALTER TABLE schedules ADD COLUMN IF NOT EXISTS timezone VARCHAR(100) NOT NULL DEFAULT 'Company timezone';
@@ -104,6 +106,8 @@ async function readRelational(client: PoolClient, options: WorkspaceReadOptions 
     ? await client.query(
         `SELECT id, employee_id AS "employeeId", to_char(date, 'YYYY-MM-DD') AS "date",
                 COALESCE(check_in, '') AS "checkIn", COALESCE(check_out, '') AS "checkOut",
+                COALESCE(worked_hours::float, 0) AS "workedHours",
+                COALESCE(status, 'Present') AS status,
                 COALESCE(overtime::float, 0) AS overtime, edited
          FROM attendance
          WHERE date >= $1::date AND date < ($1::date + INTERVAL '1 month')
@@ -113,6 +117,8 @@ async function readRelational(client: PoolClient, options: WorkspaceReadOptions 
     : await client.query(
         `SELECT id, employee_id AS "employeeId", to_char(date, 'YYYY-MM-DD') AS "date",
                 COALESCE(check_in, '') AS "checkIn", COALESCE(check_out, '') AS "checkOut",
+                COALESCE(worked_hours::float, 0) AS "workedHours",
+                COALESCE(status, 'Present') AS status,
                 COALESCE(overtime::float, 0) AS overtime, edited
          FROM attendance ORDER BY date, employee_id`
       );
@@ -400,7 +406,7 @@ async function syncRelational(client: PoolClient, data: Workspace) {
   if (data.attendance?.length) {
     await client.query(
       `
-      INSERT INTO attendance (id, employee_id, date, check_in, check_out, overtime, edited)
+      INSERT INTO attendance (id, employee_id, date, check_in, check_out, overtime, edited, worked_hours, status)
       SELECT
         x->>'id',
         x->>'employeeId',
@@ -408,13 +414,17 @@ async function syncRelational(client: PoolClient, data: Workspace) {
         NULLIF(x->>'checkIn', ''),
         NULLIF(x->>'checkOut', ''),
         COALESCE((x->>'overtime')::numeric, 0),
-        COALESCE((x->>'edited')::boolean, false)
+        COALESCE((x->>'edited')::boolean, false),
+        COALESCE((x->>'workedHours')::numeric, 0),
+        COALESCE(NULLIF(x->>'status', ''), 'Present')
       FROM jsonb_array_elements($1::jsonb) AS x
       ON CONFLICT (id) DO UPDATE SET
         check_in = EXCLUDED.check_in,
         check_out = EXCLUDED.check_out,
         overtime = EXCLUDED.overtime,
-        edited = EXCLUDED.edited;
+        edited = EXCLUDED.edited,
+        worked_hours = EXCLUDED.worked_hours,
+        status = EXCLUDED.status;
     `,
       [JSON.stringify(data.attendance)]
     );
