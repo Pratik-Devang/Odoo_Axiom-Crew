@@ -38,34 +38,50 @@ export function monthShort(period: string): string {
 }
 
 /** Inclusive YYYY-MM-DD range for a payroll period (more reliable than startsWith alone). */
-export function attendanceInPeriod(attendance: Row[], employeeIds: Set<string>, period: string): Row[] {
+export function attendanceInPeriod(
+  attendance: Row[],
+  employeeIds: Set<string>,
+  period: string,
+): Row[] {
   const start = period + '-01';
   const end = monthEnd(period);
   return attendance.filter(
-    (a) => employeeIds.has(a.employeeId) && a.date >= start && a.date <= end
+    (a) => employeeIds.has(a.employeeId) && a.date >= start && a.date <= end,
   );
 }
 
-export function attendanceForEmployee(attendance: Row[], employeeId: string, period: string): Row[] {
+export function attendanceForEmployee(
+  attendance: Row[],
+  employeeId: string,
+  period: string,
+): Row[] {
   const start = period + '-01';
   const end = monthEnd(period);
-  return attendance.filter((a) => a.employeeId === employeeId && a.date >= start && a.date <= end);
+  return attendance.filter(
+    (a) => a.employeeId === employeeId && a.date >= start && a.date <= end,
+  );
 }
 
 /** Present-day rate for one employee; null when no attendance rows exist for the period. */
 export function getEmployeeAttendanceRate(
   attendance: Row[],
   employeeId: string,
-  period: string
+  period: string,
 ): number | null {
   const rows = attendanceForEmployee(attendance, employeeId, period);
   if (!rows.length) return null;
-  return Math.round((rows.filter((a) => Boolean(a.checkIn)).length / rows.length) * 100);
+  return Math.round(
+    (rows.filter((a) => Boolean(a.checkIn)).length / rows.length) * 100,
+  );
 }
 
 /* ─── Payroll estimates ─── */
 
-export function estimatePeriodNet(s: Workspace, employeeIds: Iterable<string>, period: string): number {
+export function estimatePeriodNet(
+  s: Workspace,
+  employeeIds: Iterable<string>,
+  period: string,
+): number {
   let total = 0;
   for (const id of employeeIds) {
     const emp = s.employees.find((e) => e.id === id);
@@ -80,11 +96,17 @@ export function estimatePeriodNet(s: Workspace, employeeIds: Iterable<string>, p
   return total;
 }
 
+type PayLookup = (
+  employeeId: string,
+  period: string,
+  slip?: Row,
+) => { net: number; gross: number; hasSlip: boolean };
+
 export function employeeNetForPeriod(
   s: Workspace,
   employeeId: string,
   period: string,
-  slip?: Row
+  slip?: Row,
 ): { net: number; gross: number; hasSlip: boolean } {
   if (slip) {
     return { net: slip.net, gross: slip.gross || slip.net, hasSlip: true };
@@ -100,26 +122,29 @@ export function employeeNetForPeriod(
 
 /* ─── Filtered employees ─── */
 
-export function filterEmployees(s: Workspace, filters: DashboardFilters): Row[] {
+export function filterEmployees(
+  s: Workspace,
+  filters: DashboardFilters,
+): Row[] {
   return s.employees.filter(
     (e) =>
       (filters.department === 'All' || e.department === filters.department) &&
-      (filters.employeeType === 'All' || e.type === filters.employeeType)
+      (filters.employeeType === 'All' || e.type === filters.employeeType),
   );
 }
 
 export function filterEmployeesWithSearch(
   s: Workspace,
   filters: DashboardFilters,
-  query: string
+  query: string,
 ): Row[] {
   const normalized = query.trim().toLowerCase();
   return filterEmployees(s, filters).filter(
     (e) =>
       !normalized ||
       [e.name, e.department, e.position, e.type].some((x) =>
-        String(x).toLowerCase().includes(normalized)
-      )
+        String(x).toLowerCase().includes(normalized),
+      ),
   );
 }
 
@@ -128,24 +153,29 @@ export function filterEmployeesWithSearch(
 export function getWorkforceHealth(
   s: Workspace,
   employeeIds: Set<string>,
-  period: string
+  period: string,
 ): WorkforceHealthMetrics {
   const attendance = attendanceInPeriod(s.attendance, employeeIds, period);
   const present = attendance.filter((a) => a.checkIn);
   const complete = present.filter((a) => a.checkOut);
   const late = present.filter((a) => {
-    const row = scheduleRowForDate(employeeSchedule(s, a.employeeId, a.date), a.date);
+    const row = scheduleRowForDate(
+      employeeSchedule(s, a.employeeId, a.date),
+      a.date,
+    );
     return a.checkIn > (row?.start || '09:00');
   }).length;
   const absent = Math.max(attendance.length - present.length, 0);
   const overtime = attendance.filter((a) => hours(a) > 9).length;
-  const healthRate = attendance.length ? Math.round((complete.length / attendance.length) * 100) : null;
+  const healthRate = attendance.length
+    ? Math.round((complete.length / attendance.length) * 100)
+    : null;
 
   const requests = s.requests.filter(
     (r) =>
       employeeIds.has(r.employeeId) &&
       r.start <= monthEnd(period) &&
-      r.end >= period + '-01'
+      r.end >= period + '-01',
   );
   const approvedTimeOffDays = requests
     .filter((r) => r.status === 'Approved')
@@ -170,20 +200,24 @@ export function getDepartmentShare(
   employees: Row[],
   slips: Row[],
   period: string,
-  departmentFilter: string
+  departmentFilter: string,
+  getPay: PayLookup = (employeeId, payPeriod, slip) =>
+    employeeNetForPeriod(s, employeeId, payPeriod, slip),
 ): { rows: DepartmentShareRow[]; totalAmount: number } {
-  const ids = new Set(employees.map((e) => e.id));
-
   const rows = departments
     .filter((d) => departmentFilter === 'All' || departmentFilter === d)
     .map((d) => {
-      const deptEmps = employees.filter((e) => e.department === d && e.status === 'Active');
+      const deptEmps = employees.filter(
+        (e) => e.department === d && e.status === 'Active',
+      );
       const deptIds = deptEmps.map((e) => e.id);
       const deptSlipsAmount = slips
         .filter((p) => deptIds.includes(p.employeeId))
         .reduce((n, p) => n + p.net, 0);
-      const deptEstimated = estimatePeriodNet(s, deptIds, period);
-      const amount = deptSlipsAmount > 0 ? deptSlipsAmount : deptEstimated;
+      const amount =
+        deptSlipsAmount > 0
+          ? deptSlipsAmount
+          : deptIds.reduce((sum, id) => sum + getPay(id, period).net, 0);
       return { name: d, count: deptEmps.length, amount };
     })
     .filter((d) => d.count > 0)
@@ -197,7 +231,9 @@ export function getNetSalaryTrend(
   s: Workspace,
   employeeIds: Set<string>,
   period: string,
-  months = 6
+  months = 6,
+  getPay: PayLookup = (employeeId, payPeriod, slip) =>
+    employeeNetForPeriod(s, employeeId, payPeriod, slip),
 ): TrendPoint[] {
   return Array.from({ length: months }, (_, i) => {
     const date = new Date(period + '-01T00:00:00Z');
@@ -209,13 +245,21 @@ export function getNetSalaryTrend(
       .flatMap((r) => r.slips)
       .filter((slip: Row) => employeeIds.has(slip.employeeId));
 
-    const realNet = periodSlips.reduce((n: number, slip: Row) => n + slip.net, 0);
-    const estimatedForPeriod = estimatePeriodNet(s, employeeIds, p);
+    const realNet = periodSlips.reduce(
+      (n: number, slip: Row) => n + slip.net,
+      0,
+    );
+    // Contract evaluation is the expensive path. Avoid doing it when actual
+    // payslips already provide the value for this period.
+    const value =
+      realNet > 0
+        ? realNet
+        : [...employeeIds].reduce((sum, id) => sum + getPay(id, p).net, 0);
 
     return {
       period: p,
       label: monthShort(p),
-      value: realNet > 0 ? realNet : estimatedForPeriod,
+      value,
       isProjected: realNet === 0,
     };
   });
@@ -226,12 +270,14 @@ export function getTopNetPay(
   activeEmployees: Row[],
   slips: Row[],
   period: string,
-  limit = 5
+  limit = 5,
+  getPay: PayLookup = (employeeId, payPeriod, slip) =>
+    employeeNetForPeriod(s, employeeId, payPeriod, slip),
 ): { earners: TopEarnerRow[]; maxNet: number } {
   const earners = activeEmployees
     .map((e) => {
       const slip = slips.find((p) => p.employeeId === e.id);
-      const { net, hasSlip } = employeeNetForPeriod(s, e.id, period, slip);
+      const { net, hasSlip } = getPay(e.id, period, slip);
       return { id: e.id, name: e.name, department: e.department, net, hasSlip };
     })
     .sort((a, b) => b.net - a.net)
@@ -250,7 +296,7 @@ export function getTimelineMonths(s: Workspace, period: string): string[] {
 export function getEmployeeRosterRows(
   s: Workspace,
   filters: DashboardFilters,
-  query: string
+  query: string,
 ): EmployeeRosterRow[] {
   return filterEmployeesWithSearch(s, filters, query).map((e) => ({
     id: e.id,
@@ -258,12 +304,19 @@ export function getEmployeeRosterRows(
     department: e.department,
     type: e.type,
     status: e.status,
-    attendanceRate: getEmployeeAttendanceRate(s.attendance, e.id, filters.period),
+    attendanceRate: getEmployeeAttendanceRate(
+      s.attendance,
+      e.id,
+      filters.period,
+    ),
   }));
 }
 
 /** Full dashboard snapshot — pure function, no React. */
-export function buildDashboardSnapshot(s: Workspace, filters: DashboardFilters): DashboardSnapshot {
+export function buildDashboardSnapshot(
+  s: Workspace,
+  filters: DashboardFilters,
+): DashboardSnapshot {
   const departments = [...new Set(s.employees.map((e) => e.department))];
   const employees = filterEmployees(s, filters);
   const activeEmployees = employees.filter((e) => e.status === 'Active');
@@ -274,41 +327,81 @@ export function buildDashboardSnapshot(s: Workspace, filters: DashboardFilters):
   const slips = selectedRuns
     .flatMap((r) => r.slips.map((p: Row) => ({ ...p, runStatus: r.status })))
     .filter((p) => filteredEmployeeIds.has(p.employeeId));
+  const payCache = new Map<string, ReturnType<typeof employeeNetForPeriod>>();
+  const getPay: PayLookup = (employeeId, payPeriod, slip) => {
+    if (slip) return employeeNetForPeriod(s, employeeId, payPeriod, slip);
+    const key = `${payPeriod}:${employeeId}`;
+    const cached = payCache.get(key);
+    if (cached) return cached;
+    const pay = employeeNetForPeriod(s, employeeId, payPeriod);
+    payCache.set(key, pay);
+    return pay;
+  };
 
   const hasActualPayroll = slips.length > 0;
-  const estimatedNet = estimatePeriodNet(s, filteredEmployeeIds, filters.period);
-  const totalNet = hasActualPayroll ? slips.reduce((n, p) => n + p.net, 0) : estimatedNet;
+  const estimatedNet = hasActualPayroll
+    ? 0
+    : [...filteredEmployeeIds].reduce(
+        (sum, id) => sum + getPay(id, filters.period).net,
+        0,
+      );
+  const totalNet = hasActualPayroll
+    ? slips.reduce((n, p) => n + p.net, 0)
+    : estimatedNet;
   const totalGross = hasActualPayroll
     ? slips.reduce((n, p) => n + (p.gross || 0), 0)
-    : activeEmployees.reduce((n, e) => n + employeeNetForPeriod(s, e.id, filters.period).gross, 0);
+    : activeEmployees.reduce(
+        (n, e) => n + getPay(e.id, filters.period).gross,
+        0,
+      );
   const totalDeductions = hasActualPayroll
     ? slips.reduce((n, p) => n + (p.deductions || 0), 0)
     : Math.max(0, totalGross - totalNet);
   const avgNet = activeEmployees.length ? totalNet / activeEmployees.length : 0;
   const paidSlips = slips.filter((p) => p.runStatus === 'Paid').length;
 
-  const workforceHealth = getWorkforceHealth(s, filteredEmployeeIds, filters.period);
-  const trend = getNetSalaryTrend(s, filteredEmployeeIds, filters.period);
+  const workforceHealth = getWorkforceHealth(
+    s,
+    filteredEmployeeIds,
+    filters.period,
+  );
+  const trend = getNetSalaryTrend(
+    s,
+    filteredEmployeeIds,
+    filters.period,
+    6,
+    getPay,
+  );
   const prevMonthNet = trend[trend.length - 2]?.value || totalNet;
-  const deltaPct = prevMonthNet > 0 ? ((totalNet - prevMonthNet) / prevMonthNet) * 100 : 0;
+  const deltaPct =
+    prevMonthNet > 0 ? ((totalNet - prevMonthNet) / prevMonthNet) * 100 : 0;
   const deltaLabel = hasActualPayroll
     ? prevMonthNet > 0
       ? `${deltaPct >= 0 ? '+' : ''}${deltaPct.toFixed(1)}% vs prev month`
       : 'First payrun'
     : 'Not yet run for this period';
 
-  const { rows: departmentShare, totalAmount: totalDepartmentAmount } = getDepartmentShare(
-    s,
-    departments,
-    employees,
-    slips,
-    filters.period,
-    filters.department
-  );
+  const { rows: departmentShare, totalAmount: totalDepartmentAmount } =
+    getDepartmentShare(
+      s,
+      departments,
+      employees,
+      slips,
+      filters.period,
+      filters.department,
+      getPay,
+    );
 
   const timelineMonths = getTimelineMonths(s, filters.period);
   const timelineIndex = Math.max(0, timelineMonths.indexOf(filters.period));
-  const { earners: topEarners, maxNet: maxEarnerNet } = getTopNetPay(s, activeEmployees, slips, filters.period);
+  const { earners: topEarners, maxNet: maxEarnerNet } = getTopNetPay(
+    s,
+    activeEmployees,
+    slips,
+    filters.period,
+    5,
+    getPay,
+  );
 
   return {
     departments,
