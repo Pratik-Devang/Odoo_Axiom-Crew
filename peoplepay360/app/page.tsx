@@ -2330,17 +2330,25 @@ export default function Home() {
           <div
             key={u.id}
             onClick={() => setSelectedUserDrawer(u)}
-            className="workora-card hover:border-slate-400 hover:shadow-md transition-all cursor-pointer p-4 space-y-3 bg-white rounded-2xl border border-[#e5ded4]"
+            className={`workora-card hover:border-slate-400 hover:shadow-md transition-all cursor-pointer p-4 space-y-3 rounded-2xl border ${
+              !u.active
+                ? 'bg-slate-50/80 border-slate-200 opacity-60 grayscale-[35%]'
+                : 'bg-white border-[#e5ded4]'
+            }`}
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <Avatar name={u.name} />
                 <div>
-                  <h3 className="font-bold text-slate-900 text-sm">{u.name}</h3>
+                  <h3 className={`font-bold text-sm ${!u.active ? 'text-slate-500' : 'text-slate-900'}`}>{u.name}</h3>
                   <p className="text-xs text-slate-500">{u.email}</p>
                 </div>
               </div>
-              <span className={`text-[10px] px-2 py-0.5 rounded-full border font-bold ${ROLE_STYLES[u.roleName || ''] || 'bg-slate-100 text-slate-700'}`}>
+              <span className={`text-[10px] px-2 py-0.5 rounded-full border font-bold ${
+                !u.active
+                  ? 'bg-slate-100 text-slate-500 border-slate-200'
+                  : (ROLE_STYLES[u.roleName || ''] || 'bg-slate-100 text-slate-700')
+              }`}>
                 {u.roleName || u.roleId}
               </span>
             </div>
@@ -2348,20 +2356,20 @@ export default function Home() {
             <div className="grid grid-cols-2 gap-2 text-xs pt-2 border-t border-slate-100">
               <div>
                 <span className="text-[10px] text-slate-400 block uppercase">Department</span>
-                <span className="font-semibold text-slate-800">{u.department || 'Engineering'}</span>
+                <span className={`font-semibold ${!u.active ? 'text-slate-500' : 'text-slate-800'}`}>{u.department || 'Engineering'}</span>
               </div>
               <div>
                 <span className="text-[10px] text-slate-400 block uppercase">Position</span>
-                <span className="font-semibold text-slate-800">{u.position || 'Team Member'}</span>
+                <span className={`font-semibold ${!u.active ? 'text-slate-500' : 'text-slate-800'}`}>{u.position || 'Team Member'}</span>
               </div>
             </div>
 
             <div className="flex items-center justify-between pt-1">
               <span className={`inline-flex items-center gap-1.5 text-[11px] font-semibold ${u.active ? 'text-emerald-700' : 'text-slate-400'}`}>
-                <span className={`w-1.5 h-1.5 rounded-full ${u.active ? 'bg-emerald-500' : 'bg-slate-300'}`} />
-                {u.active ? 'Active Account' : 'Deactivated'}
+                <span className={`w-1.5 h-1.5 rounded-full ${u.active ? 'bg-emerald-500' : 'bg-slate-400'}`} />
+                {u.active ? 'Active Account' : 'Inactive'}
               </span>
-              <span className="text-xs text-[#c99a2e] font-semibold hover:underline">Inspect →</span>
+              <span className={`text-xs font-semibold hover:underline ${!u.active ? 'text-slate-400' : 'text-[#c99a2e]'}`}>Inspect →</span>
             </div>
           </div>
         ))}
@@ -2370,6 +2378,7 @@ export default function Home() {
       <DataTable
         rows={filteredUsers}
         onSelect={(u) => setSelectedUserDrawer(u)}
+        rowClassName={(u) => (!u.active ? 'opacity-60 bg-slate-50/70 grayscale-[30%]' : '')}
         columns={[
           {
             title: 'Account User',
@@ -2377,7 +2386,7 @@ export default function Home() {
               <div className="flex items-center gap-2.5">
                 <Avatar name={u.name} />
                 <div>
-                  <span className="font-semibold text-slate-900 block">{u.name}</span>
+                  <span className={`font-semibold block ${!u.active ? 'text-slate-500' : 'text-slate-900'}`}>{u.name}</span>
                   <span className="text-[11px] text-slate-400">{u.email}</span>
                 </div>
               </div>
@@ -2386,28 +2395,40 @@ export default function Home() {
           {
             title: 'System Role',
             render: (u) => (
-              <span className={`px-2 py-0.5 rounded text-[11px] font-bold border ${ROLE_STYLES[u.roleName || ''] || 'bg-slate-100 text-slate-700'}`}>
+              <span className={`px-2 py-0.5 rounded text-[11px] font-bold border ${
+                !u.active
+                  ? 'bg-slate-100 text-slate-500 border-slate-200'
+                  : (ROLE_STYLES[u.roleName || ''] || 'bg-slate-100 text-slate-700')
+              }`}>
                 {u.roleName || u.roleId}
               </span>
             ),
           },
           {
             title: 'Department',
-            render: (u) => u.department || 'Engineering',
+            render: (u) => (
+              <span className={!u.active ? 'text-slate-400' : 'text-slate-700'}>
+                {u.department || 'Engineering'}
+              </span>
+            ),
           },
           {
             title: 'Position',
-            render: (u) => u.position || 'Team Member',
+            render: (u) => (
+              <span className={!u.active ? 'text-slate-400' : 'text-slate-700'}>
+                {u.position || 'Team Member'}
+              </span>
+            ),
           },
           {
             title: 'Status',
             render: (u) => <Badge value={u.active ? 'Active' : 'Inactive'} />,
           },
           {
-            title: 'Actions',
+            title: 'Actions', 
             render: (u) => (
               <button
-                className="text-xs font-semibold text-[#c99a2e] hover:underline cursor-pointer"
+                className={`text-xs font-semibold hover:underline cursor-pointer ${!u.active ? 'text-slate-400' : 'text-[#c99a2e]'}`}
                 onClick={(e) => {
                   e.stopPropagation();
                   setSelectedUserDrawer(u);
@@ -2530,11 +2551,11 @@ export default function Home() {
                   <XCircle size={20} />
                 </button>
 
-                <div className="w-20 h-20 rounded-full bg-[#1a1a1a] text-white text-2xl font-bold flex items-center justify-center border-4 border-[#f7f4ee] shadow-sm mx-auto mb-2.5">
+                <div className={`w-20 h-20 rounded-full ${selectedUserDrawer.active ? 'bg-[#1a1a1a]' : 'bg-slate-500'} text-white text-2xl font-bold flex items-center justify-center border-4 border-[#f7f4ee] shadow-sm mx-auto mb-2.5`}>
                   {initials(selectedUserDrawer.name)}
                 </div>
 
-                <h2 className="text-lg font-bold text-slate-900 tracking-tight">
+                <h2 className={`text-lg font-bold tracking-tight ${selectedUserDrawer.active ? 'text-slate-900' : 'text-slate-500'}`}>
                   {selectedUserDrawer.name}
                 </h2>
 
@@ -2546,10 +2567,10 @@ export default function Home() {
                   <span className={`inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-semibold border ${
                     selectedUserDrawer.active 
                       ? 'bg-[#f0fdf4] text-emerald-700 border-emerald-200' 
-                      : 'bg-slate-100 text-slate-600 border-slate-200'
+                      : 'bg-slate-100 text-slate-500 border-slate-200'
                   }`}>
                     <span className={`w-1.5 h-1.5 rounded-full ${selectedUserDrawer.active ? 'bg-emerald-500' : 'bg-slate-400'}`} />
-                    {selectedUserDrawer.active ? 'Active' : 'Deactivated'}
+                    {selectedUserDrawer.active ? 'Active' : 'Inactive'}
                   </span>
                 </div>
               </div>

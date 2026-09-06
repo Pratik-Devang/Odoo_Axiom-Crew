@@ -63,11 +63,13 @@ export function DataTable({
   rows,
   empty = 'No records match your filters.',
   onSelect,
+  rowClassName,
 }: {
   columns: { title: string; render: (row: Row) => ReactNode }[];
   rows: Row[];
   empty?: string;
   onSelect?: (row: Row) => void;
+  rowClassName?: (row: Row) => string;
 }) {
   const pageSize = 100;
   const [page, setPage] = useState(0);
@@ -94,7 +96,7 @@ export function DataTable({
             <TableRow
               key={r.id}
               onClick={() => onSelect?.(r)}
-              className={`${onSelect ? 'cursor-pointer ' : ''}hover:bg-slate-50/80 transition-colors border-b border-slate-100/80`}
+              className={`${onSelect ? 'cursor-pointer ' : ''}hover:bg-slate-50/80 transition-colors border-b border-slate-100/80 ${rowClassName ? rowClassName(r) : ''}`}
             >
               {columns.map((c, i) => (
                 <TableCell key={i} className="py-3 px-4 text-xs font-medium text-slate-700">
