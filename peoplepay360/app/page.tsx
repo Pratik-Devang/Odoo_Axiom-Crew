@@ -518,11 +518,11 @@ export default function Home() {
 
   const deleteRecord = async () => {
     if (!modal?.collection || !modal.record?.id) return;
-    const archived = modal.collection === 'employees';
+    const inactive = modal.collection === 'employees';
     const result = await act(
       'delete',
       { collection: modal.collection, id: modal.record.id },
-      archived ? 'Employee archived.' : 'Record deleted.'
+      inactive ? 'Employee inactive.' : 'Record deleted.'
     );
     if (result) setModal(null);
   };
@@ -2133,7 +2133,7 @@ export default function Home() {
                         .map((c) => c.employeeId)
                     ).size,
                 },
-                { title: 'Status', render: (r) => <Badge value={r.active ? 'Active' : 'Archived'} /> },
+                { title: 'Status', render: (r) => <Badge value={r.active ? 'Active' : 'Inactive'} /> },
               ]}
             />
           )}
@@ -2401,7 +2401,7 @@ export default function Home() {
           },
           {
             title: 'Status',
-            render: (u) => <Badge value={u.active ? 'Active' : 'Archived'} />,
+            render: (u) => <Badge value={u.active ? 'Active' : 'Inactive'} />,
           },
           {
             title: 'Actions',
