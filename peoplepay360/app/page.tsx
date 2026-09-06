@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { AuthBrandedPanel } from '@/components/auth/AuthBrandedPanel';
 import {
   Plus,
   ChevronDown,
@@ -674,8 +675,6 @@ export default function Home() {
     }
   };
 
-  const departments = s ? [...new Set(s.employees.map((e) => e.department))] : [];
-
   /* ---------------------------------------------------------
      LOGIN SCREEN (Crextio Design System)
      --------------------------------------------------------- */
@@ -801,10 +800,7 @@ export default function Home() {
 
             <div className="mt-8 pt-6 border-t border-[#f0ece5] text-center">
               <p className="text-xs text-slate-500">
-                Don&apos;t have an account?{' '}
-                <Link href="/signup" className="font-semibold text-[#c99a2e] hover:underline">
-                  Sign Up
-                </Link>
+                Need account access? Contact your system Administrator.
               </p>
             </div>
           </div>
