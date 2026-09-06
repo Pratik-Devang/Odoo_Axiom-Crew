@@ -3259,10 +3259,6 @@ export default function Home() {
                   );
                 }
               }}
-              onViewRecords={() => {
-                setModal(null);
-                navigate('attendance');
-              }}
             />
           )}
 

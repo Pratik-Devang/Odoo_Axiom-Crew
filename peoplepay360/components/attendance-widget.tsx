@@ -12,7 +12,6 @@ export interface AttendanceWidgetProps {
   todayRecords?: Row[];
   onCheckIn: () => Promise<void> | void;
   onCheckOut: () => Promise<void> | void;
-  onViewRecords?: () => void;
   busy?: boolean;
   className?: string;
 }
@@ -80,7 +79,6 @@ export function AttendanceWidget({
   todayRecords = [],
   onCheckIn,
   onCheckOut,
-  onViewRecords,
   busy = false,
   className = '',
 }: AttendanceWidgetProps) {
@@ -123,33 +121,43 @@ export function AttendanceWidget({
 
   return (
     <div className={`space-y-4 select-none ${className}`}>
-      {/* Header */}
-      <div className="flex items-center justify-between pb-3 border-b border-[#e5ded4]">
+      {/* Header with status dot */}
+      <div className="flex items-center justify-between pb-3 border-b border-[#e5ded4]/80 pr-7">
         <h3 className="text-sm font-bold text-slate-900 tracking-tight">Attendance</h3>
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center">
           <span
-            className={`size-2 rounded-full transition-colors ${
-              signedIn ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500'
+            className={`size-2.5 rounded-full transition-all ${
+              signedIn
+                ? 'bg-emerald-500 ring-4 ring-emerald-100 animate-pulse'
+                : 'bg-rose-500 ring-4 ring-rose-100'
             }`}
+            title={signedIn ? 'Active shift in progress' : 'Not checked in'}
           />
-          <span
-            className={`text-xs font-semibold ${
-              signedIn ? 'text-emerald-700' : isCompleted ? 'text-slate-600' : 'text-slate-400'
-            }`}
-          >
-            {signedIn ? 'Checked In' : isCompleted ? 'Shift Ended' : 'Off Shift'}
-          </span>
         </div>
       </div>
 
-      {/* Greeting */}
-      <div>
-        <p className="text-xs text-slate-500 font-medium">Welcome back,</p>
-        <h4 className="text-lg font-bold text-slate-900 tracking-tight">{userName}</h4>
+      {/* Greeting & Live Time Clock */}
+      <div className="flex items-end justify-between pt-0.5">
+        <div>
+          <p className="text-xs text-slate-400 font-medium">Welcome back,</p>
+          <h4 className="text-xl font-bold text-slate-900 tracking-tight">{userName}</h4>
+        </div>
+        {clockNow && (
+          <div className="text-right">
+            <span className="font-mono text-[11px] font-semibold text-slate-600 bg-[#faf8f5] px-2 py-0.5 rounded-md border border-[#e5ded4]">
+              {clockNow.toLocaleTimeString('en-IN', {
+                timeZone: 'Asia/Kolkata',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+              })}
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Time Card */}
-      <div className="rounded-xl border border-[#e5ded4] bg-[#faf8f5] p-3.5 space-y-2.5">
+      <div className="rounded-xl border border-[#e5ded4] bg-[#faf8f5] p-3.5 space-y-2.5 transition-all hover:border-[#d9cdbf]">
         <div className="flex items-center justify-between text-xs">
           <span className="text-slate-600 font-medium">
             {signedIn
@@ -158,29 +166,29 @@ export function AttendanceWidget({
               ? `${checkInFormatted} — ${checkOutFormatted}`
               : 'Shift Duration'}
           </span>
-          <span className="font-mono text-xs font-bold text-slate-900 bg-white px-2 py-0.5 rounded border border-[#e5ded4]">
+          <span className="font-mono text-xs font-bold text-slate-900 bg-white px-2.5 py-0.5 rounded-lg border border-[#e5ded4] shadow-2xs">
             {elapsedFormatted}
           </span>
         </div>
         <div className="border-t border-[#e5ded4]/70" />
         <div className="flex items-center justify-between text-xs">
           <span className="text-slate-600 font-medium">Today</span>
-          <span className="font-mono text-xs font-bold text-slate-900 bg-white px-2 py-0.5 rounded border border-[#e5ded4]">
+          <span className="font-mono text-xs font-bold text-slate-900 bg-white px-2.5 py-0.5 rounded-lg border border-[#e5ded4] shadow-2xs">
             {todayTotalFormatted}
           </span>
         </div>
       </div>
 
       {/* CTA Button */}
-      <div>
+      <div className="pt-0.5">
         {signedIn ? (
           <button
             type="button"
             disabled={busy}
             onClick={() => void onCheckOut()}
-            className="w-full py-2.5 px-4 rounded-xl text-xs font-semibold bg-slate-900 hover:bg-black text-white transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+            className="w-full py-3 px-4 rounded-xl text-sm font-semibold bg-slate-900 hover:bg-black active:scale-[0.98] text-white transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 shadow-xs hover:shadow-sm"
           >
-            <Power size={14} />
+            <Power size={15} />
             Check Out
           </button>
         ) : (
@@ -188,24 +196,13 @@ export function AttendanceWidget({
             type="button"
             disabled={busy}
             onClick={() => void onCheckIn()}
-            className="w-full py-2.5 px-4 rounded-xl text-xs font-bold bg-[#e6a817] hover:bg-[#d49910] text-slate-950 transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 shadow-2xs"
+            className="w-full py-3 px-4 rounded-xl text-sm font-bold bg-[#e6a817] hover:bg-[#d49910] active:scale-[0.98] text-slate-950 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 shadow-xs hover:shadow-sm"
           >
-            <Power size={14} />
+            <Power size={15} />
             Check In
           </button>
         )}
       </div>
-
-      {/* View Records Link */}
-      {onViewRecords && (
-        <button
-          type="button"
-          onClick={onViewRecords}
-          className="w-full text-center text-xs font-medium text-slate-400 hover:text-slate-800 transition-colors pt-0.5 cursor-pointer"
-        >
-          View attendance records →
-        </button>
-      )}
     </div>
   );
 }

@@ -20,6 +20,8 @@ async function ensureSchema(client: PoolClient) {
       ALTER TABLE leave_allocations ADD COLUMN IF NOT EXISTS approver VARCHAR(255) DEFAULT '';
 
       ALTER TABLE payruns ADD COLUMN IF NOT EXISTS paid_at TIMESTAMPTZ;
+      ALTER TABLE payrun_employees ADD COLUMN IF NOT EXISTS period VARCHAR(10);
+      UPDATE payrun_employees pe SET period = p.period FROM payruns p WHERE pe.payrun_id = p.id AND (pe.period IS NULL OR pe.period = '');
 
       ALTER TABLE attendance ADD COLUMN IF NOT EXISTS overtime NUMERIC(5,2) DEFAULT 0;
       ALTER TABLE attendance ADD COLUMN IF NOT EXISTS worked_hours NUMERIC(5,2) DEFAULT 0;
