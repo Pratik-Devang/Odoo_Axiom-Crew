@@ -1,13 +1,8 @@
 'use client';
 
 import Image from 'next/image';
-<<<<<<< HEAD
 import Link from 'next/link';
-import { useCallback, useEffect, useState } from 'react';
-import { AuthBrandedPanel } from '@/components/auth/AuthBrandedPanel';
-=======
 import { useCallback, useEffect, useMemo, useState } from 'react';
->>>>>>> 3f342e940546d8bcc43507f326bc198f6fe96171
 import {
   Plus,
   ChevronDown,
@@ -655,8 +650,6 @@ export default function Home() {
     ]);
   };
 
-<<<<<<< HEAD
-=======
   const exportPdfReport = async () => {
     if (!s) return;
     try {
@@ -682,7 +675,6 @@ export default function Home() {
   };
 
   const departments = s ? [...new Set(s.employees.map((e) => e.department))] : [];
->>>>>>> 3f342e940546d8bcc43507f326bc198f6fe96171
 
   /* ---------------------------------------------------------
      LOGIN SCREEN (Crextio Design System)
@@ -702,7 +694,17 @@ export default function Home() {
       <div className="min-h-screen bg-[#fcfbf9] flex items-center justify-center p-4 sm:p-6 lg:p-8">
         <div className="w-full max-w-6xl min-h-[640px] bg-white rounded-3xl border border-[#e5ded4] shadow-xl overflow-hidden flex flex-col md:flex-row">
           {/* Left Column: Corporate Branding Panel */}
-          <AuthBrandedPanel tagline="Manage your workforce, effortlessly" />
+          <div className="hidden md:flex md:w-1/2 lg:w-7/12 bg-[#1a1a1a] flex-col justify-between p-10 relative overflow-hidden">
+            <div className="relative z-10">
+              <div className="flex items-center gap-2.5 mb-10">
+                <Image src="/favicon.png" alt="PeoplePay360" width={36} height={36} className="rounded-xl border border-white/10" />
+                <span className="text-white font-extrabold text-lg tracking-tight">peoplepay<span className="text-[#e6a817]">360</span></span>
+              </div>
+              <h2 className="text-3xl font-black text-white leading-tight mb-3">Manage your workforce,<br />effortlessly.</h2>
+              <p className="text-sm text-slate-400 leading-relaxed max-w-xs">End-to-end HR &amp; Payroll — attendance, time-off, contracts, and payslips in one place.</p>
+            </div>
+            <p className="relative z-10 text-xs text-slate-600">© {new Date().getFullYear()} PeoplePay360 · Confidential</p>
+          </div>
 
           {/* Right Column: Sign In Form Panel */}
           <div className="w-full md:w-1/2 lg:w-5/12 p-8 sm:p-12 flex flex-col justify-center bg-white">
