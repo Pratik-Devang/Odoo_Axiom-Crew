@@ -691,6 +691,8 @@ export default function Home() {
     ]);
   };
 
+  const departments = s ? [...new Set(s.employees.map((e) => e.department))] : [];
+
   /* ---------------------------------------------------------
      LOGIN SCREEN (Crextio Design System)
      --------------------------------------------------------- */
