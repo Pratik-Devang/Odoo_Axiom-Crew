@@ -1,0 +1,11 @@
+# Root .gitignore
+.tmp/
+/.tmp/
+*.exe
+*.tsbuildinfo
+.env*
+node_modules/
+dist/
+.wrangler/
+.vinext/
+.vite/
